@@ -9,7 +9,7 @@
  *   search    — one frame per recorded step event
  *   backtrack — one frame per edit op, the madder path drawing itself
  */
-import type { EditScript, Point, Snake } from '@/lib/diff/types'
+import type { EditScript, Point, Region, Snake } from '@/lib/diff/types'
 import type { Direction, SearchTrace, TraceEvent } from '@/lib/diff/trace'
 import { pathOf } from '@/lib/diff/backtrack'
 
@@ -25,6 +25,8 @@ export type Step = {
   readonly direction: Direction
   /** Set on the step where the two frontiers met. Drawn in madder. §6.6 */
   readonly middleSnake: Snake | null
+  /** Sub-rectangle currently being searched, in linear-space mode. §6.6 */
+  readonly region: Region | null
 }
 
 export type Stamp = {
@@ -40,6 +42,11 @@ export type Timeline = {
   readonly levelStarts: readonly number[]
   /** Indices of steps that discovered a snake, for "jump to next snake". */
   readonly snakeSteps: readonly number[]
+  /**
+   * Middle snakes and the step that found each, so the recursion view costs
+   * O(answer) per frame rather than rescanning the whole search. §6.6
+   */
+  readonly middleSnakes: readonly { readonly at: number; readonly snake: Snake }[]
   /** Full path of the recovered script, drawn progressively during backtrack. */
   readonly path: readonly Point[]
   readonly searchFrames: number
@@ -56,13 +63,20 @@ export function buildTimeline(trace: SearchTrace, script: EditScript): Timeline 
   const stamps: Stamp[] = []
   const levelStarts: number[] = []
   const snakeSteps: number[] = []
+  const middleSnakes: { at: number; snake: Snake }[] = []
   // A middle snake is announced just before the step that found it, so it is
   // attached to the step the viewer is looking at when the frontiers meet.
   let pendingMiddle: Snake | null = null
+  // Every step after a `recurse` belongs to that sub-rectangle, until the next.
+  let region: Region | null = null
 
   for (const event of trace.events) {
     if (event.type === 'middleSnake') {
       pendingMiddle = event.snake
+      continue
+    }
+    if (event.type === 'recurse') {
+      region = event.region
       continue
     }
     if (!isStep(event)) continue
@@ -84,7 +98,9 @@ export function buildTimeline(trace: SearchTrace, script: EditScript): Timeline 
       snake,
       direction: event.direction,
       middleSnake: pendingMiddle,
+      region,
     })
+    if (pendingMiddle !== null) middleSnakes.push({ at: steps.length - 1, snake: pendingMiddle })
     pendingMiddle = null
     stamps.push({
       snakes: snake === null ? [] : [snake],
@@ -98,6 +114,7 @@ export function buildTimeline(trace: SearchTrace, script: EditScript): Timeline 
     stamps,
     levelStarts,
     snakeSteps,
+    middleSnakes,
     path,
     searchFrames: steps.length,
     // The backtrack phase draws the path one op at a time, back to front.
@@ -151,13 +168,33 @@ export class FrontierCursor {
   }
 }
 
-/** The most recent middle snake at this frame, or null before the first. */
+/** The middle snake just found, if the current frame is the one that found it. */
 export function middleSnakeAt(timeline: Timeline, frame: number): Snake | null {
-  for (let i = Math.min(frame, timeline.searchFrames) - 1; i >= 0; i--) {
-    const found = timeline.steps[i].middleSnake
-    if (found !== null) return found
+  const index = Math.min(frame, timeline.searchFrames) - 1
+  if (index < 0) return null
+  return timeline.steps[index].middleSnake
+}
+
+/**
+ * Every middle snake found so far. Watching these accumulate *is* the
+ * recursion view: each one is a settled piece of the answer, and the path is
+ * assembled from them rather than searched for in one pass. §6.6
+ */
+export function settledSnakesAt(timeline: Timeline, frame: number): Snake[] {
+  const upTo = Math.min(frame, timeline.searchFrames)
+  const found: Snake[] = []
+  for (const entry of timeline.middleSnakes) {
+    if (entry.at >= upTo) break // recorded in step order, so the rest are later
+    found.push(entry.snake)
   }
-  return null
+  return found
+}
+
+/** The sub-rectangle being searched at this frame. Null outside linear space. */
+export function regionAt(timeline: Timeline, frame: number): Region | null {
+  const index = Math.min(frame, timeline.searchFrames) - 1
+  if (index < 0) return null
+  return timeline.steps[index].region
 }
 
 /** Which d is on screen at this frame. */

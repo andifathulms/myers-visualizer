@@ -90,6 +90,8 @@ describe('lattice frame cost', () => {
       backwardFrontier: null,
       path: null,
       middleSnake: null,
+      settledSnakes: [],
+      region: null,
       highlightK: null,
     })
     const cost = target.ops - before
@@ -106,6 +108,8 @@ describe('lattice frame cost', () => {
       backwardFrontier: null,
       path: null,
       middleSnake: null,
+      settledSnakes: [],
+      region: null,
       highlightK: null,
     })
     expect(target.drawImage).toBe(2)

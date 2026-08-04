@@ -21,6 +21,11 @@ type Props = {
   padding?: number
   onHoverPoint?: (p: Point | null) => void
   className?: string
+  /**
+   * Canvas is opaque to a screen reader, so the graph carries a description
+   * and the same numbers appear as text in the stats panel and V strip.
+   */
+  label?: string
 }
 
 export function LatticeCanvas({
@@ -32,6 +37,7 @@ export function LatticeCanvas({
   padding = 24,
   onHoverPoint,
   className,
+  label,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -97,6 +103,8 @@ export function LatticeCanvas({
       <canvas
         ref={canvasRef}
         className="block"
+        role="img"
+        aria-label={label}
         onMouseMove={handleMove}
         onMouseLeave={() => onHoverPoint?.(null)}
       />

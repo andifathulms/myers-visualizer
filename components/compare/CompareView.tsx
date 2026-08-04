@@ -85,6 +85,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
           onSwap={inputs.swap}
           onPreset={inputs.loadPreset}
           presetId={inputs.presetId}
+          shareUrl={inputs.shareUrl}
         />
       </div>
 

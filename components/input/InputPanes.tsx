@@ -3,6 +3,7 @@
 import { GRANULARITIES, type Granularity } from '@/lib/tokenize'
 import { ALGORITHMS, type AlgorithmId } from '@/lib/diff/types'
 import { PRESETS } from '@/data/presets'
+import { ShareLink } from '@/components/chrome/ShareLink'
 import type { Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
 
@@ -20,6 +21,7 @@ type Props = {
   onSwap: () => void
   onPreset: (id: string) => void
   presetId: string | null
+  shareUrl: string
   /** Omitted on the comparison page, which runs every algorithm at once. */
   algorithm?: AlgorithmId
   onAlgorithm?: (value: AlgorithmId) => void
@@ -47,6 +49,7 @@ export function InputPanes({
   onSwap,
   onPreset,
   presetId,
+  shareUrl,
   algorithm,
   onAlgorithm,
 }: Props) {
@@ -126,6 +129,8 @@ export function InputPanes({
             ))}
           </select>
         </label>
+
+        <ShareLink url={shareUrl} dict={dict} />
       </div>
     </section>
   )

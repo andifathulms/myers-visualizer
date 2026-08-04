@@ -21,6 +21,7 @@ import {
   type Point,
 } from '@/layout/lattice'
 import { matchAt, type FrontierPoint, type LatticeFrame, type MatchGrid, type Snake } from './frame'
+import type { Region } from '@/lib/diff/types'
 
 export type Layer = { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }
 
@@ -118,12 +119,16 @@ export class LatticeRenderer {
     ctx.drawImage(this.staticLayer.canvas, 0, 0, this.cssWidth, this.cssHeight)
     ctx.drawImage(this.exploredLayer.canvas, 0, 0, this.cssWidth, this.cssHeight)
 
+    if (frame.region !== null) drawRegion(ctx, g, frame.region)
     if (frame.highlightK !== null) drawDiagonalHighlight(ctx, g, frame.highlightK)
     drawFrontier(ctx, g, frame.frontier, frame.snakes, PALETTE.turmeric)
     if (frame.backwardFrontier !== null) {
       drawFrontier(ctx, g, frame.backwardFrontier, [], PALETTE.turmeric, true)
     }
     // madder last: it must sit above everything, because it is the answer.
+    for (const settled of frame.settledSnakes) {
+      drawSnakeThread(ctx, g, settled, PALETTE.madder, 1.6)
+    }
     if (frame.middleSnake !== null) drawSnakeThread(ctx, g, frame.middleSnake, PALETTE.madder, 3.2)
     if (frame.path !== null) drawPath(ctx, g, frame.path)
   }
@@ -179,6 +184,25 @@ function drawKnots(ctx: CanvasRenderingContext2D, g: Geometry, matches: MatchGri
   if (detailed) ctx.stroke()
   else ctx.fill()
   ctx.globalAlpha = 1
+}
+
+/**
+ * The sub-rectangle the search has recursed into. Indigo, not madder — it is
+ * structure, not the answer.
+ */
+function drawRegion(ctx: CanvasRenderingContext2D, g: Geometry, region: Region): void {
+  ctx.save()
+  ctx.strokeStyle = PALETTE.indigo
+  ctx.globalAlpha = 0.55
+  ctx.lineWidth = 1
+  ctx.setLineDash([4, 3])
+  ctx.strokeRect(
+    px(g, region.left),
+    py(g, region.top),
+    (region.right - region.left) * g.cell,
+    (region.bottom - region.top) * g.cell,
+  )
+  ctx.restore()
 }
 
 function drawDiagonalHighlight(ctx: CanvasRenderingContext2D, g: Geometry, k: number): void {

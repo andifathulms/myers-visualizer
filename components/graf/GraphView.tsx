@@ -18,6 +18,8 @@ import {
   levelAt,
   middleSnakeAt,
   nextLevelFrame,
+  regionAt,
+  settledSnakesAt,
   nextSnakeFrame,
   pathAt,
   previousLevelFrame,
@@ -27,7 +29,6 @@ import { buildHunks } from '@/lib/hunks'
 import { pathOf } from '@/lib/diff/backtrack'
 import { analyseAmbiguity, minimalScripts } from '@/lib/diff/ambiguity'
 import { VIEWABLE_CAP } from '@/layout/lattice'
-import { type AlgorithmId } from '@/lib/diff/types'
 import { format, type Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
 
@@ -37,7 +38,7 @@ const ALTERNATIVES = 6
 export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const inputs = useDiffInputs()
   const { a, b } = inputs.tokenized
-  const [algorithm, setAlgorithm] = useState<AlgorithmId>('myers')
+  const { algorithm, setAlgorithm } = inputs
   const state = useDiff(a.tokens, b.tokens, algorithm)
 
   const [frame, setFrame] = useState(0)
@@ -142,9 +143,11 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
         currentStep === null || currentStep.snake === null || frame === 0 ? [] : [currentStep.snake],
       backwardFrontier: frontiers.backward.length === 0 ? null : frontiers.backward,
       path: selectedPath ?? altPath ?? (timeline === null ? null : pathAt(timeline, frame)),
-      // madder is reserved for the answer, and the middle snake is one: it is
+      // madder is reserved for the answer, and a middle snake is one: it is
       // the point both frontiers agreed on. §6.6
       middleSnake: timeline === null ? null : middleSnakeAt(timeline, frame),
+      settledSnakes: timeline === null ? [] : settledSnakesAt(timeline, frame),
+      region: timeline === null ? null : regionAt(timeline, frame),
       highlightK,
     }),
     [vPoints, frontiers.backward, currentStep, frame, timeline, highlightK, selectedPath, altPath],
@@ -183,6 +186,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
           onSwap={inputs.swap}
           onPreset={inputs.loadPreset}
           presetId={inputs.presetId}
+          shareUrl={inputs.shareUrl}
           algorithm={algorithm}
           onAlgorithm={setAlgorithm}
         />
@@ -210,9 +214,26 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 matches={matches}
                 frame={latticeFrame}
                 stamps={visibleStamps}
+                label={dict.a11y.graphLabel}
               />
             </div>
           )}
+
+          {/*
+            The canvas cannot be read, so every step is also announced. Polite,
+            because stepping is user-driven and should not interrupt.
+          */}
+          <p aria-live="polite" className="sr-only">
+            {currentStep === null || timeline === null
+              ? ''
+              : format(dict.a11y.stepAnnouncement, {
+                  d: currentD,
+                  maxD: timeline.d,
+                  k: currentStep.k,
+                  x: currentStep.to.x,
+                  y: currentStep.to.y,
+                })}
+          </p>
 
           {timeline !== null ? (
             <div className="mt-3">
@@ -247,6 +268,12 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
             snakes={state.status === 'done' ? state.stats.snakes : 0}
             steps={timeline?.searchFrames ?? 0}
             vCells={state.status === 'done' ? state.stats.vCells : 0}
+            naiveVCells={
+              // Only meaningful for the variant that avoids the recording.
+              algorithm === 'myers-linear' && state.status === 'done'
+                ? (state.stats.d + 2) ** 2
+                : null
+            }
           />
           <AmbiguityPanel
             locale={locale}

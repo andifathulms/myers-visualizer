@@ -68,6 +68,8 @@ export function RenderBench() {
         backwardFrontier: null,
         path: null,
         middleSnake: null,
+        settledSnakes: [],
+        region: null,
         highlightK: null,
       })
 

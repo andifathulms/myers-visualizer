@@ -13,6 +13,7 @@ export function StatBar({
   snakes,
   steps,
   vCells,
+  naiveVCells,
 }: {
   dict: Dict
   d: number
@@ -22,6 +23,8 @@ export function StatBar({
   snakes: number
   steps: number
   vCells: number
+  /** What the greedy recording would have retained, for linear-space mode. */
+  naiveVCells: number | null
 }) {
   const t = dict.graph
   const rows: { label: string; value: string }[] = [
@@ -29,8 +32,10 @@ export function StatBar({
     { label: t.tokens, value: `N=${n} M=${m}` },
     { label: t.snakes, value: String(snakes) },
     { label: t.steps, value: String(steps) },
-    { label: t.memory, value: String(vCells) },
+    { label: t.memory, value: vCells === 0 ? '—' : String(vCells) },
   ]
+  // §6.6: the O(D²) versus O(N+M) difference as a number on screen, not a claim.
+  if (naiveVCells !== null) rows.push({ label: t.memoryNaive, value: String(naiveVCells) })
   return (
     <section aria-label={t.stats}>
       <h3 className="font-sans text-xs font-semibold uppercase tracking-wide text-indigo">

@@ -52,6 +52,7 @@ export type Dict = {
     snakes: string
     tokens: string
     memory: string
+    memoryNaive: string
     /** Placeholder {n}. */
     ambiguityCount: string
     ambiguityUnique: string
@@ -84,6 +85,14 @@ export type Dict = {
     note: string
   }
   presets: { title: string; lede: string; open: string }
+  a11y: {
+    skipToContent: string
+    graphLabel: string
+    /** Placeholders {d} {maxD} {k} {x} {y}. */
+    stepAnnouncement: string
+    copyLink: string
+    copied: string
+  }
   legend: {
     title: string
     match: string
@@ -140,6 +149,7 @@ const id: Dict = {
     snakes: 'Snake',
     tokens: 'Token',
     memory: 'Sel V tersimpan',
+    memoryNaive: 'Sel V bila naif',
     ambiguityCount: '{n} edit script minimal ditemukan',
     ambiguityUnique: 'Edit script minimal tunggal — tidak ada ambiguitas pada masukan ini.',
     ambiguityMany: 'Beberapa script sama-sama minimal. Algoritma memilih satu lewat tie-breaking.',
@@ -174,6 +184,13 @@ const id: Dict = {
     title: 'Contoh',
     lede: 'Tiap contoh memuat fenomena yang ingin ditunjukkan.',
     open: 'Buka di edit graph',
+  },
+  a11y: {
+    skipToContent: 'Lompat ke konten',
+    graphLabel: 'Edit graph — visualisasi kanvas. Angka yang sama tersedia di panel statistik dan array V di sebelahnya.',
+    stepAnnouncement: 'd = {d} dari {maxD}, diagonal k = {k}, titik ({x}, {y})',
+    copyLink: 'Salin tautan',
+    copied: 'Tersalin',
   },
   legend: {
     title: 'Legenda',
@@ -231,6 +248,7 @@ const en: Dict = {
     snakes: 'Snakes',
     tokens: 'Tokens',
     memory: 'V cells stored',
+    memoryNaive: 'V cells if naive',
     ambiguityCount: '{n} minimal edit scripts found',
     ambiguityUnique: 'The minimal edit script is unique — no ambiguity on this input.',
     ambiguityMany: 'Several scripts are equally minimal. The algorithm picks one by tie-breaking.',
@@ -265,6 +283,13 @@ const en: Dict = {
     title: 'Presets',
     lede: 'Each preset carries the phenomenon it exists to show.',
     open: 'Open in the edit graph',
+  },
+  a11y: {
+    skipToContent: 'Skip to content',
+    graphLabel: 'Edit graph — a canvas visualisation. The same numbers are available in the stats panel and the V array beside it.',
+    stepAnnouncement: 'd = {d} of {maxD}, diagonal k = {k}, point ({x}, {y})',
+    copyLink: 'Copy link',
+    copied: 'Copied',
   },
   legend: {
     title: 'Legend',

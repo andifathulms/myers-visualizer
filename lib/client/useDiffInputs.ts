@@ -8,6 +8,7 @@ import {
   type Granularity,
   type TokenizeOptions,
 } from '@/lib/tokenize'
+import { ALGORITHMS, type AlgorithmId } from '@/lib/diff/types'
 
 /**
  * Inputs, the equality options, and the URL hash they share by. No accounts,
@@ -19,6 +20,8 @@ export type DiffInputs = {
   granularity: Granularity
   ignoreWhitespace: boolean
   presetId: string | null
+  algorithm: AlgorithmId
+  setAlgorithm: (value: AlgorithmId) => void
   setA: (value: string) => void
   setB: (value: string) => void
   setGranularity: (value: Granularity) => void
@@ -27,6 +30,8 @@ export type DiffInputs = {
   loadPreset: (id: string) => void
   tokenized: ReturnType<typeof tokenizePair>
   options: TokenizeOptions
+  /** The shareable URL for the current state. */
+  shareUrl: string
 }
 
 function readHash(): Record<string, string> {
@@ -47,6 +52,8 @@ export function useDiffInputs(): DiffInputs {
   const [granularity, setGranularity] = useState<Granularity>(DEFAULT_PRESET.granularity)
   const [ignoreWhitespace, setIgnoreWhitespace] = useState(false)
   const [presetId, setPresetId] = useState<string | null>(DEFAULT_PRESET.id)
+  const [algorithm, setAlgorithm] = useState<AlgorithmId>('myers')
+  const [shareUrl, setShareUrl] = useState('')
 
   // Hash → state, once on mount. A shared link opens on the same input.
   useEffect(() => {
@@ -70,6 +77,9 @@ export function useDiffInputs(): DiffInputs {
     }
     if (hash.g === 'line' || hash.g === 'word' || hash.g === 'char') setGranularity(hash.g)
     if (hash.w === '1') setIgnoreWhitespace(true)
+    if (hash.alg !== undefined && (ALGORITHMS as readonly string[]).includes(hash.alg)) {
+      setAlgorithm(hash.alg as AlgorithmId)
+    }
   }, [])
 
   // State → hash. Presets share by id so the link stays short and readable.
@@ -84,11 +94,15 @@ export function useDiffInputs(): DiffInputs {
     }
     params.set('g', granularity)
     if (ignoreWhitespace) params.set('w', '1')
+    if (algorithm !== 'myers') params.set('alg', algorithm)
     const next = `#${params.toString()}`
     if (next !== window.location.hash) {
       window.history.replaceState(null, '', next)
     }
-  }, [aText, bText, granularity, ignoreWhitespace, presetId])
+    // Set unconditionally: on first load the hash may already match, and the
+    // share button still needs a URL.
+    setShareUrl(window.location.href)
+  }, [aText, bText, granularity, ignoreWhitespace, presetId, algorithm])
 
   const options = useMemo<TokenizeOptions>(
     () => ({ ...DEFAULT_TOKENIZE_OPTIONS, granularity, ignoreWhitespace }),
@@ -131,6 +145,8 @@ export function useDiffInputs(): DiffInputs {
     granularity,
     ignoreWhitespace,
     presetId,
+    algorithm,
+    setAlgorithm,
     setA: onA,
     setB: onB,
     setGranularity,
@@ -139,5 +155,6 @@ export function useDiffInputs(): DiffInputs {
     loadPreset,
     tokenized,
     options,
+    shareUrl,
   }
 }

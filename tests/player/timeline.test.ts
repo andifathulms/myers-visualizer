@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { myersGreedy } from '@/lib/diff/myers'
+import { myersLinear } from '@/lib/diff/linear'
 import {
   buildTimeline,
   FrontierCursor,
   levelAt,
   nextLevelFrame,
+  middleSnakeAt,
   nextSnakeFrame,
   pathAt,
   previousLevelFrame,
+  regionAt,
+  settledSnakesAt,
 } from '@/lib/player/timeline'
 import { frontierAfterLevel } from '@/lib/diff/trace'
 import { fullCorpus } from '../corpus'
@@ -71,6 +75,76 @@ describe('timeline', () => {
     const frame = nextSnakeFrame(timeline, 0)
     expect(timeline.steps[frame - 1].snake).not.toBeNull()
     expect(nextSnakeFrame(timeline, timeline.searchFrames)).toBe(timeline.totalFrames)
+  })
+})
+
+/**
+ * The recursion view, §6.6: the answer is assembled from middle snakes rather
+ * than searched for in one pass, so watching them accumulate is the point.
+ */
+describe('linear-space recursion view', () => {
+  const A = [1, 2, 3, 4, 5, 6, 7, 8]
+  const B = [8, 3, 4, 1, 2, 7, 5]
+
+  function linearTimeline() {
+    const { trace, script } = myersLinear(A, B)
+    return buildTimeline(trace, script)
+  }
+
+  it('records every middle snake against the step that found it', () => {
+    const timeline = linearTimeline()
+    expect(timeline.middleSnakes.length).toBeGreaterThan(0)
+    for (const entry of timeline.middleSnakes) {
+      expect(timeline.steps[entry.at].middleSnake).toEqual(entry.snake)
+    }
+    // In step order, so settledSnakesAt can stop early instead of scanning.
+    const ats = timeline.middleSnakes.map((entry) => entry.at)
+    expect(ats).toEqual([...ats].sort((p, q) => p - q))
+  })
+
+  it('accumulates settled snakes monotonically as the search advances', () => {
+    const timeline = linearTimeline()
+    let previous = 0
+    for (let frame = 0; frame <= timeline.searchFrames; frame++) {
+      const settled = settledSnakesAt(timeline, frame).length
+      expect(settled).toBeGreaterThanOrEqual(previous)
+      previous = settled
+    }
+    expect(previous).toBe(timeline.middleSnakes.length)
+  })
+
+  it('flares each middle snake exactly once, on the frame that found it', () => {
+    const timeline = linearTimeline()
+    let flares = 0
+    for (let frame = 1; frame <= timeline.searchFrames; frame++) {
+      if (middleSnakeAt(timeline, frame) !== null) flares++
+    }
+    expect(flares).toBe(timeline.middleSnakes.length)
+  })
+
+  it('reports the sub-rectangle being searched, always inside the lattice', () => {
+    const timeline = linearTimeline()
+    let seen = 0
+    for (let frame = 1; frame <= timeline.searchFrames; frame++) {
+      const region = regionAt(timeline, frame)
+      if (region === null) continue
+      seen++
+      expect(region.left).toBeGreaterThanOrEqual(0)
+      expect(region.top).toBeGreaterThanOrEqual(0)
+      expect(region.right).toBeLessThanOrEqual(A.length)
+      expect(region.bottom).toBeLessThanOrEqual(B.length)
+      expect(region.right).toBeGreaterThanOrEqual(region.left)
+    }
+    expect(seen).toBeGreaterThan(0)
+  })
+
+  it('leaves greedy Myers with no regions and no middle snakes', () => {
+    // Only the linear-space variant recurses; showing boxes for the greedy
+    // search would invent structure that is not there.
+    const { trace, script } = myersGreedy(A, B)
+    const timeline = buildTimeline(trace, script)
+    expect(timeline.middleSnakes).toHaveLength(0)
+    expect(regionAt(timeline, timeline.searchFrames)).toBeNull()
   })
 })
 

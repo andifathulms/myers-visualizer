@@ -3,6 +3,7 @@
  * compute it. The engine's SearchTrace hydrates into exactly this shape.
  */
 import type { Point } from '@/layout/lattice'
+import type { Region } from '@/lib/diff/types'
 
 /** A maximal diagonal run of matches — the conceptual unit of the search. §6.1 */
 export type Snake = {
@@ -57,8 +58,15 @@ export type LatticeFrame = {
   readonly backwardFrontier: readonly FrontierPoint[] | null
   /** The recovered path, drawn in madder during backtrack. Null until then. */
   readonly path: readonly Point[] | null
-  /** Highlighted middle snake, linear-space mode only. Madder. */
+  /** The middle snake just found, flared. Linear-space mode only. Madder. */
   readonly middleSnake: Snake | null
+  /**
+   * Middle snakes already settled. Watching them accumulate is the recursion
+   * view: the answer is assembled from them rather than searched in one pass.
+   */
+  readonly settledSnakes: readonly Snake[]
+  /** The sub-rectangle currently being searched. §6.6 */
+  readonly region: Region | null
   /** Diagonal k to emphasise, from a hovered V cell. §6.2 */
   readonly highlightK: number | null
 }
@@ -69,5 +77,7 @@ export const EMPTY_FRAME: LatticeFrame = {
   backwardFrontier: null,
   path: null,
   middleSnake: null,
+  settledSnakes: [],
+  region: null,
   highlightK: null,
 }

@@ -20,6 +20,21 @@ body {
   h3 {
     @apply font-serif;
   }
+
+  /*
+   * Keyboard focus has to be visible everywhere — the whole stepper is
+   * operable from the keyboard, and an invisible focus ring makes that
+   * useless. madder is the palette's only high-contrast accent, and a focus
+   * ring is transient chrome rather than a claim about the answer.
+   */
+  :focus-visible {
+    outline: 2px solid #a63d2f;
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: #c9982e40;
+  }
 }
 
 /* Motion is one orchestrated moment; honour the OS setting. PRD §9. */
