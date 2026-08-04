@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { PRESETS, findPreset } from '@/data/presets'
 import { DEFAULT_TOKENIZE_OPTIONS, tokenizePair } from '@/lib/tokenize'
 import { myersGreedy } from '@/lib/diff/myers'
+import { diff } from '@/lib/diff'
 import { analyseAmbiguity, minimalScripts } from '@/lib/diff/ambiguity'
 import { checkApply } from '@/lib/diff/apply'
 import { buildHunks } from '@/lib/hunks'
+import { hunkCount } from '@/lib/diff/types'
 import { LOCALES } from '@/lib/i18n/locales'
 
 function run(preset: (typeof PRESETS)[number]) {
@@ -94,6 +96,24 @@ describe('presets', () => {
     expect(firstInserted(script)).not.toBe('}')
     // The alternatives are genuinely different scripts, not repeats.
     expect(new Set(alternatives.map((s) => JSON.stringify(s))).size).toBe(alternatives.length)
+  })
+
+  /**
+   * The claim: at equal D, patience produces the more readable diff. Both
+   * halves matter — if D differed, this would be the ordinary minimality
+   * trade-off rather than the interesting case.
+   */
+  it('patience-wins really does win, at the same D', () => {
+    const preset = findPreset('patience-wins')
+    if (preset === undefined) throw new Error('missing preset')
+    const { a, b } = tokenizePair(preset.a, preset.b, DEFAULT_TOKENIZE_OPTIONS)
+
+    const myers = diff(a.tokens, b.tokens, 'myers')
+    const patience = diff(a.tokens, b.tokens, 'patience')
+
+    expect(patience.stats.d).toBe(myers.stats.d)
+    expect(hunkCount(patience.script)).toBeLessThan(hunkCount(myers.script))
+    expect(hunkCount(patience.script)).toBe(1)
   })
 
   it('char-level is the paper’s figure 1, with D = 5', () => {

@@ -3,6 +3,8 @@
  * Pure and deterministic; nothing here touches React, the DOM or the clock.
  */
 import { myersGreedy } from './myers'
+import { patienceDiff } from './patience'
+import { histogramDiff } from './histogram'
 import type { AlgorithmId, DiffStats, EditScript, SearchOptions, Token } from './types'
 import type { SearchTrace } from './trace'
 
@@ -21,9 +23,11 @@ export function diff(
   switch (algorithm) {
     case 'myers':
       return myersGreedy(a, b, options)
-    case 'myers-linear':
     case 'patience':
+      return patienceDiff(a, b)
     case 'histogram':
+      return histogramDiff(a, b)
+    case 'myers-linear':
       throw new Error(`algorithm ${algorithm} is not implemented yet`)
     default: {
       const never: never = algorithm
@@ -33,6 +37,8 @@ export function diff(
 }
 
 export { myersGreedy } from './myers'
+export { patienceDiff } from './patience'
+export { histogramDiff } from './histogram'
 export { backtrack, pathOf } from './backtrack'
 export { apply, checkApply, checkWellFormed, ApplyError } from './apply'
 export * from './types'

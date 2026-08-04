@@ -36,29 +36,33 @@ function total(xs) {
   return xs.length
 }`
 
-const patienceA = `#include <stdio.h>
+// Repeated boilerplate (`enabled`, `replicas`) with unique anchors
+// (`- name: …`). Myers is free to match the boilerplate across entry
+// boundaries; patience refuses to anchor on lines that appear more than once.
+const patienceA = `services:
+  - name: web
+    enabled: true
+    replicas: 2
+  - name: cache
+    enabled: true
+    replicas: 2
+  - name: queue
+    enabled: true
+    replicas: 2`
 
-int main(void) {
-  printf("satu\\n");
-  return 0;
-}
-
-int helper(void) {
-  printf("dua\\n");
-  return 0;
-}`
-
-const patienceB = `#include <stdio.h>
-
-int helper(void) {
-  printf("dua\\n");
-  return 0;
-}
-
-int main(void) {
-  printf("satu\\n");
-  return 0;
-}`
+const patienceB = `services:
+  - name: web
+    enabled: true
+    replicas: 2
+  - name: search
+    enabled: true
+    replicas: 2
+  - name: metrics
+    enabled: true
+    replicas: 2
+  - name: queue
+    enabled: true
+    replicas: 2`
 
 export const PRESETS: readonly Preset[] = [
   {
@@ -120,8 +124,8 @@ export const PRESETS: readonly Preset[] = [
     id: 'patience-wins',
     title: { id: 'Saat patience menang', en: 'Where patience wins' },
     phenomenon: {
-      id: 'Dua fungsi bertukar urutan. Myers menghasilkan script terpendek dengan mencocokkan baris-baris umum seperti "return 0;" dan kurung penutup, sehingga hunk-nya terpotong-potong. Patience mengabaikan baris yang berulang dan menghasilkan diff lebih panjang tetapi jauh lebih mudah dibaca.',
-      en: 'Two functions swap order. Myers finds the shortest script by matching common lines like "return 0;" and closing braces, which shreds the hunks. Patience ignores repeated lines and produces a longer but far more readable diff.',
+      id: 'Satu entri diganti dua entri baru. Ketiga algoritma sepakat D = 5 — sama-sama minimal — tetapi Myers memecahnya jadi dua hunk terpisah karena bebas mencocokkan baris berulang "enabled" dan "replicas" melintasi batas entri. Patience menolak berlabuh pada baris yang muncul lebih dari sekali, jadi ia berlabuh pada baris "- name:" yang unik dan menyatukan perubahan dalam satu blok. Panjang sama, keterbacaan tidak.',
+      en: 'One entry is replaced by two new ones. All three algorithms agree on D = 5 — equally minimal — but Myers splits it into two separate hunks, because it is free to match the repeated "enabled" and "replicas" lines across entry boundaries. Patience refuses to anchor on any line appearing more than once, so it anchors on the unique "- name:" lines and keeps the change in one block. Same length, different readability.',
     },
     a: patienceA,
     b: patienceB,
