@@ -5,6 +5,7 @@
 import { myersGreedy } from './myers'
 import { patienceDiff } from './patience'
 import { histogramDiff } from './histogram'
+import { myersLinear } from './linear'
 import type { AlgorithmId, DiffStats, EditScript, SearchOptions, Token } from './types'
 import type { SearchTrace } from './trace'
 
@@ -28,7 +29,7 @@ export function diff(
     case 'histogram':
       return histogramDiff(a, b)
     case 'myers-linear':
-      throw new Error(`algorithm ${algorithm} is not implemented yet`)
+      return myersLinear(a, b, options)
     default: {
       const never: never = algorithm
       throw new Error(`unknown algorithm ${JSON.stringify(never)}`)
@@ -39,6 +40,7 @@ export function diff(
 export { myersGreedy } from './myers'
 export { patienceDiff } from './patience'
 export { histogramDiff } from './histogram'
+export { myersLinear } from './linear'
 export { backtrack, pathOf } from './backtrack'
 export { apply, checkApply, checkWellFormed, ApplyError } from './apply'
 export * from './types'

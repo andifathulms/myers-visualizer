@@ -11,17 +11,21 @@ import type { Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
 
 /**
- * Myers, patience and histogram on one input, side by side. §6.5
+ * All four algorithms on one input, side by side. §6.5
  *
  * Patience will often be longer, or the same length with different grouping,
  * and the point is that longer is sometimes better — stated plainly, with the
  * reasoning, rather than left for the reader to infer.
+ *
+ * The retained-V column sits beside them so the O(D²) of the greedy recording
+ * and the O(N+M) of the linear-space variant are numbers on screen rather than
+ * a claim in prose. §6.6
  */
-const SHOWN: AlgorithmId[] = ['myers', 'patience', 'histogram']
+const SHOWN: AlgorithmId[] = ['myers', 'myers-linear', 'patience', 'histogram']
 
 const LABELS: Record<AlgorithmId, string> = {
   myers: 'Myers',
-  'myers-linear': 'Myers (linear space)',
+  'myers-linear': 'Myers — linear space',
   patience: 'Patience',
   histogram: 'Histogram',
 }
@@ -39,6 +43,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
           return {
             algorithm,
             d: result.stats.d,
+            vCells: result.stats.vCells,
             hunks: hunkCount(result.script),
             rendered: buildHunks(result.script, a.texts, b.texts),
             error: null as string | null,
@@ -47,6 +52,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
           return {
             algorithm,
             d: 0,
+            vCells: 0,
             hunks: 0,
             rendered: [],
             error: error instanceof Error ? error.message : String(error),
@@ -88,6 +94,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
             <th className="py-2 pr-4 font-medium">{dict.input.algorithm}</th>
             <th className="py-2 pr-4 font-medium">{t.scriptLength}</th>
             <th className="py-2 pr-4 font-medium">{t.hunks}</th>
+            <th className="py-2 pr-4 font-medium">{dict.graph.memory}</th>
             <th className="py-2 font-medium">{t.minimal}</th>
           </tr>
         </thead>
@@ -105,6 +112,9 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
               <td className="py-2 pr-4 font-mono tabular-nums text-indigo">
                 {result.error === null ? result.hunks : '—'}
               </td>
+              <td className="py-2 pr-4 font-mono tabular-nums text-indigo">
+                {result.vCells === 0 ? '—' : result.vCells}
+              </td>
               <td className="py-2 font-mono text-indigo">
                 {isMinimal(result.algorithm) ? t.yes : t.no}
               </td>
@@ -115,7 +125,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
 
       <p className="mt-3 max-w-3xl font-sans text-xs leading-relaxed text-indigo">{t.note}</p>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+      <div className="mt-8 grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
         {results.map((result) => (
           <section key={result.algorithm}>
             <h2 className="font-serif text-lg font-semibold">{LABELS[result.algorithm]}</h2>

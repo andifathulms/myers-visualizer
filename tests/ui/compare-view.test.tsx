@@ -6,19 +6,44 @@ import { getDict } from '@/lib/i18n/dictionary'
 const dict = getDict('id')
 
 describe('CompareView', () => {
-  it('shows all three algorithms with their script length and hunk count', () => {
+  it('shows every algorithm with its script length and hunk count', () => {
     render(<CompareView locale="id" dict={dict} />)
-    for (const name of ['Myers', 'Patience', 'Histogram']) {
+    for (const name of ['Myers', 'Myers — linear space', 'Patience', 'Histogram']) {
       expect(screen.getAllByText(name).length).toBeGreaterThan(0)
     }
   })
 
-  it('marks only Myers as minimal', () => {
+  it('marks only the Myers family as minimal', () => {
     render(<CompareView locale="id" dict={dict} />)
-    const rows = screen.getAllByRole('row').slice(1, 4)
-    expect(within(rows[0]).getByText(dict.compare.yes)).toBeDefined()
-    expect(within(rows[1]).getByText(dict.compare.no)).toBeDefined()
-    expect(within(rows[2]).getByText(dict.compare.no)).toBeDefined()
+    const rows = screen.getAllByRole('row').slice(1, 5)
+    expect(within(rows[0]).getByText(dict.compare.yes)).toBeDefined() // myers
+    expect(within(rows[1]).getByText(dict.compare.yes)).toBeDefined() // linear space
+    expect(within(rows[2]).getByText(dict.compare.no)).toBeDefined() // patience
+    expect(within(rows[3]).getByText(dict.compare.no)).toBeDefined() // histogram
+  })
+
+  /**
+   * The O(D²) versus O(N+M) claim, as two numbers on screen. §6.6
+   *
+   * Only once D is large: on the default preset D = 2, and the greedy
+   * recording is the *smaller* of the two. The linear-space variant wins
+   * asymptotically, not universally, and the table shows whichever is true.
+   */
+  it('shows linear space retaining far less V once D is large', async () => {
+    render(<CompareView locale="id" dict={dict} />)
+    const cell = (row: HTMLElement) => Number(within(row).getAllByRole('cell')[3].textContent)
+
+    const atStart = screen.getAllByRole('row').slice(1, 5)
+    expect(cell(atStart[1])).toBeGreaterThan(cell(atStart[0])) // D = 2: greedy is cheaper
+
+    fireEvent.change(screen.getByLabelText(dict.input.presets, { exact: false }), {
+      target: { value: 'worst-case' },
+    })
+    await waitFor(() => {
+      const rows = screen.getAllByRole('row').slice(1, 5)
+      // D = 80 here, so the greedy recording is an order of magnitude larger.
+      expect(cell(rows[1])).toBeLessThan(cell(rows[0]) / 10)
+    })
   })
 
   it('shows patience beating Myers on hunk count at equal D', async () => {
@@ -28,9 +53,9 @@ describe('CompareView', () => {
     })
 
     await waitFor(() => {
-      const rows = screen.getAllByRole('row').slice(1, 4)
+      const rows = screen.getAllByRole('row').slice(1, 5)
       const cells = (row: HTMLElement) => within(row).getAllByRole('cell').map((c) => c.textContent)
-      const [myers, patience] = [cells(rows[0]), cells(rows[1])]
+      const [myers, patience] = [cells(rows[0]), cells(rows[2])]
       // Same D...
       expect(patience[1]).toBe(myers[1])
       // ...fewer hunks. Minimal is not the same as readable.

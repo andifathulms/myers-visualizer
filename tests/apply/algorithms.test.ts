@@ -4,7 +4,7 @@ import { checkApply, checkWellFormed } from '@/lib/diff/apply'
 import { ALGORITHMS, isMinimal, scriptLength, type AlgorithmId } from '@/lib/diff/types'
 import { fullCorpus, worstCase } from '../corpus'
 
-const IMPLEMENTED: AlgorithmId[] = ['myers', 'patience', 'histogram']
+const IMPLEMENTED: AlgorithmId[] = ['myers', 'myers-linear', 'patience', 'histogram']
 
 /**
  * Every algorithm, every input, every option → the apply property must hold.
@@ -96,7 +96,8 @@ describe('trace shape — every algorithm', () => {
 
   it('reports no retained V cells for the non-Myers algorithms', () => {
     // They keep no V array, and claiming otherwise would make the memory
-    // counter meaningless.
+    // counter meaningless. Linear-space Myers does keep one — two, in fact,
+    // and that is exactly what its counter reports.
     expect(diff([1, 2], [2, 3], 'patience').stats.vCells).toBe(0)
     expect(diff([1, 2], [2, 3], 'histogram').stats.vCells).toBe(0)
     expect(diff([1, 2], [2, 3], 'myers').stats.vCells).toBeGreaterThan(0)
