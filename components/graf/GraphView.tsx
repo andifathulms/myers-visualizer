@@ -16,6 +16,7 @@ import {
   buildTimeline,
   FrontierCursor,
   levelAt,
+  middleSnakeAt,
   nextLevelFrame,
   nextSnakeFrame,
   pathAt,
@@ -26,6 +27,7 @@ import { buildHunks } from '@/lib/hunks'
 import { pathOf } from '@/lib/diff/backtrack'
 import { analyseAmbiguity, minimalScripts } from '@/lib/diff/ambiguity'
 import { VIEWABLE_CAP } from '@/layout/lattice'
+import { type AlgorithmId } from '@/lib/diff/types'
 import { format, type Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
 
@@ -35,7 +37,8 @@ const ALTERNATIVES = 6
 export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const inputs = useDiffInputs()
   const { a, b } = inputs.tokenized
-  const state = useDiff(a.tokens, b.tokens, 'myers')
+  const [algorithm, setAlgorithm] = useState<AlgorithmId>('myers')
+  const state = useDiff(a.tokens, b.tokens, algorithm)
 
   const [frame, setFrame] = useState(0)
   const [highlightK, setHighlightK] = useState<number | null>(null)
@@ -72,17 +75,18 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   // rebuilds — the same trade the canvas's explored layer makes.
   const cursorRef = useRef<FrontierCursor | null>(null)
   const cursorTimeline = useRef<typeof timeline>(null)
-  const vPoints = useMemo(() => {
-    if (timeline === null) return []
+  const frontiers = useMemo(() => {
+    if (timeline === null) return { forward: [], backward: [] }
     if (cursorTimeline.current !== timeline) {
       cursorRef.current = new FrontierCursor(timeline)
       cursorTimeline.current = timeline
     }
     const cursor = cursorRef.current
-    if (cursor === null) return []
+    if (cursor === null) return { forward: [], backward: [] }
     cursor.seek(frame)
-    return cursor.points()
+    return { forward: cursor.points(), backward: cursor.backwardPoints() }
   }, [timeline, frame])
+  const vPoints = frontiers.forward
 
   const n = a.tokens.length
   const m = b.tokens.length
@@ -113,6 +117,8 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     [a.tokens, b.tokens, tooLarge],
   )
 
+  /** Only the Myers family maintains a V array; the others anchor and recurse. */
+  const maintainsV = algorithm === 'myers' || algorithm === 'myers-linear'
   const currentD = timeline === null ? 0 : levelAt(timeline, frame)
   const currentStep = timeline?.steps[Math.min(frame, timeline.searchFrames - 1)] ?? null
 
@@ -134,12 +140,14 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       frontier: vPoints,
       snakes:
         currentStep === null || currentStep.snake === null || frame === 0 ? [] : [currentStep.snake],
-      backwardFrontier: null,
+      backwardFrontier: frontiers.backward.length === 0 ? null : frontiers.backward,
       path: selectedPath ?? altPath ?? (timeline === null ? null : pathAt(timeline, frame)),
-      middleSnake: null,
+      // madder is reserved for the answer, and the middle snake is one: it is
+      // the point both frontiers agreed on. §6.6
+      middleSnake: timeline === null ? null : middleSnakeAt(timeline, frame),
       highlightK,
     }),
-    [vPoints, currentStep, frame, timeline, highlightK, selectedPath, altPath],
+    [vPoints, frontiers.backward, currentStep, frame, timeline, highlightK, selectedPath, altPath],
   )
 
   const stamps = useMemo(() => timeline?.stamps ?? [], [timeline])
@@ -175,6 +183,8 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
           onSwap={inputs.swap}
           onPreset={inputs.loadPreset}
           presetId={inputs.presetId}
+          algorithm={algorithm}
+          onAlgorithm={setAlgorithm}
         />
       </div>
 
@@ -250,14 +260,25 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
               seek(timeline?.totalFrames ?? 0)
             }}
           />
-          <VStrip
-            cells={vPoints}
-            currentD={currentD}
-            highlightK={highlightK}
-            onHighlight={setHighlightK}
-            label={t.vstrip}
-            hint={t.vstripHint}
-          />
+          {maintainsV ? (
+            <VStrip
+              cells={vPoints}
+              currentD={currentD}
+              highlightK={highlightK}
+              onHighlight={setHighlightK}
+              label={t.vstrip}
+              hint={t.vstripHint}
+            />
+          ) : (
+            // Showing a V strip for an algorithm that has no V would be a lie
+            // dressed as a visualisation.
+            <section aria-label={t.vstrip}>
+              <h3 className="font-sans text-xs font-semibold uppercase tracking-wide text-indigo">
+                {t.vstrip}
+              </h3>
+              <p className="mt-1 font-sans text-xs leading-relaxed text-indigo/80">{t.noVStrip}</p>
+            </section>
+          )}
         </aside>
       </div>
 

@@ -147,4 +147,15 @@ The site links the Myers paper and James Coglan's explainer series prominently �
 
 ## Current state
 
-M0 — not yet scaffolded. Next: static export deploying to Pages, then the canvas lattice spike. **No algorithm work until a 300×300 lattice animates at 60fps.**
+M0–M6 built. Static export, canvas lattice, greedy Myers with `V` recording and backtrack, edit graph + `V` strip + stepping, unified diff output, presets, ambiguity enumeration, patience, histogram, and linear-space Myers with the middle snake.
+
+Green: apply property and oracle agreement across the corpus for every algorithm, minimality ordering, cross-variant `D` equality, trace well-formedness, determinism, step budget at the input cap.
+
+**Two things are asserted but not machine-verified**, because no browser is installed in the environment this was built in:
+
+- The 60fps claim. `pnpm bench:render` serves the spike page and reports mean/p95 draw time against the 16.7 ms budget, but the number has never been captured. `tests/render/frame-cost.test.ts` guards the property it depends on — per-frame work is O(frontier), not O(N·M) — which is a proxy, not a measurement. **Run the bench and record the number.**
+- The animation itself. The jsdom tests cover the wiring, not the drawing.
+
+Remaining from the PRD: M7 polish — the recursion view for linear space is a middle-snake highlight rather than the region-by-region visualisation §6.6 describes, and the a11y pass has not been done beyond labels and keyboard stepping.
+
+Two preset claims were written before they were checked, and both were false: this implementation's tie-breaking does *not* choose the misattributed brace, and two functions swapping order does not make patience win. Both presets were replaced with inputs that demonstrate the phenomenon, and `tests/presets/` now asserts each claim. **Assert a preset's phenomenon when adding one.**

@@ -106,6 +106,26 @@ describe('GraphView', () => {
     await waitFor(() => expect(screen.getByText(dict.graph.ambiguityUnique)).toBeDefined())
   })
 
+  it('runs the linear-space variant and shows both frontiers meeting', async () => {
+    renderGraph()
+    await waitFor(() => expect(screen.getByText(/^@@ /)).toBeDefined())
+    fireEvent.change(screen.getByLabelText(dict.input.algorithm, { exact: false }), {
+      target: { value: 'myers-linear' },
+    })
+    await waitFor(() => expect(screen.getByText(/^@@ /)).toBeDefined())
+    // Same answer, different search: the V strip still applies to this variant.
+    expect(screen.queryByText(dict.graph.noVStrip)).toBeNull()
+  })
+
+  it('says plainly that patience keeps no V array, rather than inventing one', async () => {
+    renderGraph()
+    await waitFor(() => expect(screen.getByText(/^@@ /)).toBeDefined())
+    fireEvent.change(screen.getByLabelText(dict.input.algorithm, { exact: false }), {
+      target: { value: 'patience' },
+    })
+    await waitFor(() => expect(screen.getByText(dict.graph.noVStrip)).toBeDefined())
+  })
+
   it('loads a preset and re-runs the search', async () => {
     renderGraph()
     await waitFor(() => expect(screen.getByText(/^@@ /)).toBeDefined())

@@ -1,6 +1,7 @@
 'use client'
 
 import { GRANULARITIES, type Granularity } from '@/lib/tokenize'
+import { ALGORITHMS, type AlgorithmId } from '@/lib/diff/types'
 import { PRESETS } from '@/data/presets'
 import type { Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
@@ -19,6 +20,17 @@ type Props = {
   onSwap: () => void
   onPreset: (id: string) => void
   presetId: string | null
+  /** Omitted on the comparison page, which runs every algorithm at once. */
+  algorithm?: AlgorithmId
+  onAlgorithm?: (value: AlgorithmId) => void
+}
+
+/** Algorithm names stay in English, as all algorithm terms do. */
+const ALGORITHM_LABELS: Record<AlgorithmId, string> = {
+  myers: 'Myers',
+  'myers-linear': 'Myers — linear space',
+  patience: 'Patience',
+  histogram: 'Histogram',
 }
 
 export function InputPanes({
@@ -35,6 +47,8 @@ export function InputPanes({
   onSwap,
   onPreset,
   presetId,
+  algorithm,
+  onAlgorithm,
 }: Props) {
   const t = dict.input
   const label: Record<Granularity, string> = { line: t.line, word: t.word, char: t.char }
@@ -79,6 +93,23 @@ export function InputPanes({
         >
           {t.swap}
         </button>
+
+        {algorithm !== undefined && onAlgorithm !== undefined ? (
+          <label className="flex items-center gap-1">
+            <span className="text-indigo">{t.algorithm}</span>
+            <select
+              value={algorithm}
+              onChange={(event) => onAlgorithm(event.target.value as AlgorithmId)}
+              className="rounded border border-indigo/30 bg-cotton px-2 py-1"
+            >
+              {ALGORITHMS.map((id) => (
+                <option key={id} value={id}>
+                  {ALGORITHM_LABELS[id]}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
 
         <label className="flex items-center gap-1">
           <span className="text-indigo">{t.presets}</span>

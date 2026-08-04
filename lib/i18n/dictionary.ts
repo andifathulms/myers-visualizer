@@ -44,6 +44,7 @@ export type Dict = {
     lede: string
     vstrip: string
     vstripHint: string
+    noVStrip: string
     output: string
     stats: string
     d: string
@@ -131,6 +132,7 @@ const id: Dict = {
     lede: 'Posisi cocok ditandai sebelum pencarian mulai, jadi struktur yang akan dimanfaatkan algoritma terlihat lebih dulu.',
     vstrip: 'Array V',
     vstripHint: 'Satu sel per diagonal k. Arahkan kursor ke sebuah k untuk menyorot diagonalnya di lattice.',
+    noVStrip: 'Algoritma ini tidak memelihara array V. Ia berlabuh pada elemen dan membelah rekursif, jadi tidak ada frontier untuk ditonton.',
     output: 'Keluaran diff',
     stats: 'Statistik',
     d: 'D (jarak edit)',
@@ -221,6 +223,7 @@ const en: Dict = {
     lede: 'Match positions are marked before the search starts, so the structure the algorithm will exploit is visible up front.',
     vstrip: 'The V array',
     vstripHint: 'One cell per diagonal k. Hover a k cell to highlight that diagonal in the lattice.',
+    noVStrip: 'This algorithm maintains no V array. It anchors on elements and splits recursively, so there is no frontier to watch.',
     output: 'Diff output',
     stats: 'Stats',
     d: 'D (edit distance)',

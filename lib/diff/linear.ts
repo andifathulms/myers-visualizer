@@ -67,11 +67,15 @@ export function myersLinear(
   )
 
   const script: EditScript = ops
-  // The trace's step events come from the recovered script, as for the other
-  // non-greedy algorithms; the middle-snake and recursion events above are what
-  // make this variant's behaviour visible. §6.6
+  // Unlike patience and histogram, this one really does search, and the search
+  // is the thing worth watching: two frontiers converging, the middle snake
+  // flaring where they meet, then the recursion. So the trace carries the
+  // search's own events rather than steps re-derived from the script. §6.6
   const derived = traceFromScript('myers-linear', a, b, script)
-  const merged: TraceEvent[] = [...derived.trace.events, ...events]
+  const merged: TraceEvent[] = [
+    ...events,
+    { type: 'reached', d: derived.stats.d, at: { x: a.length, y: b.length } },
+  ]
 
   const stats: DiffStats = {
     ...derived.stats,

@@ -10,7 +10,7 @@
  *   backtrack — one frame per edit op, the madder path drawing itself
  */
 import type { EditScript, Point, Snake } from '@/lib/diff/types'
-import type { SearchTrace, TraceEvent } from '@/lib/diff/trace'
+import type { Direction, SearchTrace, TraceEvent } from '@/lib/diff/trace'
 import { pathOf } from '@/lib/diff/backtrack'
 
 export type Step = {
@@ -21,6 +21,10 @@ export type Step = {
   readonly mid: Point
   readonly to: Point
   readonly snake: Snake | null
+  /** Linear-space runs two frontiers at once; everything else runs forward. */
+  readonly direction: Direction
+  /** Set on the step where the two frontiers met. Drawn in madder. §6.6 */
+  readonly middleSnake: Snake | null
 }
 
 export type Stamp = {
@@ -52,8 +56,15 @@ export function buildTimeline(trace: SearchTrace, script: EditScript): Timeline 
   const stamps: Stamp[] = []
   const levelStarts: number[] = []
   const snakeSteps: number[] = []
+  // A middle snake is announced just before the step that found it, so it is
+  // attached to the step the viewer is looking at when the frontiers meet.
+  let pendingMiddle: Snake | null = null
 
   for (const event of trace.events) {
+    if (event.type === 'middleSnake') {
+      pendingMiddle = event.snake
+      continue
+    }
     if (!isStep(event)) continue
     const snake =
       event.to.x === event.mid.x && event.to.y === event.mid.y
@@ -71,7 +82,10 @@ export function buildTimeline(trace: SearchTrace, script: EditScript): Timeline 
       mid: event.mid,
       to: event.to,
       snake,
+      direction: event.direction,
+      middleSnake: pendingMiddle,
     })
+    pendingMiddle = null
     stamps.push({
       snakes: snake === null ? [] : [snake],
       frontier: [{ k: event.k, x: event.to.x, y: event.to.y }],
@@ -102,6 +116,7 @@ export function buildTimeline(trace: SearchTrace, script: EditScript): Timeline 
  */
 export class FrontierCursor {
   private readonly v = new Map<number, { k: number; x: number; y: number }>()
+  private readonly back = new Map<number, { k: number; x: number; y: number }>()
   private index = 0
 
   constructor(private readonly timeline: Timeline) {}
@@ -114,11 +129,13 @@ export class FrontierCursor {
     const bounded = Math.max(0, Math.min(target, this.timeline.searchFrames))
     if (bounded < this.index) {
       this.v.clear()
+      this.back.clear()
       this.index = 0
     }
     for (let i = this.index; i < bounded; i++) {
       const step = this.timeline.steps[i]
-      this.v.set(step.k, { k: step.k, x: step.to.x, y: step.to.y })
+      const into = step.direction === 'backward' ? this.back : this.v
+      into.set(step.k, { k: step.k, x: step.to.x, y: step.to.y })
     }
     this.index = bounded
   }
@@ -127,6 +144,20 @@ export class FrontierCursor {
   points(): { k: number; x: number; y: number }[] {
     return [...this.v.values()].sort((p, q) => p.k - q.k)
   }
+
+  /** The backward frontier, for linear-space mode. Empty otherwise. §6.6 */
+  backwardPoints(): { k: number; x: number; y: number }[] {
+    return [...this.back.values()].sort((p, q) => p.k - q.k)
+  }
+}
+
+/** The most recent middle snake at this frame, or null before the first. */
+export function middleSnakeAt(timeline: Timeline, frame: number): Snake | null {
+  for (let i = Math.min(frame, timeline.searchFrames) - 1; i >= 0; i--) {
+    const found = timeline.steps[i].middleSnake
+    if (found !== null) return found
+  }
+  return null
 }
 
 /** Which d is on screen at this frame. */
