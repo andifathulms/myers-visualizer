@@ -9,6 +9,25 @@ export type Token = number
 export type Point = { readonly x: number; readonly y: number }
 
 /**
+ * A maximal diagonal run of matches: (x0,y0) → (x1,y1) with x1 - x0 = y1 - y0.
+ * The conceptual unit of the search — the views draw it as one thread.
+ */
+export type Snake = {
+  readonly x0: number
+  readonly y0: number
+  readonly x1: number
+  readonly y1: number
+}
+
+/** A sub-rectangle of the edit graph. Linear-space recursion works on these. §6.6 */
+export type Region = {
+  readonly left: number
+  readonly top: number
+  readonly right: number
+  readonly bottom: number
+}
+
+/**
  * Edit operations, discriminated on `type`. Every op carries its token so
  * that apply() is self-contained: it needs A and the script, nothing else.
  */
