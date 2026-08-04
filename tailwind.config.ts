@@ -1,23 +1,16 @@
 import type { Config } from 'tailwindcss'
+import { PALETTE } from './lib/palette'
 
 /**
- * Palette is normative — PRD §9. Semantic tokens only; never raw hex in components.
- *
- *   madder  — the chosen path and the middle snake. "This is the answer."
- *   turmeric — the advancing frontier, the live edge of the search.
+ * Palette is normative — PRD §9 — and lives in lib/palette.ts so that canvas,
+ * which cannot use utility classes, reads the same values. Never raw hex in
+ * components.
  */
 const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      colors: {
-        cotton: '#E8E2D4',
-        indigo: '#2A3D5C',
-        deepIndigo: '#1A2438',
-        turmeric: '#C9982E',
-        madder: '#A63D2F',
-        explored: '#C7CEDC',
-      },
+      colors: { ...PALETTE },
       fontFamily: {
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
         serif: ['var(--font-serif)', 'Georgia', 'serif'],
