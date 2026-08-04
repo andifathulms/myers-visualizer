@@ -36,7 +36,8 @@ export type Dict = {
     run: string
     swap: string
     presets: string
-    tooLarge: (n: number, m: number, cap: number) => string
+    /** Placeholders {n} {m} {cap} — the dictionary must stay serialisable. */
+    tooLarge: string
   }
   graph: {
     title: string
@@ -50,7 +51,8 @@ export type Dict = {
     snakes: string
     tokens: string
     memory: string
-    ambiguityCount: (n: number) => string
+    /** Placeholder {n}. */
+    ambiguityCount: string
     ambiguityUnique: string
     ambiguityMany: string
     altScript: string
@@ -121,8 +123,8 @@ const id: Dict = {
     run: 'Jalankan',
     swap: 'Tukar A/B',
     presets: 'Contoh',
-    tooLarge: (n, m, cap) =>
-      `Masukan ${n}×${m} melampaui batas tampilan ${cap}×${cap}. Lattice sebesar itu tidak terbaca, jadi tidak digambar — hasil diff tetap ditampilkan di bawah.`,
+    tooLarge:
+      'Masukan {n}×{m} melampaui batas tampilan {cap}×{cap}. Lattice sebesar itu tidak terbaca, jadi tidak digambar — hasil diff tetap ditampilkan di bawah.',
   },
   graph: {
     title: 'Edit graph',
@@ -136,7 +138,7 @@ const id: Dict = {
     snakes: 'Snake',
     tokens: 'Token',
     memory: 'Sel V tersimpan',
-    ambiguityCount: (n) => `${n} edit script minimal ditemukan`,
+    ambiguityCount: '{n} edit script minimal ditemukan',
     ambiguityUnique: 'Edit script minimal tunggal — tidak ada ambiguitas pada masukan ini.',
     ambiguityMany: 'Beberapa script sama-sama minimal. Algoritma memilih satu lewat tie-breaking.',
     altScript: 'Script alternatif',
@@ -211,8 +213,8 @@ const en: Dict = {
     run: 'Run',
     swap: 'Swap A/B',
     presets: 'Presets',
-    tooLarge: (n, m, cap) =>
-      `Input ${n}×${m} is above the viewable cap of ${cap}×${cap}. A lattice that dense is not readable, so it is not drawn — the diff result is still shown below.`,
+    tooLarge:
+      'Input {n}×{m} is above the viewable cap of {cap}×{cap}. A lattice that dense is not readable, so it is not drawn — the diff result is still shown below.',
   },
   graph: {
     title: 'Edit graph',
@@ -226,7 +228,7 @@ const en: Dict = {
     snakes: 'Snakes',
     tokens: 'Tokens',
     memory: 'V cells stored',
-    ambiguityCount: (n) => `${n} minimal edit scripts found`,
+    ambiguityCount: '{n} minimal edit scripts found',
     ambiguityUnique: 'The minimal edit script is unique — no ambiguity on this input.',
     ambiguityMany: 'Several scripts are equally minimal. The algorithm picks one by tie-breaking.',
     altScript: 'Alternative script',
@@ -274,4 +276,15 @@ const DICTS: Record<Locale, Dict> = { id, en }
 
 export function getDict(locale: Locale): Dict {
   return DICTS[locale]
+}
+
+/**
+ * Fill {placeholders}. Copy stays plain strings so the whole dictionary can be
+ * handed from a server component to a client one — functions cannot cross that
+ * boundary.
+ */
+export function format(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (whole, key: string) =>
+    key in values ? String(values[key]) : whole,
+  )
 }
