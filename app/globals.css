@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+html,
+body {
+  background-color: #e8e2d4;
+  color: #1a2438;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    @apply font-serif;
+  }
+}
+
+/* Motion is one orchestrated moment; honour the OS setting. PRD §9. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
