@@ -55,8 +55,13 @@ export function useDiffInputs(): DiffInputs {
   const [algorithm, setAlgorithm] = useState<AlgorithmId>('myers')
   const [shareUrl, setShareUrl] = useState('')
 
-  // Hash → state, once on mount. A shared link opens on the same input.
-  useEffect(() => {
+  /**
+   * Hash → state. Applied on mount and on every hashchange, so that pasting a
+   * shared link into an already-open page actually loads it — and so the back
+   * button moves between shared states instead of doing nothing. Our own
+   * writes use replaceState, which never fires hashchange, so this cannot loop.
+   */
+  const applyHash = useCallback(() => {
     const hash = readHash()
     const preset = hash.p === undefined ? undefined : findPreset(hash.p)
     if (preset !== undefined) {
@@ -64,23 +69,29 @@ export function useDiffInputs(): DiffInputs {
       setB(preset.b)
       setGranularity(preset.granularity)
       setPresetId(preset.id)
-      return
-    }
-    if (hash.a !== undefined || hash.b !== undefined) {
+    } else if (hash.a !== undefined || hash.b !== undefined) {
       try {
         setA(decodeURIComponent(hash.a ?? ''))
         setB(decodeURIComponent(hash.b ?? ''))
         setPresetId(null)
       } catch {
-        // A malformed hash is not worth an error state; fall back to the default.
+        // A malformed hash is not worth an error state; keep what we have.
       }
     }
     if (hash.g === 'line' || hash.g === 'word' || hash.g === 'char') setGranularity(hash.g)
-    if (hash.w === '1') setIgnoreWhitespace(true)
+    setIgnoreWhitespace(hash.w === '1')
     if (hash.alg !== undefined && (ALGORITHMS as readonly string[]).includes(hash.alg)) {
       setAlgorithm(hash.alg as AlgorithmId)
+    } else if (hash.p !== undefined || hash.a !== undefined) {
+      setAlgorithm('myers') // absent means the default, not "unchanged"
     }
   }, [])
+
+  useEffect(() => {
+    applyHash()
+    window.addEventListener('hashchange', applyHash)
+    return () => window.removeEventListener('hashchange', applyHash)
+  }, [applyHash])
 
   // State → hash. Presets share by id so the link stays short and readable.
   useEffect(() => {

@@ -16,8 +16,14 @@ type Props = {
   m: number
   matches: MatchGrid | null
   frame?: LatticeFrame
-  /** History up to and including the current step. Stamped incrementally. */
-  stamps?: readonly ExploredStamp[]
+  /**
+   * How many steps the current frame has passed, and how to get each one's
+   * contribution to the explored wash. A prefix array would be allocated every
+   * frame — at the input cap that is 135 000 elements, 60 times a second — and
+   * storing the whole history would duplicate data the timeline already holds.
+   */
+  stampAt?: (index: number) => ExploredStamp
+  stampCount?: number
   padding?: number
   onHoverPoint?: (p: Point | null) => void
   className?: string
@@ -33,7 +39,8 @@ export function LatticeCanvas({
   m,
   matches,
   frame = EMPTY_FRAME,
-  stamps = [],
+  stampAt,
+  stampCount = 0,
   padding = 24,
   onHoverPoint,
   className,
@@ -74,17 +81,21 @@ export function LatticeCanvas({
   // Explored wash: stamp forward, rebuild only on a backward seek.
   useEffect(() => {
     const renderer = rendererRef.current
-    if (renderer === null) return
-    if (stamps.length < stampedRef.current) {
+    if (renderer === null || stampAt === undefined) {
+      rendererRef.current?.draw(frame)
+      return
+    }
+    if (stampCount < stampedRef.current) {
       renderer.clearExplored()
       stampedRef.current = 0
     }
-    for (let i = stampedRef.current; i < stamps.length; i++) {
-      renderer.stampExplored(stamps[i].snakes, stamps[i].frontier)
+    for (let i = stampedRef.current; i < stampCount; i++) {
+      const stamp = stampAt(i)
+      renderer.stampExplored(stamp.snakes, stamp.frontier)
     }
-    stampedRef.current = stamps.length
+    stampedRef.current = stampCount
     renderer.draw(frame)
-  }, [stamps, frame])
+  }, [stampAt, stampCount, frame])
 
   const handleMove = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {

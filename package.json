@@ -2,7 +2,7 @@
   "name": "selisih",
   "version": "0.1.0",
   "private": true,
-  "description": "Myers diff algorithm visualizer — edit graph, frontier, V array, backtrack.",
+  "description": "Myers diff algorithm visualizer \u2014 edit graph, frontier, V array, backtrack.",
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/postbuild.mjs",
@@ -12,6 +12,7 @@
     "test:apply": "vitest run tests/apply",
     "test:oracle": "vitest run tests/oracle",
     "test:determinism": "vitest run tests/determinism",
+    "test:browser": "node scripts/smoke.mjs",
     "bench:render": "node scripts/bench-render.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "next lint"

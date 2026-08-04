@@ -34,6 +34,7 @@ pnpm test:run              # vitest once — before every commit
 pnpm test:apply            # apply property across the generated corpus
 pnpm test:oracle           # brute-force minimal D agreement
 pnpm test:determinism
+pnpm test:browser          # smoke the built export in real Chrome
 pnpm bench:render          # canvas lattice render benchmark
 pnpm typecheck
 pnpm lint
@@ -58,6 +59,15 @@ render bench — 300×300 lattice, 220 frames
 The frame interval is the meaningful number: rAF held 60fps for 220 consecutive frames while redrawing the frontier every frame. Headless Chrome rasterises canvas in software, so this is a floor, not a best case.
 
 What makes it affordable is layering — grid threads and 90 000 match knots are drawn once to a cached layer, the explored wash is stamped incrementally, and only the frontier, snakes and path are redrawn per frame. `tests/render/frame-cost.test.ts` enforces that in CI, where a timing benchmark would only produce false failures.
+
+## Browser verification
+
+`pnpm test:browser` builds the export, serves it under the production basePath and drives it in real Chrome. Two shipped code paths cannot run under jsdom at all, and this is the only thing that exercises them:
+
+- **The worker.** jsdom has no `Worker`, so the unit tests only ever hit `useDiff`'s synchronous fallback. The smoke test asserts the worker chunk is actually requested.
+- **The painting.** A jsdom canvas is a stub, so "the lattice renders" was otherwise asserted by counting draw calls. The smoke test reads pixels back.
+
+It also checks the worst case at the input cap — 300 × 300 with nothing in common, so `D = 600`, 135 152 recorded steps and 362 404 retained `V` cells. The search runs in a worker, so the main thread stays responsive throughout; when the result lands there is a one-time hitch of roughly 100–200 ms while the trace is deserialised and the timeline built. That is a hitch, not a freeze, and only on the deliberately pathological input.
 
 ## Testing
 

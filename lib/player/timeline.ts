@@ -29,15 +29,26 @@ export type Step = {
   readonly region: Region | null
 }
 
+/**
+ * One step's contribution to the explored wash. Derived on demand rather than
+ * stored: a parallel array duplicating `steps` costs another object per step,
+ * and at the input cap that is 135 000 allocations for data already held.
+ */
 export type Stamp = {
   readonly snakes: readonly Snake[]
   readonly frontier: readonly { k: number; x: number; y: number }[]
 }
 
+export function stampAt(timeline: Timeline, index: number): Stamp {
+  const step = timeline.steps[index]
+  return {
+    snakes: step.snake === null ? [] : [step.snake],
+    frontier: [{ k: step.k, x: step.to.x, y: step.to.y }],
+  }
+}
+
 export type Timeline = {
   readonly steps: readonly Step[]
-  /** One stamp per step, applied to the explored wash as the step passes. */
-  readonly stamps: readonly Stamp[]
   /** Index of the first step of each d, for "jump to next d". */
   readonly levelStarts: readonly number[]
   /** Indices of steps that discovered a snake, for "jump to next snake". */
@@ -60,7 +71,6 @@ function isStep(event: TraceEvent): event is Extract<TraceEvent, { type: 'step' 
 
 export function buildTimeline(trace: SearchTrace, script: EditScript): Timeline {
   const steps: Step[] = []
-  const stamps: Stamp[] = []
   const levelStarts: number[] = []
   const snakeSteps: number[] = []
   const middleSnakes: { at: number; snake: Snake }[] = []
@@ -102,16 +112,11 @@ export function buildTimeline(trace: SearchTrace, script: EditScript): Timeline 
     })
     if (pendingMiddle !== null) middleSnakes.push({ at: steps.length - 1, snake: pendingMiddle })
     pendingMiddle = null
-    stamps.push({
-      snakes: snake === null ? [] : [snake],
-      frontier: [{ k: event.k, x: event.to.x, y: event.to.y }],
-    })
   }
 
   const path = pathOf(script)
   return {
     steps,
-    stamps,
     levelStarts,
     snakeSteps,
     middleSnakes,

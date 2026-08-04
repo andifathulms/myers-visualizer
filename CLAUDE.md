@@ -165,7 +165,14 @@ Read it correctly. `draw` is CPU time submitting canvas commands, so on its own 
 
 The bench is **not in CI**: a timing benchmark on a shared runner produces false failures, and puppeteer's Chrome download is a large per-run cost. `tests/render/frame-cost.test.ts` guards the property the number depends on — per-frame work is O(frontier), not O(N·M) — cheaply and deterministically, and the browser bench calibrates it. Re-run the bench after any change to `components/lattice/render.ts`.
 
-Still unverified: the animation as a thing to look at. The tests cover the wiring, the accessible text, and the cost — not whether it reads well.
+**`pnpm test:browser` smokes the built export in real Chrome**, which is the only place two shipped paths run at all: the worker (jsdom has no `Worker`, so the unit tests only ever hit the synchronous fallback) and the painting (a jsdom canvas is a stub, so the lattice was otherwise verified by counting draw calls). It reads pixels back, confirms the worker chunk is requested, and checks the worst case at the cap — `D = 600`, 135 152 steps, 362 404 `V` cells — stays responsive.
+
+Two things that pass came out of running it, and are worth keeping in mind:
+
+- The hash was only read on mount, so pasting a shared link into an already-open page did nothing. It now listens for `hashchange`. Our own writes use `replaceState`, which never fires it, so there is no loop.
+- At the cap there is a one-time ~100–200 ms hitch when the result lands: deserialising 135 000 trace events from the worker and building the timeline is main-thread work. The search itself never touches the main thread. Removing the timeline's parallel `stamps` array roughly halved it; going further means changing the trace wire format to typed arrays.
+
+Still unverified: the animation as a thing to look at. The tests cover the wiring, the accessible text, the pixels and the cost — not whether it reads well.
 
 Nothing has been pushed; there is no remote. The Actions workflow and `basePath` both assume the repository is named `myers-visualizer` — if it is named otherwise, `next.config.js` needs changing to match.
 

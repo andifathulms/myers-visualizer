@@ -20,6 +20,7 @@ import {
   nextLevelFrame,
   regionAt,
   settledSnakesAt,
+  stampAt as stampOf,
   nextSnakeFrame,
   pathAt,
   previousLevelFrame,
@@ -153,10 +154,11 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     [vPoints, frontiers.backward, currentStep, frame, timeline, highlightK, selectedPath, altPath],
   )
 
-  const stamps = useMemo(() => timeline?.stamps ?? [], [timeline])
-  const visibleStamps = useMemo(
-    () => stamps.slice(0, Math.min(frame, stamps.length)),
-    [stamps, frame],
+  // The canvas is told how far along it is and how to fetch each stamp, rather
+  // than handed a freshly built prefix every frame.
+  const stampAt = useCallback(
+    (index: number) => (timeline === null ? { snakes: [], frontier: [] } : stampOf(timeline, index)),
+    [timeline],
   )
 
   const hunks = useMemo(() => {
@@ -213,7 +215,8 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 m={m}
                 matches={matches}
                 frame={latticeFrame}
-                stamps={visibleStamps}
+                stampAt={stampAt}
+                stampCount={Math.min(frame, timeline?.searchFrames ?? 0)}
                 label={dict.a11y.graphLabel}
               />
             </div>

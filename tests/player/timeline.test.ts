@@ -12,6 +12,7 @@ import {
   previousLevelFrame,
   regionAt,
   settledSnakesAt,
+  stampAt,
 } from '@/lib/player/timeline'
 import { frontierAfterLevel } from '@/lib/diff/trace'
 import { fullCorpus } from '../corpus'
@@ -30,7 +31,16 @@ describe('timeline', () => {
     const stepEvents = trace.events.filter((e) => e.type === 'step').length
     expect(timeline.searchFrames).toBe(stepEvents)
     expect(timeline.totalFrames).toBe(stepEvents + timeline.path.length)
-    expect(timeline.stamps).toHaveLength(stepEvents)
+  })
+
+  it('derives each step\u2019s explored stamp without storing a parallel array', () => {
+    const { timeline } = timelineFor(A, B)
+    for (let i = 0; i < timeline.searchFrames; i++) {
+      const stamp = stampAt(timeline, i)
+      const step = timeline.steps[i]
+      expect(stamp.frontier).toEqual([{ k: step.k, x: step.to.x, y: step.to.y }])
+      expect(stamp.snakes).toEqual(step.snake === null ? [] : [step.snake])
+    }
   })
 
   it('keeps madder off screen until there is an answer', () => {
