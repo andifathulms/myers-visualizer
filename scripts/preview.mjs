@@ -32,7 +32,14 @@ async function resolveFile(urlPath) {
   return null
 }
 
-createServer(async (req, res) => {
+export function serve(port = PORT) {
+  const server = createServer(handler)
+  return new Promise((resolve) => {
+    server.listen(port, () => resolve(server))
+  })
+}
+
+async function handler(req, res) {
   const url = new URL(req.url ?? '/', 'http://localhost')
   if (url.pathname === '/' || url.pathname === '') {
     res.writeHead(302, { location: `${BASE_PATH}/` })
@@ -50,6 +57,12 @@ createServer(async (req, res) => {
   const body = await readFile(file)
   res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' })
   res.end(body)
-}).listen(PORT, () => {
+}
+
+// Only listen when run directly; bench-render.mjs imports serve() instead.
+if (process.argv[1] && process.argv[1].endsWith('preview.mjs')) {
+  await serve()
   console.log(`preview: http://localhost:${PORT}${BASE_PATH}/`)
-})
+}
+
+export { BASE_PATH, PORT }

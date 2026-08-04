@@ -151,10 +151,21 @@ M0–M7 built — every milestone in PRD §10. Static export, canvas lattice, gr
 
 Green: apply property and oracle agreement across the corpus for every algorithm, minimality ordering, cross-variant `D` equality, trace well-formedness, determinism, step budget at the input cap. First-load JS is 85.6 KB gzipped against the 250 KB budget.
 
-**Two things are asserted but not machine-verified**, because no browser is installed in the environment this was built in:
+**The M0 gate is measured.** `pnpm bench:render` builds, serves under the production basePath, drives the spike in headless Chrome and reads the numbers back, exiting non-zero if the budget is blown. On a 300×300 lattice over 220 measured frames (20 discarded as warm-up):
 
-- The 60fps claim. `pnpm bench:render` serves the spike page and reports mean/p95 draw time against the 16.7 ms budget, but the number has never been captured. `tests/render/frame-cost.test.ts` guards the property it depends on — per-frame work is O(frontier), not O(N·M) — which is a proxy, not a measurement. **Run the bench and record the number.**
-- The animation itself. The jsdom tests cover the wiring and the accessible text, not the drawing.
+| | |
+|---|---|
+| draw mean | 0.13 ms |
+| draw p95 | 0.30 ms |
+| frame median | 16.70 ms — **59.9 fps** |
+| frame p95 | 17.20 ms |
+| budget | 16.7 ms |
+
+Read it correctly. `draw` is CPU time submitting canvas commands, so on its own it would not prove rasterisation keeps up — the frame interval is what does: rAF held 60fps for 220 consecutive frames *while* doing this work every frame. Headless Chrome rasterises in software, so this is a conservative floor rather than a best case.
+
+The bench is **not in CI**: a timing benchmark on a shared runner produces false failures, and puppeteer's Chrome download is a large per-run cost. `tests/render/frame-cost.test.ts` guards the property the number depends on — per-frame work is O(frontier), not O(N·M) — cheaply and deterministically, and the browser bench calibrates it. Re-run the bench after any change to `components/lattice/render.ts`.
+
+Still unverified: the animation as a thing to look at. The tests cover the wiring, the accessible text, and the cost — not whether it reads well.
 
 Nothing has been pushed; there is no remote. The Actions workflow and `basePath` both assume the repository is named `myers-visualizer` — if it is named otherwise, `next.config.js` needs changing to match.
 

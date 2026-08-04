@@ -41,6 +41,24 @@ pnpm lint
 
 `pnpm test:apply` and `pnpm test:oracle` gate any change to `lib/diff`.
 
+## Performance
+
+The edit graph is the product, so the render was proven before any algorithm work. `pnpm bench:render` builds the export, serves it under the production basePath, drives the 300×300 spike in headless Chrome and fails if the budget is blown.
+
+```
+render bench — 300×300 lattice, 220 frames
+  canvas           900×900 px
+  draw mean        0.13 ms
+  draw p95         0.30 ms
+  frame median     16.70 ms (59.9 fps)
+  frame p95        17.20 ms
+  budget           16.7 ms
+```
+
+The frame interval is the meaningful number: rAF held 60fps for 220 consecutive frames while redrawing the frontier every frame. Headless Chrome rasterises canvas in software, so this is a floor, not a best case.
+
+What makes it affordable is layering — grid threads and 90 000 match knots are drawn once to a cached layer, the explored wash is stamped incrementally, and only the frontier, snakes and path are redrawn per frame. `tests/render/frame-cost.test.ts` enforces that in CI, where a timing benchmark would only produce false failures.
+
 ## Testing
 
 The suite is built around properties rather than fixtures:
