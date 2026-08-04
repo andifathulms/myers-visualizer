@@ -109,8 +109,8 @@ export const PRESETS: readonly Preset[] = [
     id: 'brace-misattribution',
     title: { id: 'Kurung kurawal salah alamat', en: 'The misattributed brace' },
     phenomenon: {
-      id: 'Fungsi baru disisipkan di antara dua fungsi lama. Ada beberapa edit script yang sama-sama minimal, dan tie-breaking algoritma memilih yang mengaitkan kurung penutup ke fungsi yang salah. Inilah kasus yang pernah dilihat semua orang.',
-      en: 'A new function is inserted between two existing ones. Several edit scripts are equally minimal, and the algorithm’s tie-breaking picks the one that attributes the closing brace to the wrong function. This is the case everybody has hit.',
+      id: 'Fungsi baru disisipkan di antara dua fungsi lama. Ada tiga edit script yang sama-sama minimal — telusuri alternatifnya, dan salah satunya mengaitkan kurung kurawal penutup ke fungsi yang salah: inilah diff jelek yang pernah dilihat semua orang. Implementasi di sini kebetulan memilih yang terbaca; mana yang muncul ditentukan oleh tie-breaking, bukan oleh penilaian mana yang lebih masuk akal.',
+      en: 'A new function is inserted between two existing ones. Three edit scripts are equally minimal — step through the alternatives and one of them attributes the closing brace to the wrong function: the ugly diff everybody has seen. This implementation happens to pick a readable one; which you get is decided by tie-breaking, not by any judgement about which reads better.',
     },
     a: braceA,
     b: braceB,

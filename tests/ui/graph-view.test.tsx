@@ -79,6 +79,33 @@ describe('GraphView', () => {
     expect(screen.getByText(/^@@ /)).toBeDefined()
   })
 
+  it('reports the alternatives and switching one changes the diff output', async () => {
+    renderGraph()
+    await waitFor(() => expect(screen.getByText(/^@@ /)).toBeDefined())
+    fireEvent.change(screen.getByLabelText(dict.input.presets, { exact: false }), {
+      target: { value: 'brace-misattribution' },
+    })
+
+    // Three equally minimal scripts, so the alternative buttons appear.
+    await waitFor(() => expect(screen.getByText(dict.graph.altScript)).toBeDefined())
+    const before = screen.getByText(/^@@ /).textContent
+
+    const alternative = screen.getByRole('button', { name: '3' })
+    fireEvent.click(alternative)
+
+    // A different, equally minimal attribution of the very same change.
+    await waitFor(() => expect(screen.getByText(/^@@ /).textContent).not.toBe(before))
+  })
+
+  it('says plainly when the minimal script is unique', async () => {
+    renderGraph()
+    await waitFor(() => expect(screen.getByText(/^@@ /)).toBeDefined())
+    fireEvent.change(screen.getByLabelText(dict.input.presets, { exact: false }), {
+      target: { value: 'pure-insert' },
+    })
+    await waitFor(() => expect(screen.getByText(dict.graph.ambiguityUnique)).toBeDefined())
+  })
+
   it('loads a preset and re-runs the search', async () => {
     renderGraph()
     await waitFor(() => expect(screen.getByText(/^@@ /)).toBeDefined())

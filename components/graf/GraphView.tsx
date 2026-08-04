@@ -21,11 +21,16 @@ import {
   pathAt,
   previousLevelFrame,
 } from '@/lib/player/timeline'
+import { AmbiguityPanel } from '@/components/ambiguity/AmbiguityPanel'
 import { buildHunks } from '@/lib/hunks'
 import { pathOf } from '@/lib/diff/backtrack'
+import { analyseAmbiguity, minimalScripts } from '@/lib/diff/ambiguity'
 import { VIEWABLE_CAP } from '@/layout/lattice'
 import { format, type Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
+
+/** How many alternative minimal scripts to offer. More than a handful is noise. */
+const ALTERNATIVES = 6
 
 export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const inputs = useDiffInputs()
@@ -35,6 +40,8 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const [frame, setFrame] = useState(0)
   const [highlightK, setHighlightK] = useState<number | null>(null)
   const [selectedOp, setSelectedOp] = useState<number | null>(null)
+  /** 0 is the script Myers actually chose; the rest are equally minimal. §6.4 */
+  const [altIndex, setAltIndex] = useState(0)
 
   const timeline = useMemo(() => {
     if (state.status !== 'done') return null
@@ -81,6 +88,26 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const m = b.tokens.length
   const tooLarge = n > VIEWABLE_CAP || m > VIEWABLE_CAP
 
+  // How many equally-minimal scripts exist, and what do the alternatives look
+  // like? Computed by DP over the edit graph, independently of the search.
+  const ambiguity = useMemo(() => analyseAmbiguity(a.tokens, b.tokens), [a.tokens, b.tokens])
+  const alternatives = useMemo(
+    () => (ambiguity.count > 1 ? minimalScripts(a.tokens, b.tokens, ALTERNATIVES) : []),
+    [a.tokens, b.tokens, ambiguity.count],
+  )
+  useEffect(() => setAltIndex(0), [alternatives])
+
+  /**
+   * The script on screen. Index 0 is what Myers chose; picking another shows
+   * a different, equally minimal attribution of the same change — which is
+   * the misattributed-brace lesson, made concrete.
+   */
+  const shownScript = useMemo(() => {
+    if (state.status !== 'done') return null
+    if (altIndex === 0 || alternatives.length === 0) return state.script
+    return alternatives[Math.min(altIndex, alternatives.length - 1)] ?? state.script
+  }, [state, altIndex, alternatives])
+
   const matches = useMemo(
     () => (tooLarge ? null : buildMatchGrid(a.tokens, b.tokens)),
     [a.tokens, b.tokens, tooLarge],
@@ -91,10 +118,16 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
 
   // Clicking a diff line highlights the move that produced it. §6.3
   const selectedPath = useMemo(() => {
-    if (state.status !== 'done' || selectedOp === null) return null
-    const walked = pathOf(state.script.slice(0, selectedOp + 1))
+    if (shownScript === null || selectedOp === null) return null
+    const walked = pathOf(shownScript.slice(0, selectedOp + 1))
     return walked.slice(walked.length - 2)
-  }, [state, selectedOp])
+  }, [shownScript, selectedOp])
+
+  /** An alternative is shown whole, not animated: it was never searched for. */
+  const altPath = useMemo(() => {
+    if (altIndex === 0 || shownScript === null) return null
+    return pathOf(shownScript)
+  }, [altIndex, shownScript])
 
   const latticeFrame = useMemo<LatticeFrame>(
     () => ({
@@ -102,11 +135,11 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       snakes:
         currentStep === null || currentStep.snake === null || frame === 0 ? [] : [currentStep.snake],
       backwardFrontier: null,
-      path: selectedPath ?? (timeline === null ? null : pathAt(timeline, frame)),
+      path: selectedPath ?? altPath ?? (timeline === null ? null : pathAt(timeline, frame)),
       middleSnake: null,
       highlightK,
     }),
-    [vPoints, currentStep, frame, timeline, highlightK, selectedPath],
+    [vPoints, currentStep, frame, timeline, highlightK, selectedPath, altPath],
   )
 
   const stamps = useMemo(() => timeline?.stamps ?? [], [timeline])
@@ -116,9 +149,9 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   )
 
   const hunks = useMemo(() => {
-    if (state.status !== 'done') return []
-    return buildHunks(state.script, a.texts, b.texts)
-  }, [state, a.texts, b.texts])
+    if (shownScript === null) return []
+    return buildHunks(shownScript, a.texts, b.texts)
+  }, [shownScript, a.texts, b.texts])
 
   const t = dict.graph
 
@@ -204,6 +237,18 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
             snakes={state.status === 'done' ? state.stats.snakes : 0}
             steps={timeline?.searchFrames ?? 0}
             vCells={state.status === 'done' ? state.stats.vCells : 0}
+          />
+          <AmbiguityPanel
+            locale={locale}
+            dict={dict}
+            ambiguity={ambiguity}
+            alternatives={alternatives.length}
+            selected={altIndex}
+            onSelect={(index) => {
+              setAltIndex(index)
+              setSelectedOp(null)
+              seek(timeline?.totalFrames ?? 0)
+            }}
           />
           <VStrip
             cells={vPoints}
