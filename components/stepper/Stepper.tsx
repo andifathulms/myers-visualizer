@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+import { Button, Select } from '@/components/ui/controls'
 import type { Dict } from '@/lib/i18n/dictionary'
 
 /**
@@ -9,6 +10,11 @@ import type { Dict } from '@/lib/i18n/dictionary'
  *
  * prefers-reduced-motion disables autoplay and keeps stepping instantaneous,
  * so the controls stay usable without the animation. PRD §9.
+ *
+ * Play is the only filled control on the page: for a first visitor it is the
+ * single thing worth pressing, and it should be obvious which one it is. The
+ * two jump controls are separated from transport by a rule, because they move
+ * by a different unit — a d, a snake — rather than by a frame.
  */
 type Props = {
   frame: number
@@ -40,7 +46,6 @@ export function Stepper({
   onSpeed,
 }: Props) {
   const t = dict.stepper
-  const scrubRef = useRef<HTMLInputElement>(null)
 
   // Keyboard stepping: the whole point is being able to move one step at a time.
   useEffect(() => {
@@ -73,86 +78,73 @@ export function Stepper({
   }, [frame, onSeek, onPlayToggle, onNextLevel, onPreviousLevel])
 
   return (
-    <div className="flex flex-wrap items-center gap-2 font-sans text-xs">
-      <Button onClick={() => onSeek(0)} label={t.reset}>
-        ⏮
-      </Button>
-      <Button onClick={() => onSeek(frame - 1)} label={t.stepBack}>
-        ◀
-      </Button>
-      <Button onClick={onPlayToggle} label={playing ? t.pause : t.play} primary>
-        {playing ? '❚❚' : '▶'}
-      </Button>
-      <Button onClick={() => onSeek(frame + 1)} label={t.step}>
-        ▶
-      </Button>
-      <Button onClick={() => onSeek(total)} label={t.end}>
-        ⏭
-      </Button>
-      <Button onClick={onNextLevel} label={t.nextD}>
-        d+
-      </Button>
-      <Button onClick={onNextSnake} label={t.nextSnake}>
-        snake
-      </Button>
+    <div className="rounded-xl border border-rule bg-paper p-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Button onClick={() => onSeek(0)} label={t.reset}>
+          <Glyph>⏮</Glyph>
+        </Button>
+        <Button onClick={() => onSeek(frame - 1)} label={t.stepBack}>
+          <Glyph>◀</Glyph>
+        </Button>
+        <Button onClick={onPlayToggle} label={playing ? t.pause : t.play} tone="primary" size="md">
+          <span aria-hidden className="text-base leading-none">
+            {playing ? '❚❚' : '▶'}
+          </span>
+        </Button>
+        <Button onClick={() => onSeek(frame + 1)} label={t.step}>
+          <Glyph>▶</Glyph>
+        </Button>
+        <Button onClick={() => onSeek(total)} label={t.end}>
+          <Glyph>⏭</Glyph>
+        </Button>
 
-      <input
-        ref={scrubRef}
-        type="range"
-        min={0}
-        max={Math.max(1, total)}
-        value={frame}
-        aria-label={t.step}
-        onChange={(event) => onSeek(Number(event.target.value))}
-        className="ml-2 h-1 min-w-[8rem] flex-1 accent-madder"
-      />
-      <span className="font-mono tabular-nums text-indigo">
-        {frame}/{total}
-      </span>
+        <span aria-hidden className="mx-1.5 h-6 w-px bg-rule" />
 
-      <label className="ml-2 flex items-center gap-1">
-        <span className="text-indigo">{t.speed}</span>
-        <select
-          value={speed}
-          onChange={(event) => onSpeed(Number(event.target.value))}
-          className="rounded border border-indigo/30 bg-cotton px-1 py-0.5 font-mono"
-        >
-          {SPEEDS.map((s) => (
-            <option key={s} value={s}>
-              {s}×
-            </option>
-          ))}
-        </select>
-      </label>
+        <Button onClick={onNextLevel} label={t.nextD}>
+          <span className="font-mono">d+</span>
+        </Button>
+        <Button onClick={onNextSnake} label={t.nextSnake}>
+          <span className="font-mono">snake</span>
+        </Button>
+
+        <div className="ml-auto flex items-center gap-2">
+          <label htmlFor="speed" className="font-sans text-[13px] text-muted">
+            {t.speed}
+          </label>
+          <Select id="speed" value={speed} onChange={(event) => onSpeed(Number(event.target.value))}>
+            {SPEEDS.map((s) => (
+              <option key={s} value={s}>
+                {s}×
+              </option>
+            ))}
+          </Select>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center gap-3">
+        <input
+          type="range"
+          min={0}
+          max={Math.max(1, total)}
+          value={frame}
+          aria-label={t.progress}
+          onChange={(event) => onSeek(Number(event.target.value))}
+          className="h-1.5 flex-1 accent-madder"
+        />
+        <span className="font-mono text-[13px] tabular-nums text-muted">
+          {frame}/{total}
+        </span>
+      </div>
+
+      <p className="mt-2 font-sans text-[12px] leading-relaxed text-muted/80">{t.keys}</p>
     </div>
   )
 }
 
-function Button({
-  onClick,
-  label,
-  children,
-  primary = false,
-}: {
-  onClick: () => void
-  label: string
-  children: React.ReactNode
-  primary?: boolean
-}) {
+function Glyph({ children }: { children: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={label}
-      aria-label={label}
-      className={[
-        'rounded border px-2 py-1 font-mono leading-none',
-        primary
-          ? 'border-indigo bg-indigo text-cotton hover:bg-deepIndigo'
-          : 'border-indigo/30 hover:border-indigo',
-      ].join(' ')}
-    >
+    <span aria-hidden className="text-[13px] leading-none">
       {children}
-    </button>
+    </span>
   )
 }

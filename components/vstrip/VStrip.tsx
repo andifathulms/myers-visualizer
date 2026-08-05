@@ -1,5 +1,7 @@
 'use client'
 
+import { Panel } from '@/components/ui/Panel'
+
 /**
  * The V array as an indexed strip, one cell per diagonal k. §6.2
  *
@@ -24,13 +26,9 @@ type Props = {
 
 export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint }: Props) {
   return (
-    <section aria-label={label}>
-      <h3 className="font-sans text-xs font-semibold uppercase tracking-wide text-indigo">
-        {label}
-      </h3>
-      <p className="mt-1 font-sans text-xs text-indigo/80">{hint}</p>
+    <Panel title={label} hint={hint} ariaLabel={label}>
       <ol
-        className="mt-3 flex flex-wrap gap-1"
+        className="flex flex-wrap gap-1.5"
         onMouseLeave={() => onHighlight(null)}
       >
         {cells.map((cell) => {
@@ -46,24 +44,24 @@ export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint }
                 aria-label={`k = ${cell.k}, x = ${cell.x}, y = ${cell.y}`}
                 aria-pressed={active}
                 className={[
-                  'flex w-12 flex-col items-center rounded border px-1 py-0.5 font-mono text-[11px] leading-tight transition-colors',
+                  'flex w-[3.25rem] flex-col items-center rounded-lg border py-1 font-mono leading-tight transition-colors',
                   active
                     ? 'border-madder bg-madder/10 text-madder'
                     : live
-                      ? 'border-turmeric bg-turmeric/10 text-deepIndigo'
-                      : 'border-indigo/25 text-indigo',
+                      ? 'border-turmeric bg-turmeric/15 text-deepIndigo'
+                      : 'border-rule bg-cotton/40 text-muted',
                 ].join(' ')}
               >
-                <span className="text-[9px] uppercase tracking-wide opacity-70">k{cell.k}</span>
-                <span className="tabular-nums">{cell.x}</span>
+                <span className="text-[10px] tracking-wide opacity-70">k{cell.k}</span>
+                <span className="text-[13px] tabular-nums">{cell.x}</span>
               </button>
             </li>
           )
         })}
         {cells.length === 0 ? (
-          <li className="font-mono text-xs text-indigo/60">—</li>
+          <li className="font-mono text-[13px] text-muted">—</li>
         ) : null}
       </ol>
-    </section>
+    </Panel>
   )
 }
