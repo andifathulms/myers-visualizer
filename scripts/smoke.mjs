@@ -18,8 +18,14 @@ import { join } from 'node:path'
 import puppeteer from 'puppeteer'
 import { serve, BASE_PATH } from './preview.mjs'
 
+/**
+ * Point at the deployed site with SMOKE_URL to check the real thing:
+ *   SMOKE_URL=https://andifathulms.github.io/myers-visualizer pnpm test:browser
+ * Otherwise the local export is built and served.
+ */
+const REMOTE = process.env.SMOKE_URL
 const PORT = Number(process.env.PORT ?? 4323)
-const base = `http://localhost:${PORT}${BASE_PATH}`
+const base = REMOTE ?? `http://localhost:${PORT}${BASE_PATH}`
 
 async function exists(path) {
   try {
@@ -43,12 +49,12 @@ function check(name, ok, detail = '') {
   console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}${detail === '' ? '' : ` — ${detail}`}`)
 }
 
-if (!(await exists(join(process.cwd(), 'out', 'id', 'graf', 'index.html')))) {
+if (REMOTE === undefined && !(await exists(join(process.cwd(), 'out', 'id', 'graf', 'index.html')))) {
   console.log('smoke: no export found, building…')
   await run('pnpm', ['build'])
 }
 
-const server = await serve(PORT)
+const server = REMOTE === undefined ? await serve(PORT) : null
 const browser = await puppeteer.launch({
   headless: true,
   args: ['--no-sandbox', '--disable-dev-shm-usage'],
@@ -71,7 +77,7 @@ try {
     if (response.status() >= 400) notFound.push(`${response.status()} ${response.url()}`)
   })
 
-  console.log('\nsmoke — built export in real Chrome\n')
+  console.log(`\nsmoke — ${REMOTE ?? 'built export'} in real Chrome\n`)
 
   await page.goto(`${base}/id/graf/`, { waitUntil: 'networkidle0' })
   await page.waitForSelector('canvas[role="img"]')
@@ -195,6 +201,47 @@ try {
     worstStats.replace(/\n/g, ' ').slice(0, 90),
   )
 
+  /**
+   * PRD §11: fully offline after first load. Browser HTTP caching alone does
+   * not give this — a reload with no network fails without a worker. So the
+   * check is the real one: load, let the worker install, cut the network, and
+   * reload.
+   */
+  await page.goto(`${base}/id/graf/`, { waitUntil: 'networkidle0' })
+  const registered = await page.evaluate(async () => {
+    if (!('serviceWorker' in navigator)) return false
+    const registration = await navigator.serviceWorker.ready
+    return registration.active !== null
+  })
+  check('service worker installs', registered)
+
+  // Give the precache a moment to finish before pulling the plug.
+  await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 1500)))
+
+  await page.setOfflineMode(true)
+  try {
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    await page.waitForFunction(() => document.body.textContent?.includes('@@ '), {
+      timeout: 20_000,
+    })
+    const offlinePixels = await page.evaluate(() => {
+      const canvas = document.querySelector('canvas')
+      const ctx = canvas?.getContext('2d')
+      if (!canvas || !ctx) return 0
+      const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      let ink = 0
+      for (let i = 0; i < data.length; i += 4) if (data[i + 3] > 8) ink++
+      return ink
+    })
+    // Not just an offline shell: the search ran and the lattice drew, with no
+    // network at all.
+    check('works fully offline after first load', offlinePixels > 500, `${offlinePixels} px inked`)
+  } catch (error) {
+    check('works fully offline after first load', false, String(error).slice(0, 80))
+  } finally {
+    await page.setOfflineMode(false)
+  }
+
   check('every request resolves', notFound.length === 0, notFound.join(', '))
   check('no console errors or uncaught exceptions', consoleErrors.length === 0, consoleErrors[0] ?? '')
 
@@ -203,5 +250,5 @@ try {
   if (failed.length > 0) process.exitCode = 1
 } finally {
   await browser.close()
-  server.close()
+  server?.close()
 }

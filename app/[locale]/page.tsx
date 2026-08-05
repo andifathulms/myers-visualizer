@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { LOCALES, isLocale } from '@/lib/i18n/locales'
 import { getDict } from '@/lib/i18n/dictionary'
+import { READING } from '@/lib/links'
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -72,7 +73,25 @@ export default function Home({ params }: { params: { locale: string } }) {
 
       <section className="mt-14">
         <h2 className="text-2xl font-semibold">{t.creditsTitle}</h2>
-        <p className="mt-3 max-w-2xl font-sans text-sm leading-relaxed text-indigo">{t.notGit}</p>
+        <ul className="mt-4 flex max-w-2xl flex-col gap-4">
+          {READING.map((entry) => (
+            <li key={entry.href}>
+              <a
+                href={entry.href}
+                rel="noreferrer noopener"
+                className="font-sans text-sm font-medium underline decoration-indigo/40 underline-offset-4 hover:text-madder"
+              >
+                {entry.title}
+              </a>
+              <p className="mt-1 font-sans text-sm leading-relaxed text-indigo">
+                {entry.note[locale]}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 max-w-2xl border-l-2 border-indigo/30 pl-4 font-sans text-sm leading-relaxed text-indigo">
+          {t.notGit}
+        </p>
       </section>
     </main>
   )

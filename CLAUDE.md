@@ -174,6 +174,8 @@ Two things that pass came out of running it, and are worth keeping in mind:
 
 Still unverified: the animation as a thing to look at. The tests cover the wiring, the accessible text, the pixels and the cost — not whether it reads well.
 
-Nothing has been pushed; there is no remote. The Actions workflow and `basePath` both assume the repository is named `myers-visualizer` — if it is named otherwise, `next.config.js` needs changing to match.
+**Deployed:** https://andifathulms.github.io/myers-visualizer/ — verified live with `SMOKE_URL=… pnpm test:browser`, 15/15.
+
+`basePath` must match the repository name, and `scripts/postbuild.mjs` hardcodes it too when generating the service worker. Renaming the repository means changing both.
 
 Two preset claims were written before they were checked, and both were false: this implementation's tie-breaking does *not* choose the misattributed brace, and two functions swapping order does not make patience win. Both presets were replaced with inputs that demonstrate the phenomenon, and `tests/presets/` now asserts each claim. **Assert a preset's phenomenon when adding one.**

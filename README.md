@@ -67,7 +67,7 @@ What makes it affordable is layering — grid threads and 90 000 match knots are
 - **The worker.** jsdom has no `Worker`, so the unit tests only ever hit `useDiff`'s synchronous fallback. The smoke test asserts the worker chunk is actually requested.
 - **The painting.** A jsdom canvas is a stub, so "the lattice renders" was otherwise asserted by counting draw calls. The smoke test reads pixels back.
 
-It also checks the worst case at the input cap — 300 × 300 with nothing in common, so `D = 600`, 135 152 recorded steps and 362 404 retained `V` cells. The search runs in a worker, so the main thread stays responsive throughout; when the result lands there is a one-time hitch of roughly 100–200 ms while the trace is deserialised and the timeline built. That is a hitch, not a freeze, and only on the deliberately pathological input.
+It also verifies the offline claim the way it has to be verified: load the page, let the service worker install, cut the network, reload, and check the search still runs and the lattice still paints. And it checks the worst case at the input cap — 300 × 300 with nothing in common, so `D = 600`, 135 152 recorded steps and 362 404 retained `V` cells. The search runs in a worker, so the main thread stays responsive throughout; when the result lands there is a one-time hitch of roughly 100–200 ms while the trace is deserialised and the timeline built. That is a hitch, not a freeze, and only on the deliberately pathological input.
 
 ## Testing
 
@@ -94,7 +94,13 @@ Git applies additional heuristics and fallbacks on top of Myers. This makes no c
 
 ## Deployment
 
-`main` builds and deploys to GitHub Pages via Actions. The workflow runs the apply property and the oracle before it builds. `basePath` matches the repository name and `.nojekyll` is written into `out/`; verify with `pnpm preview` before pushing.
+Live at **https://andifathulms.github.io/myers-visualizer/**
+
+`main` builds and deploys to GitHub Pages via Actions. The workflow runs typecheck, lint, the apply property and the oracle before it builds, and fails outright if `out/.nojekyll` is missing — without it Jekyll drops `_next/` and the site serves blank.
+
+`basePath` must match the repository name. `scripts/postbuild.mjs` also generates the service worker, with a precache manifest and a cache version derived from the build's content rather than a clock, so an unchanged build does not churn browsers' caches.
+
+Verify a deployment with `SMOKE_URL=https://andifathulms.github.io/myers-visualizer pnpm test:browser`.
 
 ## Licence
 

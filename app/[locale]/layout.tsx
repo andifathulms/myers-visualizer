@@ -4,6 +4,7 @@ import { getDict } from '@/lib/i18n/dictionary'
 import { SiteNav } from '@/components/chrome/SiteNav'
 import { SiteFooter } from '@/components/chrome/SiteFooter'
 import { LocaleLang } from '@/components/chrome/LocaleLang'
+import { ServiceWorker } from '@/components/chrome/ServiceWorker'
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -24,6 +25,7 @@ export default function LocaleLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <LocaleLang locale={params.locale} />
+      <ServiceWorker />
       <a
         href="#konten"
         className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded focus:bg-indigo focus:px-3 focus:py-2 focus:font-sans focus:text-sm focus:text-cotton"
