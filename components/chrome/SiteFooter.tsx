@@ -1,6 +1,7 @@
 import type { Locale } from '@/lib/i18n/locales'
 import { getDict } from '@/lib/i18n/dictionary'
 import { MakerSignature } from '@/components/chrome/MakerSignature'
+import { BrandMark } from '@/components/chrome/BrandMark'
 
 import { READING, REPOSITORY } from '@/lib/links'
 
@@ -21,7 +22,10 @@ export function SiteFooter({ locale }: { locale: Locale }) {
   return (
     <footer className="mt-20 border-t border-rule bg-paper/60">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 font-sans text-sm sm:grid-cols-[1fr_auto]">
-        <p className="font-serif text-lg font-semibold">{dict.nav.brand}</p>
+        <p className="flex items-center gap-2.5 font-serif text-lg font-semibold">
+          <BrandMark size={22} />
+          {dict.nav.brand}
+        </p>
 
         <nav
           aria-label={dict.home.creditsTitle}

@@ -1,0 +1,20 @@
+{
+  "name": "Myers Visualizer — the Myers diff algorithm, made watchable",
+  "short_name": "Myers Visualizer",
+  "description": "Watch the Myers diff algorithm run: the edit graph, the advancing frontier, the V array, and the backtrack that recovers the edit script.",
+  "start_url": "/myers-visualizer/en/graf/",
+  "scope": "/myers-visualizer/",
+  "display": "standalone",
+  "background_color": "#E4E1D6",
+  "theme_color": "#1B1D1C",
+  "icons": [
+    { "src": "/myers-visualizer/brand/myers-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/myers-visualizer/brand/myers-icon-512.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "/myers-visualizer/brand/myers-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

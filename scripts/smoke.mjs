@@ -26,6 +26,8 @@ import { serve, BASE_PATH } from './preview.mjs'
 const REMOTE = process.env.SMOKE_URL
 const PORT = Number(process.env.PORT ?? 4323)
 const base = REMOTE ?? `http://localhost:${PORT}${BASE_PATH}`
+// Asset URLs in the markup are absolute paths that already carry the basePath.
+const origin = new URL(base).origin
 
 async function exists(path) {
   try {
@@ -245,6 +247,51 @@ try {
   } finally {
     await page.setOfflineMode(false)
   }
+
+  /**
+   * The brand assets, fetched the way a browser or a crawler fetches them —
+   * by the URL in the markup. Every one of these fails silently when the
+   * basePath is wrong: no install prompt, a blank tab icon, an empty social
+   * card. Nothing on screen ever says so.
+   */
+  const declared = await page.evaluate(() => ({
+    manifest: document.querySelector('link[rel="manifest"]')?.getAttribute('href') ?? '',
+    icon: document.querySelector('link[rel="icon"]')?.getAttribute('href') ?? '',
+    apple: document.querySelector('link[rel="apple-touch-icon"]')?.getAttribute('href') ?? '',
+    og: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? '',
+  }))
+
+  // og:image is an absolute production URL, which does not exist yet when the
+  // run is against a local export. Only the path is under test, so every URL
+  // is resolved against whichever origin is actually being smoked.
+  const resolves = async (url) => {
+    if (url === '') return false
+    const { pathname, search } = new URL(url, origin)
+    const target = `${origin}${pathname}${search}`
+    const response = await page.evaluate(async (href) => {
+      const result = await fetch(href, { method: 'GET' })
+      return { ok: result.ok, type: result.headers.get('content-type') ?? '' }
+    }, target)
+    return response.ok
+  }
+
+  check('the favicon and apple touch icon resolve', (await resolves(declared.icon)) && (await resolves(declared.apple)), `${declared.icon} · ${declared.apple}`)
+
+  const manifestOk = await resolves(declared.manifest)
+  let iconsOk = false
+  if (manifestOk) {
+    const icons = await page.evaluate(async (href) => {
+      const body = await (await fetch(href)).json()
+      const results = await Promise.all(
+        body.icons.map(async (icon) => (await fetch(icon.src)).ok),
+      )
+      return { count: body.icons.length, ok: results.every(Boolean) }
+    }, `${origin}${new URL(declared.manifest, origin).pathname}`)
+    iconsOk = icons.ok && icons.count >= 3
+  }
+  check('the manifest and its icons resolve', manifestOk && iconsOk, declared.manifest)
+
+  check('the social card image resolves', await resolves(declared.og), declared.og)
 
   check('every request resolves', notFound.length === 0, notFound.join(', '))
   check('no console errors or uncaught exceptions', consoleErrors.length === 0, consoleErrors[0] ?? '')

@@ -42,3 +42,23 @@ export const PALETTE = {
 } as const
 
 export type PaletteToken = keyof typeof PALETTE
+
+/**
+ * The brand mark's own colours — the "snake" staircase from the brand kit,
+ * whose masters live in `exports/` (untracked; the shipped subset is under
+ * `public/brand/` and `app/`).
+ *
+ * These are deliberately *not* UI tokens and must not be used as ones. The
+ * kit's rules: green belongs to the path itself and is never a plain accent,
+ * the cream dot is the file's starting point and the red dot is the
+ * wrong-attribution moment — never swapped. They live here rather than inline
+ * in a component only because this file is where hex literals are allowed.
+ */
+export const BRAND = {
+  paper: '#E4E1D6',
+  ink: '#1B1D1C',
+  /** The path. */
+  insert: '#3F7D5C',
+  /** Where the attribution goes wrong. */
+  delete: '#B14A3E',
+} as const

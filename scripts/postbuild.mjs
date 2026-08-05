@@ -34,6 +34,10 @@ const assets = []
 for (const path of files) {
   const rel = relative(OUT, path).split(sep).join('/')
   if (rel === '.nojekyll' || rel === 'sw.js' || rel.endsWith('.map')) continue
+  // The social card is fetched by crawlers, never by the app. Precaching it
+  // would spend 40 KB of a visitor's offline budget on an image they will
+  // never see.
+  if (rel === 'brand/og.png') continue
   // A directory's index.html is requested as the directory URL, so that is
   // the form the cache has to be keyed by.
   if (rel.endsWith('/index.html')) assets.push(`${BASE_PATH}/${rel.slice(0, -'index.html'.length)}`)

@@ -6,3 +6,7 @@ next-env.d.ts
 .DS_Store
 .env*.local
 coverage/
+
+# Brand asset masters. The subset the site actually ships is committed under
+# public/brand/ and app/, so the build never depends on this folder.
+exports/

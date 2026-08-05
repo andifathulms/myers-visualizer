@@ -81,6 +81,10 @@ The suite is built around properties rather than fixtures:
 
 Edge fixtures are permanent: empty A, empty B, both empty, identical, fully disjoint, single elements, heavily repeated elements.
 
+## Brand and install
+
+The mark is the shortest-path staircase through an edit graph — starting on the cream dot, ending on the red one, where the attribution is decided. Asset masters live in `exports/` and are not committed; the shipped subset is `app/icon.svg`, `app/apple-icon.png` and `public/brand/`. The site is installable: `public/manifest.webmanifest` declares the 192, 512 and maskable icons, and opens on the edit graph rather than the home page. The service worker was already there for the offline requirement.
+
 ## Not git
 
 Git applies additional heuristics and fallbacks on top of Myers. This makes no claim of byte-identical parity with `git diff`, and the tie-breaking here demonstrably differs from git's on some inputs.

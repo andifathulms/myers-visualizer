@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { Locale } from '@/lib/i18n/locales'
 import type { Dict } from '@/lib/i18n/dictionary'
+import { BrandMark } from '@/components/chrome/BrandMark'
 
 /**
  * Sticky, because the tool pages are long and the way back to the
@@ -30,7 +31,7 @@ export function SiteNav({ locale, dict }: { locale: Locale; dict: Dict }) {
           href={`/${locale}`}
           className="mr-2 flex shrink-0 items-center gap-2 font-serif text-lg font-semibold tracking-tight sm:mr-4"
         >
-          <BrandMark />
+          <BrandMark size={20} />
           {dict.nav.brand}
         </Link>
 
@@ -66,21 +67,5 @@ export function SiteNav({ locale, dict }: { locale: Locale; dict: Dict }) {
         </Link>
       </nav>
     </header>
-  )
-}
-
-/**
- * Three points and the diagonal between them — the smallest possible edit
- * graph, and the only mark the site needs. The last point is madder: it is
- * where the path ends.
- */
-function BrandMark() {
-  return (
-    <svg aria-hidden width="18" height="18" viewBox="0 0 18 18" className="shrink-0">
-      <path d="M3 3 L15 15" stroke="currentColor" strokeWidth="1.4" opacity="0.35" />
-      <circle cx="3" cy="3" r="2" fill="currentColor" />
-      <circle cx="9" cy="9" r="1.6" fill="currentColor" opacity="0.5" />
-      <circle cx="15" cy="15" r="2" className="fill-madder" />
-    </svg>
   )
 }

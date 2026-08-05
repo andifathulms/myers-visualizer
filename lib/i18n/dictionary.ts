@@ -1,3 +1,4 @@
+import { APP_NAME } from '../brand'
 import type { Locale } from './locales'
 
 /**
@@ -160,7 +161,7 @@ const id: Dict = {
     compare: 'Banding',
     presets: 'Contoh',
     home: 'Beranda',
-    brand: 'Myers Visualizer',
+    brand: APP_NAME,
   },
   home: {
     kicker: 'Algoritma diff Myers, dibuat bisa ditonton',
@@ -340,7 +341,7 @@ const en: Dict = {
     compare: 'Compare',
     presets: 'Presets',
     home: 'Home',
-    brand: 'Myers Visualizer',
+    brand: APP_NAME,
   },
   home: {
     kicker: 'The Myers diff algorithm, made watchable',
