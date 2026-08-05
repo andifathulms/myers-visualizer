@@ -16,17 +16,22 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  # puppeteer is only for the local browser bench and smoke test; CI runs
+  # neither, so there is no reason to download Chrome on every install.
+  PUPPETEER_SKIP_DOWNLOAD: 'true'
+
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # No `version:` here — package.json's packageManager is the single
+      # source, and passing both makes action-setup fail outright.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
@@ -42,12 +47,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # No `version:` here — package.json's packageManager is the single
+      # source, and passing both makes action-setup fail outright.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
