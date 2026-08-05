@@ -1,8 +1,13 @@
+import { Panel } from '@/components/ui/Panel'
 import type { Dict } from '@/lib/i18n/dictionary'
 
 /**
  * The numbers behind the picture — including the retained V cells, so the
  * O(D²) cost of recording is a figure on screen rather than a claim. §6.6
+ *
+ * D leads, at a size the rest of the panel does not compete with: it is the
+ * one number that answers "how big was this change", and it is the number the
+ * comparison page is arguing about.
  */
 export function StatBar({
   dict,
@@ -28,7 +33,6 @@ export function StatBar({
 }) {
   const t = dict.graph
   const rows: { label: string; value: string }[] = [
-    { label: t.d, value: `${currentD} / ${d}` },
     { label: t.tokens, value: `N=${n} M=${m}` },
     { label: t.snakes, value: String(snakes) },
     { label: t.steps, value: String(steps) },
@@ -36,19 +40,25 @@ export function StatBar({
   ]
   // §6.6: the O(D²) versus O(N+M) difference as a number on screen, not a claim.
   if (naiveVCells !== null) rows.push({ label: t.memoryNaive, value: String(naiveVCells) })
+
   return (
-    <section aria-label={t.stats}>
-      <h3 className="font-sans text-xs font-semibold uppercase tracking-wide text-indigo">
-        {t.stats}
-      </h3>
-      <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-xs">
+    <Panel title={t.stats} hint={t.statsHint} ariaLabel={t.stats}>
+      <div className="flex items-baseline gap-3 border-b border-rule pb-3">
+        <span className="font-mono text-3xl tabular-nums leading-none text-deepIndigo">
+          {currentD}
+          <span className="text-muted">/{d}</span>
+        </span>
+        <span className="font-sans text-[13px] leading-snug text-muted">{t.d}</span>
+      </div>
+
+      <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1.5 font-sans text-[13px]">
         {rows.map((row) => (
           <div key={row.label} className="contents">
-            <dt className="text-indigo/80">{row.label}</dt>
-            <dd className="tabular-nums text-deepIndigo">{row.value}</dd>
+            <dt className="text-muted">{row.label}</dt>
+            <dd className="text-right font-mono tabular-nums text-deepIndigo">{row.value}</dd>
           </div>
         ))}
       </dl>
-    </section>
+    </Panel>
   )
 }
