@@ -160,7 +160,7 @@ const id: Dict = {
     compare: 'Banding',
     presets: 'Contoh',
     home: 'Beranda',
-    brand: 'Selisih',
+    brand: 'Myers Visualizer',
   },
   home: {
     kicker: 'Algoritma diff Myers, dibuat bisa ditonton',
@@ -340,7 +340,7 @@ const en: Dict = {
     compare: 'Compare',
     presets: 'Presets',
     home: 'Home',
-    brand: 'Selisih',
+    brand: 'Myers Visualizer',
   },
   home: {
     kicker: 'The Myers diff algorithm, made watchable',

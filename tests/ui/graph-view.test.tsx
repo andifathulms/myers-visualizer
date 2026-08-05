@@ -23,7 +23,7 @@ describe('GraphView', () => {
     renderGraph()
     // The default preset changes one line, so a hunk header must appear.
     await waitFor(() => expect(screen.getByText(/^@@ /)).toBeDefined())
-    expect(screen.getByText('TIGA')).toBeDefined()
+    expect(screen.getByText('THREE')).toBeDefined()
   })
 
   it('shows the V array with a cell per diagonal, including negative k', async () => {
@@ -132,6 +132,6 @@ describe('GraphView', () => {
     fireEvent.change(screen.getByLabelText(dict.input.presets, { exact: false }), {
       target: { value: 'pure-insert' },
     })
-    await waitFor(() => expect(screen.getByText('baru A')).toBeDefined())
+    await waitFor(() => expect(screen.getByText('new A')).toBeDefined())
   })
 })

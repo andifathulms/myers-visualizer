@@ -1,10 +1,8 @@
-# Selisih
+# Myers Visualizer
 
 **The Myers diff algorithm, made watchable.** See the edit graph, watch the frontier expand, follow the backtrack that recovers the edit script — and find out why diffs sometimes attribute the wrong lines.
 
-> *selisih* (Indonesian) — difference, discrepancy, the gap between two things.
-
-Static site, no backend. Indonesian-first interface; algorithm terms stay in English so they are recognisable in the paper and in source code.
+Static site, no backend. English by default, with a full Indonesian locale at `/id`. Algorithm terms stay in English in both, so they are recognisable in the paper and in source code.
 
 ## What it does
 

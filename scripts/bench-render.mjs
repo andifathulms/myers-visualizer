@@ -56,7 +56,7 @@ try {
   await page.setViewport({ width: 1200, height: 1000, deviceScaleFactor: 1 })
   await page.goto(`http://localhost:${PORT}${URL_PATH}`, { waitUntil: 'networkidle0' })
 
-  const result = await page.waitForFunction(() => window.__selisihBench, { timeout: 60_000 })
+  const result = await page.waitForFunction(() => window.__myersBench, { timeout: 60_000 })
   const bench = await result.jsonValue()
 
   // A canvas that never got laid out would report a beautiful zero.

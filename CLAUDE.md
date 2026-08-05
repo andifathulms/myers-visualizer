@@ -1,4 +1,4 @@
-# CLAUDE.md — Selisih
+# CLAUDE.md — Myers Visualizer
 
 Myers diff algorithm visualizer. Edit graph, advancing frontier, `V` array, backtrack to edit script, plus algorithm comparison and the linear-space variant. Static site, GitHub Pages, no backend.
 
@@ -124,7 +124,8 @@ tests/
 - Integers only. Indices, `k`, `d`, and token ids are all integers. No floats in the engine.
 - Follow the paper's notation in identifiers: `x`, `y`, `k`, `d`, `V`, `snake`, `N`, `M`. A reader should be able to hold the paper beside the code. This is the one place terse names are correct.
 - Comments cite the paper section or figure they implement.
-- Algorithm terms stay in English in code and UI; interface copy is Indonesian.
+- Algorithm terms stay in English in code and UI. Interface copy exists in both locales; English is the default and `/id` is the second locale. Every string lives in `lib/i18n/dictionary.ts` — nothing user-visible is inline in a component.
+- Preset sample text is English in both locales: it is one shared body of data, and the default locale is English.
 - Preset ids stable and readable: `brace-misattribution`, `pure-insert`, `worst-case`, `patience-wins`. They appear in shared URLs.
 - Tailwind utilities inline; semantic tokens in `tailwind.config.ts` — `cotton`, `indigo`, `deepIndigo`, `turmeric`, `madder`, `explored`. Never raw hex in components.
 
@@ -189,6 +190,6 @@ Still unverified: the animation as a thing to look at. The tests cover the wirin
 
 **Deployed:** https://andifathulms.github.io/myers-visualizer/ — verified live with `SMOKE_URL=… pnpm test:browser`, 15/15.
 
-`basePath` must match the repository name, and `scripts/postbuild.mjs` hardcodes it too when generating the service worker. Renaming the repository means changing both.
+`basePath` must match the repository name, and `scripts/postbuild.mjs` hardcodes it too when generating the service worker. Renaming the repository means changing both. That script also hardcodes `DEFAULT_LOCALE` to pick the offline navigation shell; it must match `lib/i18n/locales.ts`.
 
 Two preset claims were written before they were checked, and both were false: this implementation's tie-breaking does *not* choose the misattributed brace, and two functions swapping order does not make patience win. Both presets were replaced with inputs that demonstrate the phenomenon, and `tests/presets/` now asserts each claim. **Assert a preset's phenomenon when adding one.**

@@ -16,7 +16,7 @@ import { buildMatchGrid, type FrontierPoint, type Snake } from './frame'
  *   frame — the actual interval between animation frames, which is what the
  *           user experiences
  *
- * The result is also written to window.__selisihBench so the headless runner
+ * The result is also written to window.__myersBench so the headless runner
  * can read it. See scripts/bench-render.mjs.
  */
 const SIZE = 300
@@ -46,7 +46,7 @@ export type BenchResult = {
 
 declare global {
   interface Window {
-    __selisihBench?: BenchResult
+    __myersBench?: BenchResult
   }
 }
 
@@ -156,7 +156,7 @@ export function RenderBench() {
         // reported but not the gate.
         pass: percentile(sortedDraws, 0.95) < BUDGET_MS,
       }
-      window.__selisihBench = result
+      window.__myersBench = result
       setReport(
         `${SIZE}×${SIZE} · ${frames} frames · draw mean ${result.drawMean.toFixed(2)} ms · ` +
           `p95 ${result.drawP95.toFixed(2)} ms · frame median ${result.frameMedian.toFixed(2)} ms ` +

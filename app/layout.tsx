@@ -14,14 +14,18 @@ const serif = Newsreader({ subsets: ['latin'], variable: '--font-serif', display
 const sans = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'Selisih — algoritma diff Myers, terlihat',
+  title: 'Myers Visualizer — the Myers diff algorithm, made watchable',
   description:
-    'Visualisasi algoritma diff Myers: edit graph, frontier, array V, dan backtrack yang memulihkan edit script.',
+    'Watch the Myers diff algorithm run: the edit graph, the advancing frontier, the V array, and the backtrack that recovers the edit script.',
 }
 
+/**
+ * `lang` is the default locale's; LocaleLang corrects it per route, because
+ * this layout is shared by both.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${mono.variable} ${serif.variable} ${sans.variable}`}>
+    <html lang="en" className={`${mono.variable} ${serif.variable} ${sans.variable}`}>
       <body className="bg-cotton text-deepIndigo antialiased">{children}</body>
     </html>
   )

@@ -11,7 +11,7 @@ export default function Index() {
       <meta httpEquiv="refresh" content={`0; url=${BASE}/${DEFAULT_LOCALE}/`} />
       <main className="grid min-h-screen place-items-center">
         <Link href={`/${DEFAULT_LOCALE}`} className="font-sans underline">
-          Selisih
+          Myers Visualizer
         </Link>
       </main>
     </>

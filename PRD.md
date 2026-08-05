@@ -1,9 +1,6 @@
-# PRD — Selisih
+# PRD — Myers Visualizer
 
 **The Myers diff algorithm, made watchable. See the edit graph, watch the frontier expand, follow the backtrack that recovers the edit script — and find out why diffs sometimes attribute the wrong lines.**
-
-> *selisih* (Indonesian) — difference, discrepancy, the gap between two things.
-> Rename freely; the slug is used throughout as `selisih`.
 
 | | |
 |---|---|
@@ -11,7 +8,7 @@
 | **Owner** | Andi Fathul Mukminin Salahuddin |
 | **Type** | Personal portfolio project, open source, educational |
 | **Deployment** | GitHub Pages (static export, no server) |
-| **Language** | Indonesian-first UI; English secondary. Algorithm terms stay in English. |
+| **Language** | English by default; Indonesian a full second locale at `/id`. Algorithm terms stay in English in both. |
 | **Normative source** | Myers, *An O(ND) Difference Algorithm and Its Variations*, Algorithmica 1(2):251–266, 1986. |
 
 ---
@@ -152,7 +149,7 @@ The edit graph is two sequences crossing at right angles with meaning at the int
 
 **Motion.** One orchestrated moment: the frontier advancing outward in turmeric as `d` increments, snakes extending along the free diagonals, then the madder path drawing itself backward through the lattice during the backtrack. In linear-space mode, two frontiers advance toward each other and the middle snake flares when they meet. Nothing else moves. `prefers-reduced-motion` disables autoplay and keeps stepping instantaneous.
 
-**Copy.** Indonesian first; algorithm terms stay in English — *snake*, *frontier*, *edit script*, *diagonal* — so a reader recognises them in the paper and in source code afterwards. The ambiguity view states the fact plainly: several shortest scripts exist, and the algorithm picks one by tie-breaking rather than by judgement.
+**Copy.** English by default, Indonesian a full second locale; algorithm terms stay in English in both — *snake*, *frontier*, *edit script*, *diagonal* — so a reader recognises them in the paper and in source code afterwards. The ambiguity view states the fact plainly: several shortest scripts exist, and the algorithm picks one by tie-breaking rather than by judgement.
 
 ## 10. Milestones
 

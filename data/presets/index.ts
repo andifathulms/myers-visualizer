@@ -6,6 +6,9 @@ import type { Locale } from '@/lib/i18n/locales'
  * a preset without a documented reason is just sample data. §6.8
  *
  * Ids are stable and readable: they appear in shared URLs.
+ *
+ * The sample text is English in both locales — it is one shared body of data,
+ * and English is the default locale.
  */
 export type Preset = {
   readonly id: string
@@ -16,7 +19,7 @@ export type Preset = {
   readonly granularity: Granularity
 }
 
-const braceA = `function hitung(x) {
+const braceA = `function add(x) {
   return x + 1
 }
 
@@ -24,12 +27,12 @@ function total(xs) {
   return xs.length
 }`
 
-const braceB = `function hitung(x) {
+const braceB = `function add(x) {
   return x + 1
 }
 
-function rerata(xs) {
-  return jumlah(xs) / xs.length
+function average(xs) {
+  return sum(xs) / xs.length
 }
 
 function total(xs) {
@@ -72,8 +75,8 @@ export const PRESETS: readonly Preset[] = [
       id: 'Satu baris berubah. D kecil, dan sebagian besar lattice adalah satu snake panjang — inilah kenapa diff cepat pada perubahan nyata.',
       en: 'One line changes. D is small and most of the lattice is one long snake — this is why diff is fast on real edits.',
     },
-    a: 'satu\ndua\ntiga\nempat\nlima',
-    b: 'satu\ndua\nTIGA\nempat\nlima',
+    a: 'one\ntwo\nthree\nfour\nfive',
+    b: 'one\ntwo\nTHREE\nfour\nfive',
     granularity: 'line',
   },
   {
@@ -83,8 +86,8 @@ export const PRESETS: readonly Preset[] = [
       id: 'Tidak ada yang dihapus. Jalur hanya bergerak ke bawah lalu menyusuri diagonal: D sama dengan jumlah baris yang disisipkan.',
       en: 'Nothing is deleted. The path only moves down, then runs the diagonal: D equals the number of inserted lines.',
     },
-    a: 'satu\ndua\ntiga',
-    b: 'satu\nbaru A\nbaru B\ndua\ntiga',
+    a: 'one\ntwo\nthree',
+    b: 'one\nnew A\nnew B\ntwo\nthree',
     granularity: 'line',
   },
   {
@@ -94,8 +97,8 @@ export const PRESETS: readonly Preset[] = [
       id: 'Cermin dari sisipan murni: jalur hanya bergerak ke kanan. D sama dengan jumlah baris yang dihapus.',
       en: 'The mirror of a pure insertion: the path only moves right. D equals the number of deleted lines.',
     },
-    a: 'satu\nlama A\nlama B\ndua\ntiga',
-    b: 'satu\ndua\ntiga',
+    a: 'one\nold A\nold B\ntwo\nthree',
+    b: 'one\ntwo\nthree',
     granularity: 'line',
   },
   {
@@ -138,8 +141,8 @@ export const PRESETS: readonly Preset[] = [
       id: 'Tidak ada satu pun elemen yang sama, jadi D = N + M dan tidak ada diagonal gratis sama sekali. Ini jalur patologis yang sengaja bisa dijangkau: pencarian berjalan di worker dengan step budget, jadi UI tidak pernah membeku.',
       en: 'No element is shared, so D = N + M and there are no free diagonals at all. The pathological path is deliberately reachable: the search runs in a worker with a step budget, so the UI never freezes.',
     },
-    a: Array.from({ length: 40 }, (_, i) => `kiri ${i}`).join('\n'),
-    b: Array.from({ length: 40 }, (_, i) => `kanan ${i}`).join('\n'),
+    a: Array.from({ length: 40 }, (_, i) => `left ${i}`).join('\n'),
+    b: Array.from({ length: 40 }, (_, i) => `right ${i}`).join('\n'),
     granularity: 'line',
   },
   {

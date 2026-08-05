@@ -49,7 +49,7 @@ function check(name, ok, detail = '') {
   console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}${detail === '' ? '' : ` — ${detail}`}`)
 }
 
-if (REMOTE === undefined && !(await exists(join(process.cwd(), 'out', 'id', 'graf', 'index.html')))) {
+if (REMOTE === undefined && !(await exists(join(process.cwd(), 'out', 'en', 'graf', 'index.html')))) {
   console.log('smoke: no export found, building…')
   await run('pnpm', ['build'])
 }
@@ -79,7 +79,7 @@ try {
 
   console.log(`\nsmoke — ${REMOTE ?? 'built export'} in real Chrome\n`)
 
-  await page.goto(`${base}/id/graf/`, { waitUntil: 'networkidle0' })
+  await page.goto(`${base}/en/graf/`, { waitUntil: 'networkidle0' })
   await page.waitForSelector('canvas[role="img"]')
 
   // The diff ran and rendered.
@@ -132,7 +132,7 @@ try {
 
   const before = await signature()
   await page.evaluate(() => {
-    const step = document.querySelector('button[title="Maju"]')
+    const step = document.querySelector('button[title="Step"]')
     for (let i = 0; i < 12; i++) step?.click()
   })
   await new Promise((resolve) => setTimeout(resolve, 300))
@@ -140,13 +140,13 @@ try {
   check('stepping repaints the lattice', before !== after)
 
   // The end of the timeline draws the path.
-  await page.evaluate(() => document.querySelector('button[title="Akhir"]')?.click())
+  await page.evaluate(() => document.querySelector('button[title="End"]')?.click())
   await new Promise((resolve) => setTimeout(resolve, 300))
   const atEnd = await signature()
   check('seeking to the end repaints', atEnd !== after)
 
   // The other pages load and render.
-  await page.goto(`${base}/id/banding/`, { waitUntil: 'networkidle0' })
+  await page.goto(`${base}/en/banding/`, { waitUntil: 'networkidle0' })
   await page.waitForFunction(() => document.body.textContent?.includes('Histogram'), {
     timeout: 15_000,
   })
@@ -161,8 +161,8 @@ try {
   check('preset library links into the graph', presetLinks >= 8, `${presetLinks} presets`)
 
   // A shared preset link opens on that preset.
-  await page.goto(`${base}/id/graf/#p=worst-case`, { waitUntil: 'networkidle0' })
-  await page.waitForFunction(() => document.body.textContent?.includes('kiri 0'), { timeout: 15_000 })
+  await page.goto(`${base}/en/graf/#p=worst-case`, { waitUntil: 'networkidle0' })
+  await page.waitForFunction(() => document.body.textContent?.includes('left 0'), { timeout: 15_000 })
   check('a shared preset link restores its input', true)
 
   /**
@@ -172,12 +172,12 @@ try {
    * runs in a worker precisely so that the main thread stays free, and rAF
    * latency is what proves it did.
    */
-  const worstA = Array.from({ length: 300 }, (_, i) => `kiri ${i}`).join('\n')
-  const worstB = Array.from({ length: 300 }, (_, i) => `kanan ${i}`).join('\n')
+  const worstA = Array.from({ length: 300 }, (_, i) => `left ${i}`).join('\n')
+  const worstB = Array.from({ length: 300 }, (_, i) => `right ${i}`).join('\n')
   const worstHash = `#a=${encodeURIComponent(encodeURIComponent(worstA))}&b=${encodeURIComponent(
     encodeURIComponent(worstB),
   )}&g=line`
-  await page.goto(`${base}/id/graf/${worstHash}`, { waitUntil: 'networkidle0' })
+  await page.goto(`${base}/en/graf/${worstHash}`, { waitUntil: 'networkidle0' })
 
   const latencies = []
   for (let i = 0; i < 8; i++) {
@@ -197,7 +197,7 @@ try {
   // The whole stats panel, not just its <dl>: D is now set above the list,
   // at a size that matches how much it matters.
   const worstStats = await page.evaluate(
-    () => document.querySelector('[aria-label="Statistik"]')?.innerText ?? '',
+    () => document.querySelector('[aria-label="Stats"]')?.innerText ?? '',
   )
   check(
     'worst case reports D = 600 and the O(D²) recording',
@@ -211,7 +211,7 @@ try {
    * check is the real one: load, let the worker install, cut the network, and
    * reload.
    */
-  await page.goto(`${base}/id/graf/`, { waitUntil: 'networkidle0' })
+  await page.goto(`${base}/en/graf/`, { waitUntil: 'networkidle0' })
   const registered = await page.evaluate(async () => {
     if (!('serviceWorker' in navigator)) return false
     const registration = await navigator.serviceWorker.ready
