@@ -7,20 +7,38 @@
  *
  *   madder is reserved for the chosen path and the middle snake: the two
  *   things that are *the answer*. Never use it for anything else.
+ *
+ * The lattice tokens below are normative and unchanged. The rest are surface
+ * and text tones, added so the interface can group things — a card that lifts
+ * off the ground, a hairline that is not a translucent hack, a secondary text
+ * tone that is actually legible. They carry no algorithmic meaning.
  */
 export const PALETTE = {
   /** Undyed cotton — the ground. */
   cotton: '#E8E2D4',
+  /** Bleached cotton — a raised surface. Cards sit on this, above the ground. */
+  paper: '#F4F1E8',
+  /** A hairline between surfaces. Warm, so it reads as a fold rather than a border. */
+  rule: '#D3CAB6',
   /** The lattice and structure. */
   indigo: '#2A3D5C',
   /** Text. */
   deepIndigo: '#1A2438',
+  /** Secondary text — 5.5:1 on paper, so it is a tone and not a whisper. */
+  muted: '#5C6880',
   /** The advancing frontier — the live edge of the search. */
   turmeric: '#C9982E',
   /** The chosen path and the middle snake. Nothing else. */
   madder: '#A63D2F',
   /** Pale indigo wash for the explored region. */
   explored: '#C7CEDC',
+  /**
+   * The diff output's two directions. Deletion is deliberately *not* madder:
+   * madder means "this is the answer" in the lattice, and a removed line is
+   * not an answer. Both clear 4.5:1 on paper.
+   */
+  added: '#3E6B54',
+  removed: '#8A4B3A',
 } as const
 
 export type PaletteToken = keyof typeof PALETTE

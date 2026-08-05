@@ -15,10 +15,25 @@ body {
 }
 
 @layer base {
+  body {
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
   h1,
   h2,
   h3 {
     @apply font-serif;
+    /* Serif display sizes need negative tracking, or they read as loose. */
+    letter-spacing: -0.011em;
+    text-wrap: balance;
+  }
+
+  /* Figures line up in columns wherever they appear — stats, V cells, diffs. */
+  code,
+  kbd,
+  samp {
+    font-variant-numeric: tabular-nums;
   }
 
   /*
@@ -30,10 +45,27 @@ body {
   :focus-visible {
     outline: 2px solid #a63d2f;
     outline-offset: 2px;
+    border-radius: 3px;
   }
 
   ::selection {
     background-color: #c9982e40;
+  }
+}
+
+@layer components {
+  /*
+   * Prose measure. Explanation is the point of the home page, and a
+   * 120-character line is not read — it is skimmed and abandoned.
+   */
+  .measure {
+    max-width: 64ch;
+  }
+
+  /* A card's lift: one hairline plus a whisper of shadow, never a slab. */
+  .card {
+    @apply rounded-xl border border-rule bg-paper;
+    box-shadow: 0 1px 2px rgba(26, 36, 56, 0.04);
   }
 }
 
