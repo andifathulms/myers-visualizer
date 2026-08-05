@@ -128,6 +128,19 @@ tests/
 - Preset ids stable and readable: `brace-misattribution`, `pure-insert`, `worst-case`, `patience-wins`. They appear in shared URLs.
 - Tailwind utilities inline; semantic tokens in `tailwind.config.ts` — `cotton`, `indigo`, `deepIndigo`, `turmeric`, `madder`, `explored`. Never raw hex in components.
 
+## Design system
+
+All tokens live in `lib/palette.ts`. Tailwind and the canvas both read it; a hex literal belongs there and nowhere else.
+
+- **Lattice tokens are normative and fixed** — `indigo`, `explored`, `turmeric`, `madder`. `madder` still means *this is the answer*: the chosen path and the middle snake, plus focus rings, and nothing else. A pressed button, a selected tab or a deleted line must not use it.
+- **Surface tokens** — `cotton` is the ground, `paper` is a raised surface, `rule` is the hairline between them. Cards are `.card` (globals.css): paper, one hairline, a whisper of shadow. Grouping is what makes the tool legible; nothing should float on the ground alone.
+- **Text tones** — `deepIndigo` primary, `muted` secondary (5.5:1 on paper), `indigo` for lede paragraphs. Do not use opacity to fake a text tone.
+- **`added` / `removed`** are the diff output's two directions, tinted as well as coloured so the signal is not colour alone. Deliberately not `madder`.
+- **Type scale** — serif (Newsreader) for headings only; sans (Inter) for interface; mono (DM Mono) for every figure, token id, and diff line. Body copy is 15px, panel copy 13px, micro labels 11px uppercase with `tracking-[0.07em]`. Nothing smaller than 11px. Prose gets `.measure` (64ch).
+- **Controls** live in `components/ui/controls.tsx` — `Button`, `Field`, `Select`, `Toggle`, `Note`. Minimum 32px tall, labels above inputs, never beside. `Panel` and `StepHeading` are in `components/ui/Panel.tsx`.
+- **Every panel carries a plain-language `hint`.** Algorithm terms stay English by policy, so each one is glossed where it appears — plus the glossary on the home page. A new panel without a hint is not finished.
+- The home page is ordered for someone who has never run `git diff`: question → worked example with no jargon → the idea in three steps → why diffs blame the wrong line → notation → glossary → paper. Do not move the notation up.
+
 ## Testing rules
 
 - `pnpm test:run` before every commit; `pnpm test:apply` and `pnpm test:oracle` before any commit touching `lib/diff` or `lib/tokenize`.
@@ -149,7 +162,7 @@ The site links the Myers paper and James Coglan's explainer series prominently �
 
 M0–M7 built — every milestone in PRD §10. Static export, canvas lattice, greedy Myers with `V` recording and backtrack, edit graph + `V` strip + stepping, unified diff output, presets, ambiguity enumeration, patience, histogram, linear-space Myers with the middle snake and recursion view, sharing, granularity and whitespace options, and the a11y pass.
 
-Green: apply property and oracle agreement across the corpus for every algorithm, minimality ordering, cross-variant `D` equality, trace well-formedness, determinism, step budget at the input cap. First-load JS is 85.6 KB gzipped against the 250 KB budget.
+Green: apply property and oracle agreement across the corpus for every algorithm, minimality ordering, cross-variant `D` equality, trace well-formedness, determinism, step budget at the input cap. First-load JS is 87.4 KB gzipped shared, 107 KB on the graph page, against the 250 KB budget.
 
 **The M0 gate is measured.** `pnpm bench:render` builds, serves under the production basePath, drives the spike in headless Chrome and reads the numbers back, exiting non-zero if the budget is blown. On a 300×300 lattice over 220 measured frames (20 discarded as warm-up):
 

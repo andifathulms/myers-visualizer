@@ -194,7 +194,11 @@ try {
   )
 
   await page.waitForFunction(() => document.body.textContent?.includes('@@ '), { timeout: 60_000 })
-  const worstStats = await page.evaluate(() => document.querySelector('dl')?.innerText ?? '')
+  // The whole stats panel, not just its <dl>: D is now set above the list,
+  // at a size that matches how much it matters.
+  const worstStats = await page.evaluate(
+    () => document.querySelector('[aria-label="Statistik"]')?.innerText ?? '',
+  )
   check(
     'worst case reports D = 600 and the O(D²) recording',
     worstStats.includes('600') && worstStats.includes('362404'),
