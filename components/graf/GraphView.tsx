@@ -8,6 +8,7 @@ import { Stepper } from '@/components/stepper/Stepper'
 import { Hunks } from '@/components/hunks/Hunks'
 import { InputPanes } from '@/components/input/InputPanes'
 import { Legend } from '@/components/chrome/Legend'
+import { Panel, StepHeading } from '@/components/ui/Panel'
 import { StatBar } from '@/components/chrome/StatBar'
 import { useDiff } from '@/lib/client/useDiff'
 import { useDiffInputs } from '@/lib/client/useDiffInputs'
@@ -169,11 +170,19 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const t = dict.graph
 
   return (
-    <main className="mx-auto max-w-7xl px-5 py-8">
-      <h1 className="font-serif text-3xl font-semibold">{t.title}</h1>
-      <p className="mt-2 max-w-2xl font-sans text-sm text-indigo">{t.lede}</p>
+    <main className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
+      <header className="max-w-3xl">
+        <h1 className="font-serif text-4xl font-semibold">{t.title}</h1>
+        <p className="measure mt-3 font-sans text-[15px] leading-relaxed text-indigo">{t.lede}</p>
+      </header>
 
-      <div className="mt-6">
+      {/*
+        The page is a sequence — put something in, watch it run, read the
+        result — and the headings say so. A first visitor arriving straight
+        here from a shared link has no other clue what order to read it in.
+      */}
+      <section className="mt-10">
+        <StepHeading step={1} title={t.stepInput} hint={t.stepInputHint} />
         <InputPanes
           locale={locale}
           dict={dict}
@@ -192,54 +201,82 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
           algorithm={algorithm}
           onAlgorithm={setAlgorithm}
         />
-      </div>
+      </section>
 
       {state.status === 'error' ? (
-        <p className="mt-6 rounded border border-madder bg-madder/10 p-3 font-sans text-sm text-madder">
+        <p
+          role="alert"
+          className="mt-6 rounded-xl border border-madder/40 bg-madder/10 p-4 font-sans text-sm text-madder"
+        >
           {state.message}
         </p>
       ) : null}
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div>
-          {tooLarge ? (
-            // An unreadable graph is not a visualisation. Say so, and show the
-            // result instead. §6.1
-            <p className="rounded border border-indigo/30 bg-indigo/5 p-4 font-sans text-sm text-indigo">
-              {format(dict.input.tooLarge, { n, m, cap: VIEWABLE_CAP })}
+      <section className="mt-12">
+        <StepHeading step={2} title={t.stepWatch} hint={t.stepWatchHint} />
+
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
+          <div className="flex flex-col gap-4">
+            {tooLarge ? (
+              // An unreadable graph is not a visualisation. Say so, and show the
+              // result instead. §6.1
+              <p className="rounded-xl border border-dashed border-indigo/40 bg-paper p-5 font-sans text-sm leading-relaxed text-indigo">
+                {format(dict.input.tooLarge, { n, m, cap: VIEWABLE_CAP })}
+              </p>
+            ) : (
+              <Panel title={t.canvas} hint={t.canvasHint} padded={false}>
+                {/*
+                  The lattice is not self-describing: which axis is the old
+                  text and which is the new is exactly the thing a newcomer
+                  cannot guess, and getting it backwards makes the whole
+                  picture read wrong.
+                */}
+                {/*
+                  Capped, and centred rather than stretched. The lattice is
+                  square, so a full-width column turns a five-line input into
+                  an 800px void that pushes the controls below the fold.
+                */}
+                <div className="mx-auto w-full max-w-[38rem] px-4 pb-4">
+                  <p className="pb-1 font-mono text-[11px] text-muted">{t.axisA}</p>
+                  <div className="flex gap-2">
+                    <div className="flex items-center" aria-hidden>
+                      <p className="font-mono text-[11px] text-muted [writing-mode:vertical-rl]">
+                        {t.axisB}
+                      </p>
+                    </div>
+                    <div className="aspect-square w-full rounded-lg border border-rule bg-cotton/40">
+                      <LatticeCanvas
+                        n={n}
+                        m={m}
+                        matches={matches}
+                        frame={latticeFrame}
+                        stampAt={stampAt}
+                        stampCount={Math.min(frame, timeline?.searchFrames ?? 0)}
+                        label={dict.a11y.graphLabel}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Panel>
+            )}
+
+            {/*
+              The canvas cannot be read, so every step is also announced. Polite,
+              because stepping is user-driven and should not interrupt.
+            */}
+            <p aria-live="polite" className="sr-only">
+              {currentStep === null || timeline === null
+                ? ''
+                : format(dict.a11y.stepAnnouncement, {
+                    d: currentD,
+                    maxD: timeline.d,
+                    k: currentStep.k,
+                    x: currentStep.to.x,
+                    y: currentStep.to.y,
+                  })}
             </p>
-          ) : (
-            <div className="aspect-square w-full rounded border border-indigo/20 bg-cotton">
-              <LatticeCanvas
-                n={n}
-                m={m}
-                matches={matches}
-                frame={latticeFrame}
-                stampAt={stampAt}
-                stampCount={Math.min(frame, timeline?.searchFrames ?? 0)}
-                label={dict.a11y.graphLabel}
-              />
-            </div>
-          )}
 
-          {/*
-            The canvas cannot be read, so every step is also announced. Polite,
-            because stepping is user-driven and should not interrupt.
-          */}
-          <p aria-live="polite" className="sr-only">
-            {currentStep === null || timeline === null
-              ? ''
-              : format(dict.a11y.stepAnnouncement, {
-                  d: currentD,
-                  maxD: timeline.d,
-                  k: currentStep.k,
-                  x: currentStep.to.x,
-                  y: currentStep.to.y,
-                })}
-          </p>
-
-          {timeline !== null ? (
-            <div className="mt-3">
+            {timeline !== null ? (
               <Stepper
                 frame={frame}
                 total={timeline.totalFrames}
@@ -253,68 +290,65 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 onNextSnake={() => seek(nextSnakeFrame(timeline, frame))}
                 onSpeed={setSpeed}
               />
-            </div>
-          ) : null}
+            ) : null}
 
-          <div className="mt-4">
-            <Legend dict={dict} />
+            <Panel title={dict.legend.title}>
+              <Legend dict={dict} />
+            </Panel>
           </div>
-        </div>
 
-        <aside className="flex flex-col gap-6">
-          <StatBar
-            dict={dict}
-            d={state.status === 'done' ? state.stats.d : 0}
-            currentD={currentD}
-            n={n}
-            m={m}
-            snakes={state.status === 'done' ? state.stats.snakes : 0}
-            steps={timeline?.searchFrames ?? 0}
-            vCells={state.status === 'done' ? state.stats.vCells : 0}
-            naiveVCells={
-              // Only meaningful for the variant that avoids the recording.
-              algorithm === 'myers-linear' && state.status === 'done'
-                ? (state.stats.d + 2) ** 2
-                : null
-            }
-          />
-          <AmbiguityPanel
-            locale={locale}
-            dict={dict}
-            ambiguity={ambiguity}
-            alternatives={alternatives.length}
-            selected={altIndex}
-            onSelect={(index) => {
-              setAltIndex(index)
-              setSelectedOp(null)
-              seek(timeline?.totalFrames ?? 0)
-            }}
-          />
-          {maintainsV ? (
-            <VStrip
-              cells={vPoints}
+          <aside className="flex flex-col gap-5">
+            <StatBar
+              dict={dict}
+              d={state.status === 'done' ? state.stats.d : 0}
               currentD={currentD}
-              highlightK={highlightK}
-              onHighlight={setHighlightK}
-              label={t.vstrip}
-              hint={t.vstripHint}
+              n={n}
+              m={m}
+              snakes={state.status === 'done' ? state.stats.snakes : 0}
+              steps={timeline?.searchFrames ?? 0}
+              vCells={state.status === 'done' ? state.stats.vCells : 0}
+              naiveVCells={
+                // Only meaningful for the variant that avoids the recording.
+                algorithm === 'myers-linear' && state.status === 'done'
+                  ? (state.stats.d + 2) ** 2
+                  : null
+              }
             />
-          ) : (
-            // Showing a V strip for an algorithm that has no V would be a lie
-            // dressed as a visualisation.
-            <section aria-label={t.vstrip}>
-              <h3 className="font-sans text-xs font-semibold uppercase tracking-wide text-indigo">
-                {t.vstrip}
-              </h3>
-              <p className="mt-1 font-sans text-xs leading-relaxed text-indigo/80">{t.noVStrip}</p>
-            </section>
-          )}
-        </aside>
-      </div>
+            {maintainsV ? (
+              <VStrip
+                cells={vPoints}
+                currentD={currentD}
+                highlightK={highlightK}
+                onHighlight={setHighlightK}
+                label={t.vstrip}
+                hint={t.vstripHint}
+              />
+            ) : (
+              // Showing a V strip for an algorithm that has no V would be a lie
+              // dressed as a visualisation.
+              <Panel title={t.vstrip} ariaLabel={t.vstrip}>
+                <p className="font-sans text-[13px] leading-relaxed text-muted">{t.noVStrip}</p>
+              </Panel>
+            )}
+            <AmbiguityPanel
+              locale={locale}
+              dict={dict}
+              ambiguity={ambiguity}
+              alternatives={alternatives.length}
+              selected={altIndex}
+              onSelect={(index) => {
+                setAltIndex(index)
+                setSelectedOp(null)
+                seek(timeline?.totalFrames ?? 0)
+              }}
+            />
+          </aside>
+        </div>
+      </section>
 
-      <section className="mt-10">
-        <h2 className="font-serif text-xl font-semibold">{t.output}</h2>
-        <div className="mt-3">
+      <section className="mt-12">
+        <StepHeading step={3} title={t.stepResult} hint={t.stepResultHint} />
+        <div className="max-w-4xl">
           <Hunks
             hunks={hunks}
             selectedOp={selectedOp}

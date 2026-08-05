@@ -8,32 +8,41 @@ export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
 }
 
+/**
+ * Every preset carries the phenomenon it exists to show, so the phenomenon is
+ * the body of the card rather than a footnote to it: the reason to open one
+ * is the thing it demonstrates, not its name.
+ */
 export default function ContohPage({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale)) notFound()
   const { locale } = params
   const dict = getDict(locale)
 
   return (
-    <main className="mx-auto max-w-4xl px-5 py-12">
-      <h1 className="font-serif text-3xl font-semibold">{dict.presets.title}</h1>
-      <p className="mt-2 max-w-2xl font-sans text-sm text-indigo">{dict.presets.lede}</p>
+    <main className="mx-auto max-w-5xl px-5 py-10 sm:py-14">
+      <header className="max-w-3xl">
+        <h1 className="font-serif text-4xl font-semibold">{dict.presets.title}</h1>
+        <p className="measure mt-3 font-sans text-[15px] leading-relaxed text-indigo">
+          {dict.presets.lede}
+        </p>
+      </header>
 
-      <ul className="mt-8 flex flex-col gap-8">
+      <ul className="mt-10 grid gap-5 sm:grid-cols-2">
         {PRESETS.map((preset) => (
-          <li key={preset.id} className="border-l-2 border-indigo/30 pl-5">
+          <li key={preset.id} className="card flex flex-col p-5">
             <h2 className="font-serif text-xl font-semibold">{preset.title[locale]}</h2>
-            <p className="mt-2 max-w-2xl font-sans text-sm leading-relaxed text-indigo">
+            <p className="mt-2 flex-1 font-sans text-sm leading-relaxed text-muted">
               {preset.phenomenon[locale]}
             </p>
-            <div className="mt-3 flex flex-wrap items-center gap-3 font-sans text-xs">
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
               {/* The preset id is the shared URL — stable and readable. */}
               <Link
                 href={`/${locale}/graf#p=${preset.id}`}
-                className="rounded border border-indigo px-3 py-1 hover:border-madder hover:text-madder"
+                className="inline-flex h-9 items-center rounded-lg border border-rule bg-cotton px-3.5 font-sans text-[13px] font-medium text-deepIndigo transition-colors hover:border-madder hover:text-madder"
               >
-                {dict.presets.open}
+                {dict.presets.open} →
               </Link>
-              <code className="font-mono text-indigo/70">{preset.id}</code>
+              <code className="font-mono text-[11px] text-muted/70">{preset.id}</code>
             </div>
           </li>
         ))}
