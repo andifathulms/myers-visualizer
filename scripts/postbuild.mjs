@@ -18,6 +18,34 @@ const DEFAULT_LOCALE = 'en'
 await writeFile(join(OUT, '.nojekyll'), '')
 console.log('postbuild: wrote out/.nojekyll')
 
+/**
+ * `<html lang>` per locale.
+ *
+ * The App Router allows exactly one layout to render <html>, and that is the
+ * root one, which is shared by both locales and has no params. So the lang
+ * attribute was hard-coded to English and patched after hydration by a client
+ * component — which meant every crawler, and every screen reader reading the
+ * static document, saw Indonesian pages declared as English.
+ *
+ * Rewriting it here fixes it in the shipped bytes instead. Deterministic, and
+ * asserted by tests/ui/seo.test.ts against the built output.
+ */
+async function setLangAttributes(locales) {
+  let changed = 0
+  for (const path of await walk(OUT)) {
+    if (!path.endsWith('.html')) continue
+    const rel = relative(OUT, path).split(sep).join('/')
+    const locale = locales.find((code) => rel === `${code}/index.html` || rel.startsWith(`${code}/`))
+    if (locale === undefined || locale === DEFAULT_LOCALE) continue
+    const html = await readFile(path, 'utf8')
+    const patched = html.replace('<html lang="en"', `<html lang="${locale}"`)
+    if (patched === html) continue
+    await writeFile(path, patched)
+    changed++
+  }
+  return changed
+}
+
 async function walk(dir) {
   const found = []
   for (const entry of await readdir(dir, { withFileTypes: true })) {
@@ -27,6 +55,9 @@ async function walk(dir) {
   }
   return found
 }
+
+const relabelled = await setLangAttributes(['en', 'id'])
+console.log(`postbuild: set <html lang> on ${relabelled} non-default-locale pages`)
 
 const files = await walk(OUT)
 const assets = []

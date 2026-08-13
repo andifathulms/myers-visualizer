@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { GraphView } from '@/components/graf/GraphView'
 import { ShareLink } from '@/components/chrome/ShareLink'
-import { LocaleLang } from '@/components/chrome/LocaleLang'
 import { getDict } from '@/lib/i18n/dictionary'
 
 const dict = getDict('id')
@@ -114,12 +113,13 @@ describe('accessibility', () => {
     Reflect.deleteProperty(window, 'matchMedia')
   })
 
-  it('sets the document language from the locale', () => {
-    render(<LocaleLang locale="en" />)
-    expect(document.documentElement.lang).toBe('en')
-    render(<LocaleLang locale="id" />)
-    expect(document.documentElement.lang).toBe('id')
-  })
+  /*
+   * `<html lang>` used to be patched by a client component after hydration and
+   * was asserted here. It is set in the built bytes now — which is what a
+   * crawler and a screen reader actually read, neither of them waiting for
+   * hydration — so the claim moved to scripts/smoke.mjs, where it is checked
+   * against the shipped output rather than against a component.
+   */
 })
 
 describe('sharing', () => {

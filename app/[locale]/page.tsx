@@ -8,6 +8,12 @@ import { WALKTHROUGH, WALKTHROUGH_D } from '@/data/walkthrough'
 import { Panel } from '@/components/ui/Panel'
 import { Note } from '@/components/ui/controls'
 import { HeroFigure } from '@/components/home/HeroFigure'
+import { metadataFor, structuredData } from '@/lib/seo'
+
+/** Title, description, canonical and hreflang, from this page's own copy. */
+export function generateMetadata({ params }: { params: { locale: string } }) {
+  return isLocale(params.locale) ? metadataFor(params.locale, '') : {}
+}
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -32,6 +38,16 @@ export default function Home({ params }: { params: { locale: string } }) {
 
   return (
     <main>
+      {/*
+        Structured data for the site itself, from the same dictionary lede the
+        page renders below. Inline JSON, not a script fetched from anywhere —
+        nothing third-party is loaded here or anywhere else on the site.
+      */}
+      <script
+        type="application/ld+json"
+        // The content is built from our own strings, never from user input.
+        dangerouslySetInnerHTML={{ __html: structuredData(locale) }}
+      />
       {/*
         Hero. Two columns from lg, because the picture is the argument and
         putting it under a full-width headline pushes it below the fold —

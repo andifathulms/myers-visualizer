@@ -301,6 +301,55 @@ try {
   check('every request resolves', notFound.length === 0, notFound.join(', '))
   check('no console errors or uncaught exceptions', consoleErrors.length === 0, consoleErrors[0] ?? '')
 
+  /**
+   * Discoverability, read out of the shipped bytes rather than the component
+   * tree. Every page used to emit the site's one title, the site's one
+   * description and an og:url pointing at the root, with `<html lang="en">` on
+   * the Indonesian pages — corrected only after hydration, which no crawler
+   * and no screen reader waits for.
+   */
+  const head = async (path) => {
+    await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' })
+    return page.evaluate(() => ({
+      lang: document.documentElement.lang,
+      title: document.title,
+      description: document.querySelector('meta[name="description"]')?.content ?? '',
+      canonical: document.querySelector('link[rel="canonical"]')?.href ?? '',
+      ogUrl: document.querySelector('meta[property="og:url"]')?.content ?? '',
+      alternates: [...document.querySelectorAll('link[rel="alternate"][hreflang]')].map(
+        (l) => `${l.getAttribute('hreflang')}=${l.getAttribute('href')}`,
+      ),
+      ld: document.querySelector('script[type="application/ld+json"]')?.textContent ?? '',
+    }))
+  }
+
+  const enHome = await head('/en/')
+  const idHome = await head('/id/')
+  const enGraf = await head('/en/graf/')
+
+  check('the Indonesian pages declare Indonesian', idHome.lang === 'id' && enHome.lang === 'en',
+    `en=${enHome.lang} id=${idHome.lang}`)
+  check('each route has its own title', enGraf.title !== enHome.title, enGraf.title)
+  check('each locale has its own description', enHome.description !== idHome.description,
+    idHome.description.slice(0, 48))
+  check('each page canonicalises to itself',
+    enGraf.canonical.endsWith('/en/graf/') && idHome.canonical.endsWith('/id/'), enGraf.canonical)
+  check('og:url points at the page, not the site root',
+    enGraf.ogUrl.endsWith('/en/graf/'), enGraf.ogUrl)
+  check('hreflang covers both locales and a default',
+    enGraf.alternates.length === 3 && enGraf.alternates.some((a) => a.startsWith('x-default=')),
+    enGraf.alternates.join(' '))
+  check('the home page carries valid structured data',
+    (() => { try { return JSON.parse(enHome.ld)['@type'] === 'WebApplication' } catch { return false } })(),
+    enHome.ld.slice(0, 40))
+
+  const robots = await fetch(`${base}/robots.txt`).then((r) => (r.ok ? r.text() : ''))
+  check('robots.txt points at the sitemap', robots.includes('Sitemap:'), robots.split('\n')[0])
+  const sitemap = await fetch(`${base}/sitemap.xml`).then((r) => (r.ok ? r.text() : ''))
+  const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
+  check('the sitemap lists every route in every locale', locs.length === 8, `${locs.length} URLs`)
+  check('the sitemap omits the benchmark harness', !sitemap.includes('/bench'), '')
+
   const failed = checks.filter((entry) => !entry.ok)
   console.log(`\n  ${checks.length - failed.length}/${checks.length} passed\n`)
   if (failed.length > 0) process.exitCode = 1

@@ -56,8 +56,11 @@ export const viewport: Viewport = {
 }
 
 /**
- * `lang` is the default locale's; LocaleLang corrects it per route, because
- * this layout is shared by both.
+ * One layout may render <html>, and it is this one — shared by both locales
+ * and holding no params. So `lang` is the default locale's here and
+ * scripts/postbuild.mjs rewrites it per locale in the built output, which is
+ * what a crawler and a screen reader actually read. It used to be corrected
+ * by a client component after hydration, which neither of them waits for.
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

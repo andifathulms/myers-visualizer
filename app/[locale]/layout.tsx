@@ -3,7 +3,6 @@ import { LOCALES, isLocale } from '@/lib/i18n/locales'
 import { getDict } from '@/lib/i18n/dictionary'
 import { SiteNav } from '@/components/chrome/SiteNav'
 import { SiteFooter } from '@/components/chrome/SiteFooter'
-import { LocaleLang } from '@/components/chrome/LocaleLang'
 import { ServiceWorker } from '@/components/chrome/ServiceWorker'
 
 export function generateStaticParams() {
@@ -24,7 +23,6 @@ export default function LocaleLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <LocaleLang locale={params.locale} />
       <ServiceWorker />
       <a
         href="#konten"
