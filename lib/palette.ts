@@ -24,8 +24,13 @@ export const PALETTE = {
   indigo: '#2A3D5C',
   /** Text. */
   deepIndigo: '#1A2438',
-  /** Secondary text — 5.5:1 on paper, so it is a tone and not a whisper. */
-  muted: '#5C6880',
+  /**
+   * Secondary text. 5.1:1 on cotton and 5.8:1 on paper — measured, not
+   * estimated. It was a shade lighter and claimed 5.5:1; it was actually
+   * 4.3:1 on the ground, which is where the glossary and the axis labels
+   * live. `tests/ui/tokens.test.ts` holds the floor now.
+   */
+  muted: '#525E75',
   /** The advancing frontier — the live edge of the search. */
   turmeric: '#C9982E',
   /** The chosen path and the middle snake. Nothing else. */

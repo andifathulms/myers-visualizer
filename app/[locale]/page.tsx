@@ -205,7 +205,9 @@ function List({ items }: { items: readonly string[] }) {
     <ol className="font-mono text-[13px] leading-6 text-deepIndigo">
       {items.map((item, index) => (
         <li key={index} className="flex gap-2">
-          <span aria-hidden className="w-3 shrink-0 select-none text-muted/60">
+          {/* A hairline mark, so it uses the hairline token rather than
+              thinning a text tone with opacity until it disappears. */}
+          <span aria-hidden className="w-3 shrink-0 select-none text-rule">
             ·
           </span>
           {item}

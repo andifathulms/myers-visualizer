@@ -2,16 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * The token layer. Everything below is a variable, and every component reads
+ * these through Tailwind rather than picking a value of its own.
+ *
+ * Colour is the one thing not authored here: `lib/palette.ts` is the source,
+ * because canvas cannot use utility classes and has to read the same numbers.
+ * These custom properties are its RGB channels, restated so that Tailwind can
+ * apply an alpha to them. `tests/ui/tokens.test.ts` pins the two together —
+ * a hex changed in the palette and not here is a test failure, not a drift.
+ */
 :root {
   --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', monospace;
   --font-serif: 'Newsreader', Georgia, serif;
   --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Surfaces. */
+  --color-cotton: 232 226 212;
+  --color-paper: 244 241 232;
+  --color-rule: 211 202 182;
+  /* Text. */
+  --color-indigo: 42 61 92;
+  --color-deep-indigo: 26 36 56;
+  --color-muted: 82 94 117;
+  /* Lattice — normative. PRD §9. */
+  --color-turmeric: 201 152 46;
+  --color-madder: 166 61 47;
+  --color-explored: 199 206 220;
+  /* Diff output. */
+  --color-added: 62 107 84;
+  --color-removed: 138 75 58;
+
+  /*
+   * One type scale, in role order. Prose sits at --text-base and never below:
+   * the explanation is the product on the home page, and 14px explanation next
+   * to 14px chrome gives the eye nothing to sort by.
+   *
+   * --text-fine and --text-micro are for density only — V cells, token ids,
+   * diff lines, uppercase labels — where a figure is scanned, not read.
+   */
+  --text-micro: 0.6875rem; /* 11px — uppercase labels. Nothing smaller ships. */
+  --text-fine: 0.8125rem; /* 13px — mono figures. */
+  --text-sm: 0.875rem; /* 14px — secondary interface. */
+  --text-base: 1rem; /* 16px — body. */
+  --text-lg: 1.125rem; /* 18px — lede. */
+  --text-h3: 1.25rem; /* 20px */
+  --text-h2: clamp(1.5rem, 1.15rem + 1.6vw, 1.875rem);
+  --text-h1: clamp(1.75rem, 1.3rem + 2.1vw, 2.25rem);
+  --text-hero: clamp(2rem, 1.15rem + 4vw, 3.25rem);
+
+  /*
+   * Vertical rhythm. Tailwind's 4px spacing scale already covers the inside of
+   * a component; what it has no opinion about is the distance between one
+   * section and the next, which is exactly what was being guessed per page.
+   */
+  --space-gutter: 1.25rem; /* page side padding */
+  --space-stack: 1.5rem; /* between blocks inside a section */
+  --space-section: 3rem; /* between sections */
+  --space-hero: 3.5rem; /* above the fold, top of page */
 }
 
 html,
 body {
-  background-color: #e8e2d4;
-  color: #1a2438;
+  background-color: rgb(var(--color-cotton));
+  color: rgb(var(--color-deep-indigo));
 }
 
 @layer base {
@@ -43,13 +97,13 @@ body {
    * ring is transient chrome rather than a claim about the answer.
    */
   :focus-visible {
-    outline: 2px solid #a63d2f;
+    outline: 2px solid rgb(var(--color-madder));
     outline-offset: 2px;
     border-radius: 3px;
   }
 
   ::selection {
-    background-color: #c9982e40;
+    background-color: rgb(var(--color-turmeric) / 0.25);
   }
 }
 
@@ -65,7 +119,13 @@ body {
   /* A card's lift: one hairline plus a whisper of shadow, never a slab. */
   .card {
     @apply rounded-xl border border-rule bg-paper;
-    box-shadow: 0 1px 2px rgba(26, 36, 56, 0.04);
+    box-shadow: 0 1px 2px rgb(var(--color-deep-indigo) / 0.04);
+  }
+
+  /* Section rhythm, so the distance between two sections is a token. */
+  .section {
+    padding-top: var(--space-section);
+    padding-bottom: var(--space-section);
   }
 }
 
