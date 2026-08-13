@@ -148,7 +148,7 @@ export default function Home({ params }: { params: { locale: string } }) {
         <h2 className="font-serif text-h2 font-semibold">{t.whatTitle}</h2>
         <p className="measure mt-3 font-sans text-lg text-indigo">{t.what}</p>
 
-        <div className="card mt-6 max-w-2xl overflow-hidden">
+        <div className="card mt-6 max-w-3xl overflow-hidden">
           <table className="w-full border-collapse font-sans text-base">
             <thead>
               <tr className="border-b border-rule bg-cotton/50 text-left">
@@ -161,15 +161,22 @@ export default function Home({ params }: { params: { locale: string } }) {
                 <th className="px-4 py-2.5 text-right text-micro font-semibold uppercase tracking-[0.07em] text-muted">
                   {t.moves.cost}
                 </th>
+                {/* The column that carries the point, rather than a footnote
+                    under the table saying the same thing later. */}
+                <th className="px-4 py-2.5 text-right text-micro font-semibold uppercase tracking-[0.07em] text-muted">
+                  {t.moveK}
+                </th>
               </tr>
             </thead>
             <tbody>
-              <MoveRow move="(x,y) → (x+1,y)" meaning={t.moveRight} cost="1" />
-              <MoveRow move="(x,y) → (x,y+1)" meaning={t.moveDown} cost="1" />
-              <MoveRow move="(x,y) → (x+1,y+1)" meaning={t.moveDiag} cost="0" free />
+              <MoveRow move="(x,y) → (x+1,y)" meaning={t.moveRight} cost="1" k="k+1" />
+              <MoveRow move="(x,y) → (x,y+1)" meaning={t.moveDown} cost="1" k="k−1" />
+              <MoveRow move="(x,y) → (x+1,y+1)" meaning={t.moveDiag} cost="0" k="k" free />
             </tbody>
           </table>
         </div>
+        <h3 className="mt-8 font-serif text-h3 font-semibold">{t.kTitle}</h3>
+        <p className="measure mt-2 font-sans text-base text-muted">{t.kBody}</p>
       </section>
 
       {/*
@@ -323,11 +330,14 @@ function MoveRow({
   move,
   meaning,
   cost,
+  k,
   free = false,
 }: {
   move: string
   meaning: string
   cost: string
+  /** What the move does to k — the column the whole trick lives in. */
+  k: string
   free?: boolean
 }) {
   return (
@@ -340,6 +350,13 @@ function MoveRow({
         }`}
       >
         {cost}
+      </td>
+      <td
+        className={`px-4 py-2.5 text-right font-mono ${
+          free ? 'font-semibold text-deepIndigo' : 'text-muted'
+        }`}
+      >
+        {k}
       </td>
     </tr>
   )

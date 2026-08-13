@@ -44,6 +44,10 @@ export type Dict = {
     whatTitle: string
     what: string
     moves: { move: string; meaning: string; cost: string }
+    /** The k column: why the algorithm indexes by x − y at all. */
+    moveK: string
+    kTitle: string
+    kBody: string
     moveRight: string
     moveDown: string
     moveDiag: string
@@ -283,6 +287,9 @@ const id: Dict = {
     whatTitle: 'Untuk yang ingin detailnya',
     what: 'Diberi dua urutan A (panjang N) dan B (panjang M), bentuk sebuah edit graph: kisi (N+1) × (M+1) titik, di mana titik (x, y) berarti "sudah memakai x elemen A dan y elemen B". Diff adalah jalur dari (0,0) ke (N,M). Edit script terpendek adalah jalur dengan langkah non-diagonal paling sedikit.',
     moves: { move: 'Langkah', meaning: 'Arti', cost: 'Biaya' },
+    moveK: 'k = x − y',
+    kTitle: 'Kenapa k, dan kenapa itu yang membuatnya cepat',
+    kBody: 'Perhatikan kolom terakhir. Langkah diagonal menambah x dan y sekaligus, jadi k = x − y tidak berubah — gratis dan tetap di jalur yang sama. Hanya langkah berbayar yang memindahkan k, tepat satu ke kanan atau ke kiri. Akibatnya: setelah d suntingan, hanya diagonal −d sampai +d yang bisa dijangkau, dan pada tiap diagonal cukup disimpan satu angka — titik terjauh yang dicapai. Di situlah kisi (N+1)×(M+1) menyusut jadi satu baris berisi paling banyak 2d+1 angka, dan pencarian jadi O((N+M)·D), bukan O(N·M). Myers §2.',
     moveRight: 'hapus A[x]',
     moveDown: 'sisip B[y]',
     moveDiag: 'pertahankan — hanya bila A[x] == B[y]',
@@ -519,6 +526,9 @@ const en: Dict = {
     whatTitle: 'If you want the detail',
     what: 'Given sequences A (length N) and B (length M), build an edit graph: a grid of (N+1) × (M+1) points, where point (x, y) means "consumed x elements of A and y of B". A diff is a path from (0,0) to (N,M). The shortest edit script is the path with the fewest non-diagonal moves.',
     moves: { move: 'Move', meaning: 'Meaning', cost: 'Cost' },
+    moveK: 'k = x − y',
+    kTitle: 'Why k, and why that is what makes it fast',
+    kBody: 'Look at the last column. A diagonal step raises x and y together, so k = x − y does not change — free, and still on the same diagonal. Only a paid step moves k, by exactly one, left or right. Which means: after d edits only the diagonals from −d to +d are reachable at all, and on each of them there is just one number worth keeping — the furthest point reached. That is where an (N+1)×(M+1) grid collapses into a single row of at most 2d+1 numbers, and why the search is O((N+M)·D) rather than O(N·M). Myers §2.',
     moveRight: 'delete A[x]',
     moveDown: 'insert B[y]',
     moveDiag: 'keep — only when A[x] == B[y]',
