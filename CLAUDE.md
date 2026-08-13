@@ -131,17 +131,21 @@ tests/
 
 ## Design system
 
-All tokens live in `lib/palette.ts`. Tailwind and the canvas both read it; a hex literal belongs there and nowhere else.
+Colour is authored in `lib/palette.ts` and restated as RGB channels in `app/globals.css`, because canvas needs hex and Tailwind needs channels to apply an alpha. A hex literal belongs in the palette and nowhere else — not in a component, not in the CSS. Sizes and rhythm are custom properties in `globals.css`, surfaced through `tailwind.config.ts`.
+
+`tests/ui/tokens.test.ts` holds all of it: the CSS matches the palette, no stray hex, every text tone clears 4.5:1 on **both** surfaces, and nothing uses a font size off the scale.
 
 - **Lattice tokens are normative and fixed** — `indigo`, `explored`, `turmeric`, `madder`. `madder` still means *this is the answer*: the chosen path and the middle snake, plus focus rings, and nothing else. A pressed button, a selected tab or a deleted line must not use it.
 - **Surface tokens** — `cotton` is the ground, `paper` is a raised surface, `rule` is the hairline between them. Cards are `.card` (globals.css): paper, one hairline, a whisper of shadow. Grouping is what makes the tool legible; nothing should float on the ground alone.
-- **Text tones** — `deepIndigo` primary, `muted` secondary (5.5:1 on paper), `indigo` for lede paragraphs. Do not use opacity to fake a text tone.
+- **Text tones** — `deepIndigo` primary, `muted` secondary (5.05:1 on cotton, 5.78:1 on paper), `indigo` for lede paragraphs. Do not use opacity to fake a text tone: `muted/60` was 2.7:1. Contrast claims here are measured by the test, not estimated — the previous `muted` advertised 5.5:1 and was 4.34:1 on the ground.
 - **`added` / `removed`** are the diff output's two directions, tinted as well as coloured so the signal is not colour alone. Deliberately not `madder`.
-- **Type scale** — serif (Newsreader) for headings only; sans (Inter) for interface; mono (DM Mono) for every figure, token id, and diff line. Body copy is 15px, panel copy 13px, micro labels 11px uppercase with `tracking-[0.07em]`. Nothing smaller than 11px. Prose gets `.measure` (64ch).
+- **Type scale** — serif (Newsreader) for headings only; sans (Inter) for interface; mono (DM Mono) for every figure, token id, and diff line. One scale, named by role, replacing Tailwind's own so an off-scale class produces nothing at all: `micro` (11px, uppercase labels with `tracking-[0.07em]`), `fine` (13px, mono figures), `sm` (14px, secondary interface), `base` (16px, **all** prose), `lg` (18px, ledes), then `h3`/`h2`/`h1`/`hero`, which clamp rather than switching at a breakpoint. Nothing smaller than 11px. Line height rides on the scale — do not add a `leading-*`. Prose gets `.measure` (64ch).
+- **Rhythm** — `--space-gutter`, `--space-stack`, `--space-section`, `--space-hero`, as `px-gutter` / `py-section` and friends. The distance between two sections is a token, not a guess per page.
 - **Controls** live in `components/ui/controls.tsx` — `Button`, `Field`, `Select`, `Toggle`, `Note`. Minimum 32px tall, labels above inputs, never beside. `Panel` and `StepHeading` are in `components/ui/Panel.tsx`.
 - **Every panel carries a plain-language `hint`.** Algorithm terms stay English by policy, so each one is glossed where it appears — plus the glossary on the home page. A new panel without a hint is not finished.
 - **Brand assets.** Masters live in `exports/`, which is **gitignored** — it is a design output folder, not a build input. The subset the site ships is committed: `app/icon.svg` (favicon, the one-bend form), `app/apple-icon.png` (180px, iOS home screen), `public/brand/` (192/512/maskable PWA icons and the 1200×630 social card). Copy a new size in rather than pointing the build at `exports/`. The mark's own colours are `BRAND` in `lib/palette.ts` and are **not** UI tokens: the kit reserves green for the path itself, and the cream and red dots mean start and wrong-attribution — never swapped. Below 40px only the one-bend staircase is drawn; `components/chrome/BrandMark.tsx` is the only place that renders it in the interface.
-- The home page is ordered for someone who has never run `git diff`: question → worked example with no jargon → the idea in three steps → why diffs blame the wrong line → notation → glossary → paper. Do not move the notation up.
+- **The home page opens with the picture.** `components/home/HeroFigure.tsx` is a still edit graph in inline SVG — no JavaScript, in the first paint, since a hero that waits for hydration is not a hero. Its route is hand-drawn, so `tests/ui/hero-figure.test.tsx` asserts it against what `lib/diff` actually returns for the worked example. Change the drawing, change the assertion.
+- The home page is ordered for someone who has never run `git diff`: picture → question → worked example with no jargon → the idea in three steps → why diffs blame the wrong line → notation → glossary → paper. Do not move the notation up.
 
 ## Testing rules
 
