@@ -95,6 +95,8 @@ export type Dict = {
     stats: string
     statsHint: string
     d: string
+    /** Placeholder {current}. Progress toward D, said in words not as a ratio. */
+    dReached: string
     steps: string
     snakes: string
     tokens: string
@@ -296,6 +298,7 @@ const id: Dict = {
     stats: 'Statistik',
     statsHint: 'Angka di balik gambar, termasuk memori yang benar-benar dipakai.',
     d: 'D (jarak edit)',
+    dReached: 'tercapai sejauh ini: {current}',
     steps: 'Langkah terekam',
     snakes: 'Snake',
     tokens: 'Token',
@@ -497,6 +500,7 @@ const en: Dict = {
     stats: 'Stats',
     statsHint: 'The numbers behind the picture, including the memory actually used.',
     d: 'D (edit distance)',
+    dReached: 'reached so far: {current}',
     steps: 'Recorded steps',
     snakes: 'Snakes',
     tokens: 'Tokens',
