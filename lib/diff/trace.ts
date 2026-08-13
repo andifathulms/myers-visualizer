@@ -93,6 +93,22 @@ export function frontierAfterLevel(
  */
 export type FromMove = 'down' | 'right' | 'none'
 
+/** Which predecessors of (d, k) are in the lattice at all. */
+export function optionsFrom(
+  vLeft: number,
+  vRight: number,
+  k: number,
+  n: number,
+  m: number,
+): { readonly rightOk: boolean; readonly downOk: boolean } {
+  return {
+    // Right = delete A[x]: needs x < n at the source, i.e. V[k-1] + 1 ≤ n.
+    rightOk: vLeft !== V_UNREACHED && vLeft + 1 <= n,
+    // Down = insert B[y]: keeps x, so the new y = V[k+1] − k must stay within m.
+    downOk: vRight !== V_UNREACHED && vRight - k <= m,
+  }
+}
+
 export function chooseFrom(
   vLeft: number,
   vRight: number,
@@ -100,14 +116,39 @@ export function chooseFrom(
   n: number,
   m: number,
 ): FromMove {
-  // Right = delete A[x]: needs x < n at the source, i.e. V[k-1] + 1 ≤ n.
-  const rightOk = vLeft !== V_UNREACHED && vLeft + 1 <= n
-  // Down = insert B[y]: keeps x, so the new y = V[k+1] − k must stay within m.
-  const downOk = vRight !== V_UNREACHED && vRight - k <= m
+  const { rightOk, downOk } = optionsFrom(vLeft, vRight, k, n, m)
   if (!rightOk && !downOk) return 'none'
   if (!rightOk) return 'down'
   if (!downOk) return 'right'
   return vLeft < vRight ? 'down' : 'right'
+}
+
+/**
+ * Was this step decided by a tie? §6.4
+ *
+ * Both predecessors of (d, k) land on the same diagonal: going down from
+ * k + 1 arrives at x = V[k+1], going right from k − 1 arrives at
+ * V[k-1] + 1. When those are equal the two are exactly as good, and
+ * `chooseFrom` picks down — not because it reaches further, but because the
+ * comparison is written `<` rather than `<=`. That single character is the
+ * tie-break the whole site is about, and until now it was only ever described
+ * in prose on the home page.
+ *
+ * Derived from the recorded snapshots rather than stored in the trace: the V
+ * history is already kept for the backtrack, so the fact is there to be read
+ * and the trace format owes it nothing.
+ *
+ * This describes *this* implementation. Another Myers, git's included, may
+ * break the same tie the other way and return a different — equally minimal —
+ * script. That is the point rather than a caveat.
+ */
+export function tiedAt(s: VSnapshots, d: number, k: number, n: number, m: number): boolean {
+  if (d <= 0) return false
+  // Row d holds V as it stood before level d ran — the predecessors' values.
+  const vLeft = snapshotGet(s, d, k - 1)
+  const vRight = snapshotGet(s, d, k + 1)
+  const { rightOk, downOk } = optionsFrom(vLeft, vRight, k, n, m)
+  return rightOk && downOk && vLeft + 1 === vRight
 }
 
 export class SnapshotRecorder {

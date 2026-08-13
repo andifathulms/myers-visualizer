@@ -66,6 +66,109 @@ function tables(a: readonly Token[], b: readonly Token[]): Tables {
   return { width, best, counts }
 }
 
+/**
+ * Prefix tables: the mirror of `tables`, counting minimal paths *into* a node
+ * rather than out of it. Predecessors all lie at a smaller x or a smaller y,
+ * so a single forward sweep is enough.
+ */
+function prefixTables(a: readonly Token[], b: readonly Token[]): Tables {
+  const n = a.length
+  const m = b.length
+  const width = n + 1
+  const best = new Int32Array(width * (m + 1))
+  const counts = new Float64Array(width * (m + 1))
+
+  for (let y = 0; y <= m; y++) {
+    for (let x = 0; x <= n; x++) {
+      const here = y * width + x
+      if (x === 0 && y === 0) {
+        best[here] = 0
+        counts[here] = 1
+        continue
+      }
+      const diagonal = x > 0 && y > 0 && a[x - 1] === b[y - 1] ? best[(y - 1) * width + (x - 1)] : -1
+      const right = x > 0 ? 1 + best[y * width + (x - 1)] : -1
+      const down = y > 0 ? 1 + best[(y - 1) * width + x] : -1
+
+      let value = Number.MAX_SAFE_INTEGER
+      if (diagonal >= 0) value = Math.min(value, diagonal)
+      if (right >= 0) value = Math.min(value, right)
+      if (down >= 0) value = Math.min(value, down)
+      best[here] = value
+
+      let total = 0
+      if (diagonal === value) total += counts[(y - 1) * width + (x - 1)]
+      if (right === value) total += counts[y * width + (x - 1)]
+      if (down === value) total += counts[(y - 1) * width + x]
+      counts[here] = Math.min(total, COUNT_CAP + 1)
+    }
+  }
+  return { width, best, counts }
+}
+
+/**
+ * How contested one operation is: the number of minimal scripts that attribute
+ * the change exactly this way.
+ */
+export type OpShare = {
+  /** Minimal scripts taking this edge. Never zero for an op of a minimal script. */
+  readonly scripts: number
+  /** True when every minimal script takes it — this part of the diff is not a choice. */
+  readonly forced: boolean
+}
+
+/**
+ * Per-operation contestedness for a minimal script. §6.4
+ *
+ * The ambiguity view says "there are twelve minimal scripts" and lets you page
+ * through them; what it cannot say is *which lines they disagree about*. That
+ * is the practically useful half, because ambiguity is local: most of a diff
+ * is forced — every minimal script contains it — and the disagreement
+ * concentrates on a handful of edges. The misattributed brace is one of them.
+ *
+ * The count for an edge u → v is (minimal paths into u) × (minimal paths out
+ * of v), which is why this needs the prefix tables as well as the suffix ones.
+ * It is a count over a set, not a probability: nothing here says one
+ * attribution is likelier than another, only how many of the equally-minimal
+ * answers agree with this one.
+ *
+ * Returns null when the total saturates `COUNT_CAP`. A share we cannot state
+ * exactly is one we do not state — below the cap every count is an integer
+ * well inside Float64's exact range, and so is every product, since the paths
+ * through one edge are a subset of all of them.
+ */
+export function sharesOfScript(
+  a: readonly Token[],
+  b: readonly Token[],
+  script: EditScript,
+): readonly OpShare[] | null {
+  const suffix = tables(a, b)
+  const total = suffix.counts[0]
+  if (total > COUNT_CAP) return null
+
+  const prefix = prefixTables(a, b)
+  const width = suffix.width
+  const shares: OpShare[] = []
+
+  let x = 0
+  let y = 0
+  for (const op of script) {
+    const from = prefix.counts[y * width + x]
+    if (op.type === 'keep') {
+      x++
+      y++
+    } else if (op.type === 'delete') {
+      x++
+    } else {
+      y++
+    }
+    const to = suffix.counts[y * width + x]
+    const scripts = from * to
+    shares.push({ scripts, forced: scripts === total })
+  }
+  return shares
+}
+
 export function analyseAmbiguity(a: readonly Token[], b: readonly Token[]): Ambiguity {
   const { counts, best } = tables(a, b)
   const total = counts[0]
