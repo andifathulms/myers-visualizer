@@ -180,6 +180,8 @@ export type Dict = {
     memoryCrossover: string
     /** Names the horizontally scrollable table region. */
     tableScroll: string
+    /** The table's own name, for readers who land on it directly. */
+    tableCaption: string
     tableTitle: string
     outputTitle: string
     outputHint: string
@@ -391,6 +393,7 @@ const id: Dict = {
     memoryCrossover: 'Varian linear-space menyimpan lebih banyak sel daripada greedy di sini. Itu bukan salah hitung: ia menukar penyimpanan O(D²) dengan O(N+M) plus biaya tetap rekursi, dan pada masukan sekecil ini biaya tetapnya yang menang. Bedanya berbalik saat D bertambah — buka contoh yang lebih besar di edit graph untuk melihatnya.',
     allAgree: 'Pada masukan ini keempatnya sepakat: D sama, jumlah hunk sama. Itu biasa pada suntingan kecil — perbedaannya muncul ketika ada baris berulang yang memberi Myers tempat berlabuh lain. Coba contoh "{preset}".',
     tableScroll: 'Tabel perbandingan, dapat digulir mendatar',
+    tableCaption: 'Empat algoritma pada masukan yang sama: panjang script, jumlah hunk, sel V tersimpan, dan apakah minimalitas dijamin.',
     tableTitle: 'Angkanya',
     outputTitle: 'Keluarannya, berdampingan',
     outputHint: 'Masukan yang sama, empat cara membacanya.',
@@ -607,6 +610,7 @@ const en: Dict = {
     memoryCrossover: 'The linear-space variant stored more cells than greedy here. That is not a miscount: it trades O(D²) storage for O(N+M) plus a fixed recursion overhead, and on an input this small the overhead wins. The order reverses as D grows — open a larger preset in the edit graph to watch it.',
     allAgree: 'On this input all four agree: same D, same number of hunks. That is the common case on small edits — the differences appear when a repeated line gives Myers somewhere else to anchor. Try the "{preset}" preset.',
     tableScroll: 'Comparison table, scrolls horizontally',
+    tableCaption: 'Four algorithms on the same input: script length, hunk count, V cells stored, and whether minimality is guaranteed.',
     tableTitle: 'The numbers',
     outputTitle: 'The output, side by side',
     outputHint: 'One input, four ways of reading it.',

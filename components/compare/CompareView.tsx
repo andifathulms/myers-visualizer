@@ -148,6 +148,12 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
           className="card max-w-4xl overflow-x-auto"
         >
           <table className="w-full border-collapse font-sans text-sm">
+            {/*
+              The table had no name of its own: the visible heading above it is
+              the step heading, not a caption, so a reader landing on the table
+              directly was told nothing about what it holds.
+            */}
+            <caption className="sr-only">{t.tableCaption}</caption>
             <thead>
               <tr className="border-b border-rule bg-cotton/50 text-left">
                 <Th>{dict.input.algorithm}</Th>
@@ -162,7 +168,12 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 const shortest = result.error === null && result.d === best
                 return (
                   <tr key={result.algorithm} className="border-b border-rule/60 last:border-0">
-                    <td className="px-4 py-3">
+                    {/*
+                      The algorithm names the row, so it is a header for it.
+                      As a <td> every other cell in the row read as a bare
+                      number with nothing to attach it to. WCAG 1.3.1.
+                    */}
+                    <th scope="row" className="px-4 py-3 text-left font-normal">
                       <span className="font-medium text-deepIndigo">
                         {LABELS[result.algorithm]}
                       </span>
@@ -171,7 +182,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                           {t.shortest}
                         </span>
                       ) : null}
-                    </td>
+                    </th>
                     <td
                       className={`px-4 py-3 text-right font-mono tabular-nums ${
                         shortest ? 'font-medium text-deepIndigo' : 'text-muted'
@@ -271,7 +282,10 @@ function Th({
   align?: 'left' | 'right'
 }) {
   return (
+    // Explicit, rather than relying on every screen reader inferring column
+    // scope from <thead>. WCAG 1.3.1.
     <th
+      scope="col"
       className={`px-4 py-2.5 text-micro font-semibold uppercase tracking-[0.07em] text-muted ${
         align === 'right' ? 'text-right' : ''
       }`}

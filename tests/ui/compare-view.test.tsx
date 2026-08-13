@@ -31,7 +31,8 @@ describe('CompareView', () => {
    */
   it('shows linear space retaining far less V once D is large', async () => {
     render(<CompareView locale="id" dict={dict} />)
-    const cell = (row: HTMLElement) => Number(within(row).getAllByRole('cell')[3].textContent)
+    // Column one is a rowheader, not a cell, so V cells stored is index 2.
+    const cell = (row: HTMLElement) => Number(within(row).getAllByRole('cell')[2].textContent)
 
     const atStart = screen.getAllByRole('row').slice(1, 5)
     expect(cell(atStart[1])).toBeGreaterThan(cell(atStart[0])) // D = 2: greedy is cheaper
@@ -56,10 +57,11 @@ describe('CompareView', () => {
       const rows = screen.getAllByRole('row').slice(1, 5)
       const cells = (row: HTMLElement) => within(row).getAllByRole('cell').map((c) => c.textContent)
       const [myers, patience] = [cells(rows[0]), cells(rows[2])]
+      // The algorithm name is a rowheader now, so D is index 0 and hunks 1.
       // Same D...
-      expect(patience[1]).toBe(myers[1])
+      expect(patience[0]).toBe(myers[0])
       // ...fewer hunks. Minimal is not the same as readable.
-      expect(Number(patience[2])).toBeLessThan(Number(myers[2]))
+      expect(Number(patience[1])).toBeLessThan(Number(myers[1]))
     })
   })
 })
