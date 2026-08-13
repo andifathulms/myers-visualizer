@@ -157,6 +157,8 @@ export type Dict = {
     note: string
     /** Shown only when every algorithm returns the same shape of answer. Placeholder {preset}. */
     allAgree: string
+    /** Shown only when the linear-space variant stored more than greedy did. */
+    memoryCrossover: string
     tableTitle: string
     outputTitle: string
     outputHint: string
@@ -355,6 +357,7 @@ const id: Dict = {
     yes: 'Ya',
     no: 'Tidak dijamin',
     note: 'Hanya Myers yang menjamin D minimal. Patience dan histogram menukar minimalitas dengan keterbacaan.',
+    memoryCrossover: 'Varian linear-space menyimpan lebih banyak sel daripada greedy di sini. Itu bukan salah hitung: ia menukar penyimpanan O(D²) dengan O(N+M) plus biaya tetap rekursi, dan pada masukan sekecil ini biaya tetapnya yang menang. Bedanya berbalik saat D bertambah — buka contoh yang lebih besar di edit graph untuk melihatnya.',
     allAgree: 'Pada masukan ini keempatnya sepakat: D sama, jumlah hunk sama. Itu biasa pada suntingan kecil — perbedaannya muncul ketika ada baris berulang yang memberi Myers tempat berlabuh lain. Coba contoh "{preset}".',
     tableTitle: 'Angkanya',
     outputTitle: 'Keluarannya, berdampingan',
@@ -558,6 +561,7 @@ const en: Dict = {
     yes: 'Yes',
     no: 'Not guaranteed',
     note: 'Only Myers guarantees a minimal D. Patience and histogram trade minimality for readability.',
+    memoryCrossover: 'The linear-space variant stored more cells than greedy here. That is not a miscount: it trades O(D²) storage for O(N+M) plus a fixed recursion overhead, and on an input this small the overhead wins. The order reverses as D grows — open a larger preset in the edit graph to watch it.',
     allAgree: 'On this input all four agree: same D, same number of hunks. That is the common case on small edits — the differences appear when a repeated line gives Myers somewhere else to anchor. Try the "{preset}" preset.',
     tableTitle: 'The numbers',
     outputTitle: 'The output, side by side',

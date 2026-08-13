@@ -87,6 +87,16 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
     results.every((r) => r.d === results[0].d && r.hunks === results[0].hunks)
   const showcase = findPreset('patience-wins')
 
+  /*
+   * §6.6 sells the linear-space variant on memory, and on a five-line input it
+   * stores *more* than greedy — true, and read bare it looks like the page
+   * contradicting itself. The crossover is a fact about input size, so say it
+   * where the number is, and only when the number needs it.
+   */
+  const greedyCells = results.find((r) => r.algorithm === 'myers')?.vCells ?? 0
+  const linearCells = results.find((r) => r.algorithm === 'myers-linear')?.vCells ?? 0
+  const memoryInverted = greedyCells > 0 && linearCells > greedyCells
+
   return (
     <main className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
       <header className="max-w-3xl">
@@ -184,6 +194,10 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
             </div>
           ))}
         </dl>
+
+        {memoryInverted ? (
+          <p className="measure mt-5 font-sans text-base text-muted">{t.memoryCrossover}</p>
+        ) : null}
 
         {allAgree && showcase !== undefined ? (
           <p className="measure mt-5 font-sans text-base text-muted">
