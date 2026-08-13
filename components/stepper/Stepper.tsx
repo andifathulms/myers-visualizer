@@ -50,11 +50,18 @@ export function Stepper({
 }: Props) {
   const t = dict.stepper
 
-  // Keyboard stepping: the whole point is being able to move one step at a time.
+  /*
+   * Keyboard stepping: the whole point is being able to move one step at a
+   * time. It listens on the window, so it has to stand down wherever the key
+   * already means something — a form field, a select, and any pane the user
+   * is scrolling with the arrows, which is how the diff is read at 320px.
+   * Stealing ArrowRight there leaves the overflowing half unreachable.
+   */
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null
-      if (target !== null && ['INPUT', 'TEXTAREA'].includes(target.tagName)) return
+      if (target !== null && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return
+      if (target !== null && target.scrollWidth > target.clientWidth) return
       switch (event.key) {
         case ' ':
           event.preventDefault()

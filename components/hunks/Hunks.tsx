@@ -30,6 +30,8 @@ type Props = {
   shareLabel?: string
   /** Copy for the composed accessible name. Defaults keep the plain reading. */
   labels?: LineLabels
+  /** Names the scroll region. Without one it is announced as nothing. */
+  scrollLabel?: string
 }
 
 /**
@@ -66,6 +68,7 @@ export function Hunks({
   totalScripts = 1,
   shareLabel = '{used}/{total}',
   labels = PLAIN,
+  scrollLabel,
 }: Props) {
   if (hunks.length === 0) {
     return (
@@ -75,7 +78,21 @@ export function Hunks({
     )
   }
   return (
-    <div className="overflow-x-auto rounded-xl border border-rule bg-paper">
+    /*
+      tabindex so the pane can be scrolled without a mouse: at 320px the diff
+      is wider than the viewport, and only Chrome gives scrollable containers
+      a tab stop of its own — Firefox and Safari do not, which left the
+      overflowing half unreachable. WCAG 2.1.1.
+
+      role="region" is the one ARIA addition in this pass and it is here
+      because a focusable scroll pane with no role and no name is announced
+      as nothing at all: the user lands on it and hears silence.
+    */
+    <div
+      tabIndex={0}
+      role={scrollLabel === undefined ? undefined : 'region'}
+      aria-label={scrollLabel}
+      className="overflow-x-auto rounded-xl border border-rule bg-paper">
       {hunks.map((hunk, index) => (
         <div key={index} className="border-b border-rule last:border-0">
           <div className="border-b border-rule bg-cotton/50 px-3 py-1.5 font-mono text-micro text-muted">

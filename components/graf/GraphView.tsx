@@ -435,6 +435,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
               inserted: t.lineInserted,
               share: t.lineShare,
             }}
+            scrollLabel={t.outputScroll}
           />
         </div>
       </section>

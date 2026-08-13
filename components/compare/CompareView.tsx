@@ -139,7 +139,14 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
       <section className="mt-12">
         <StepHeading step={2} title={t.tableTitle} />
 
-        <div className="card max-w-4xl overflow-x-auto">
+        {/* Same reasoning as the diff pane: keyboard-scrollable, and named so
+            that landing on it says something. WCAG 2.1.1. */}
+        <div
+          tabIndex={0}
+          role="region"
+          aria-label={t.tableScroll}
+          className="card max-w-4xl overflow-x-auto"
+        >
           <table className="w-full border-collapse font-sans text-sm">
             <thead>
               <tr className="border-b border-rule bg-cotton/50 text-left">
@@ -242,6 +249,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                     onSelectOp={setSelectedOp}
                     emptyLabel={locale === 'id' ? 'Tidak ada perbedaan.' : 'No differences.'}
                     labels={lineLabels}
+                    scrollLabel={`${LABELS[result.algorithm]} — ${dict.graph.outputScroll}`}
                   />
                 ) : (
                   <p className="px-3 py-4 font-sans text-fine text-madder">{result.error}</p>

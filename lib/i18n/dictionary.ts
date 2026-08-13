@@ -95,6 +95,9 @@ export type Dict = {
     idleVStrip: string
     output: string
     outputHint: string
+    /** Names the horizontally scrollable diff region. */
+    outputScroll: string
+    /** Names the horizontally scrollable diff region. */
     stats: string
     statsHint: string
     d: string
@@ -175,6 +178,8 @@ export type Dict = {
     allAgree: string
     /** Shown only when the linear-space variant stored more than greedy did. */
     memoryCrossover: string
+    /** Names the horizontally scrollable table region. */
+    tableScroll: string
     tableTitle: string
     outputTitle: string
     outputHint: string
@@ -317,6 +322,7 @@ const id: Dict = {
     noVStrip: 'Algoritma ini tidak memelihara array V. Ia berlabuh pada elemen dan membelah rekursif, jadi tidak ada frontier untuk ditonton.',
     output: 'Keluaran diff',
     outputHint: 'Klik sebuah baris untuk menyorot langkah yang menghasilkannya di kisi.',
+    outputScroll: 'Keluaran diff, dapat digulir mendatar',
     stats: 'Statistik',
     statsHint: 'Angka di balik gambar, termasuk memori yang benar-benar dipakai.',
     d: 'D (jarak edit)',
@@ -384,6 +390,7 @@ const id: Dict = {
     note: 'Hanya Myers yang menjamin D minimal. Patience dan histogram menukar minimalitas dengan keterbacaan.',
     memoryCrossover: 'Varian linear-space menyimpan lebih banyak sel daripada greedy di sini. Itu bukan salah hitung: ia menukar penyimpanan O(D²) dengan O(N+M) plus biaya tetap rekursi, dan pada masukan sekecil ini biaya tetapnya yang menang. Bedanya berbalik saat D bertambah — buka contoh yang lebih besar di edit graph untuk melihatnya.',
     allAgree: 'Pada masukan ini keempatnya sepakat: D sama, jumlah hunk sama. Itu biasa pada suntingan kecil — perbedaannya muncul ketika ada baris berulang yang memberi Myers tempat berlabuh lain. Coba contoh "{preset}".',
+    tableScroll: 'Tabel perbandingan, dapat digulir mendatar',
     tableTitle: 'Angkanya',
     outputTitle: 'Keluarannya, berdampingan',
     outputHint: 'Masukan yang sama, empat cara membacanya.',
@@ -531,6 +538,7 @@ const en: Dict = {
     noVStrip: 'This algorithm maintains no V array. It anchors on elements and splits recursively, so there is no frontier to watch.',
     output: 'Diff output',
     outputHint: 'Click a line to highlight the move that produced it on the grid.',
+    outputScroll: 'Diff output, scrolls horizontally',
     stats: 'Stats',
     statsHint: 'The numbers behind the picture, including the memory actually used.',
     d: 'D (edit distance)',
@@ -598,6 +606,7 @@ const en: Dict = {
     note: 'Only Myers guarantees a minimal D. Patience and histogram trade minimality for readability.',
     memoryCrossover: 'The linear-space variant stored more cells than greedy here. That is not a miscount: it trades O(D²) storage for O(N+M) plus a fixed recursion overhead, and on an input this small the overhead wins. The order reverses as D grows — open a larger preset in the edit graph to watch it.',
     allAgree: 'On this input all four agree: same D, same number of hunks. That is the common case on small edits — the differences appear when a repeated line gives Myers somewhere else to anchor. Try the "{preset}" preset.',
+    tableScroll: 'Comparison table, scrolls horizontally',
     tableTitle: 'The numbers',
     outputTitle: 'The output, side by side',
     outputHint: 'One input, four ways of reading it.',
