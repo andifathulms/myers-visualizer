@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LOCALES, type Locale } from '@/lib/i18n/locales'
-import type { Dict } from '@/lib/i18n/dictionary'
+import { LOCALES, LOCALE_NAMES, type Locale } from '@/lib/i18n/locales'
+import { format, type Dict } from '@/lib/i18n/dictionary'
 import { BrandMark } from '@/components/chrome/BrandMark'
 
 /**
@@ -94,19 +94,34 @@ function LocaleToggle({
     >
       {LOCALES.map((code) =>
         code === locale ? (
+          /*
+            The current locale was a bare "EN" on a non-focusable span, so
+            tabbing gave you "Switch language: ID" and never said what you
+            were already reading. The two letters stay visual; the sentence
+            beside them is what a screen reader gets. aria-current is gone
+            with it — it marks the current item in a set of links, and this
+            is not a link.
+          */
           <span
             key={code}
-            aria-current="true"
-            className="rounded-md bg-indigo/10 px-2 py-1 text-micro font-semibold uppercase tracking-wider text-deepIndigo"
+            className="rounded-md bg-indigo/10 px-2 py-1 text-micro font-semibold text-deepIndigo"
           >
-            {code}
+            {/* `uppercase` sits on the visual half only: applied to the
+                wrapper it also uppercased the sentence below, and some
+                screen readers spell all-caps out letter by letter. */}
+            <span aria-hidden className="uppercase tracking-wider">
+              {code}
+            </span>
+            <span className="sr-only">
+              {format(dict.a11y.currentLocale, { name: LOCALE_NAMES[code] })}
+            </span>
           </span>
         ) : (
           <Link
             key={code}
             href={`/${code}`}
             title={dict.a11y.switchLocale}
-            aria-label={`${dict.a11y.switchLocale}: ${code.toUpperCase()}`}
+            aria-label={`${dict.a11y.switchLocale}: ${LOCALE_NAMES[code]}`}
             className="rounded-md px-2 py-1 text-micro font-semibold uppercase tracking-wider text-muted transition-colors hover:text-deepIndigo"
           >
             {code}

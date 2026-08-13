@@ -9,6 +9,16 @@ export type Locale = (typeof LOCALES)[number]
  */
 export const DEFAULT_LOCALE: Locale = 'en'
 
+/**
+ * The languages' own names, for announcing which one you are reading. Each is
+ * written in that language — a reader who cannot read the current one still
+ * recognises the name of their own.
+ */
+export const LOCALE_NAMES: Record<Locale, string> = {
+  en: 'English',
+  id: 'Bahasa Indonesia',
+}
+
 export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value)
 }

@@ -196,6 +196,8 @@ export type Dict = {
     copyLink: string
     copied: string
     switchLocale: string
+    /** Placeholder {name} — says which language you are reading, not just which you can switch to. */
+    currentLocale: string
   }
   legend: {
     title: string
@@ -413,6 +415,7 @@ const id: Dict = {
     copyLink: 'Salin tautan',
     copied: 'Tersalin',
     switchLocale: 'Ganti bahasa',
+    currentLocale: 'Bahasa saat ini: {name}',
   },
   legend: {
     title: 'Legenda',
@@ -630,6 +633,7 @@ const en: Dict = {
     copyLink: 'Copy link',
     copied: 'Copied',
     switchLocale: 'Switch language',
+    currentLocale: 'Current language: {name}',
   },
   legend: {
     title: 'Legend',
