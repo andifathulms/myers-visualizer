@@ -286,6 +286,15 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                       />
                     </div>
                   </div>
+                  {/*
+                    At frame 0 the lattice is an empty grid with a couple of
+                    grey diagonals on it — less than the still figure in the
+                    hero promises. Say that it is waiting rather than leaving
+                    the reader to wonder whether it broke.
+                  */}
+                  {frame === 0 ? (
+                    <p className="mt-3 font-sans text-fine text-muted">{t.idleCanvas}</p>
+                  ) : null}
                 </div>
               </Panel>
             )}
@@ -363,6 +372,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 onHighlight={setHighlightK}
                 label={t.vstrip}
                 hint={t.vstripHint}
+                idle={t.idleVStrip}
               />
             ) : (
               // Showing a V strip for an algorithm that has no V would be a lie

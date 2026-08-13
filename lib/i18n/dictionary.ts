@@ -90,6 +90,9 @@ export type Dict = {
     vstrip: string
     vstripHint: string
     noVStrip: string
+    /** Before the first step: the lattice and the strip are honestly empty. */
+    idleCanvas: string
+    idleVStrip: string
     output: string
     outputHint: string
     stats: string
@@ -296,6 +299,8 @@ const id: Dict = {
     axisB: 'B — sesudah ↓',
     vstrip: 'Array V',
     vstripHint: 'Satu sel per diagonal k. Arahkan kursor ke sebuah k untuk menyorot diagonalnya di lattice.',
+    idleCanvas: 'Belum ada yang dicari. Tekan putar di bawah, atau melangkah satu per satu.',
+    idleVStrip: 'Masih kosong — V baru terisi setelah langkah pertama.',
     noVStrip: 'Algoritma ini tidak memelihara array V. Ia berlabuh pada elemen dan membelah rekursif, jadi tidak ada frontier untuk ditonton.',
     output: 'Keluaran diff',
     outputHint: 'Klik sebuah baris untuk menyorot langkah yang menghasilkannya di kisi.',
@@ -500,6 +505,8 @@ const en: Dict = {
     axisB: 'B — after ↓',
     vstrip: 'The V array',
     vstripHint: 'One cell per diagonal k. Hover a k cell to highlight that diagonal in the lattice.',
+    idleCanvas: 'Nothing has been searched yet. Press play below, or step through it one move at a time.',
+    idleVStrip: 'Empty until the first step — V fills in as d advances.',
     noVStrip: 'This algorithm maintains no V array. It anchors on elements and splits recursively, so there is no frontier to watch.',
     output: 'Diff output',
     outputHint: 'Click a line to highlight the move that produced it on the grid.',

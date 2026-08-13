@@ -22,9 +22,11 @@ type Props = {
   onHighlight: (k: number | null) => void
   label: string
   hint: string
+  /** Shown before the first step, in place of a bare em dash. */
+  idle: string
 }
 
-export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint }: Props) {
+export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint, idle }: Props) {
   return (
     <Panel title={label} hint={hint} ariaLabel={label}>
       <ol
@@ -59,7 +61,9 @@ export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint }
           )
         })}
         {cells.length === 0 ? (
-          <li className="font-mono text-fine text-muted">—</li>
+          // An em dash says "no data" and leaves the reader to guess whether
+          // that is a state or a fault. This says which.
+          <li className="font-sans text-fine text-muted">{idle}</li>
         ) : null}
       </ol>
     </Panel>
