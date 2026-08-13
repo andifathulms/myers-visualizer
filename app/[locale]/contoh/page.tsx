@@ -31,7 +31,8 @@ export default function ContohPage({ params }: { params: { locale: string } }) {
         {PRESETS.map((preset) => (
           <li key={preset.id} className="card flex flex-col p-5">
             <h2 className="font-serif text-h3 font-semibold">{preset.title[locale]}</h2>
-            <p className="mt-2 flex-1 font-sans text-sm text-muted">
+            {/* The phenomenon is the content of this page, so it is prose. */}
+            <p className="mt-2 flex-1 font-sans text-base text-muted">
               {preset.phenomenon[locale]}
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
@@ -42,7 +43,18 @@ export default function ContohPage({ params }: { params: { locale: string } }) {
               >
                 {dict.presets.open} →
               </Link>
-              <code className="font-mono text-micro text-muted">{preset.id}</code>
+              {/*
+                Shown as the fragment it actually is. A bare slug beside a
+                button reads as leaked metadata; `#p=worst-case` reads as the
+                link the button is about to follow, which is what it is.
+              */}
+              <code
+                aria-label={dict.presets.linkFragment}
+                title={dict.presets.linkFragment}
+                className="font-mono text-micro text-muted"
+              >
+                #p={preset.id}
+              </code>
             </div>
           </li>
         ))}

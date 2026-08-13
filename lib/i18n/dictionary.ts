@@ -168,7 +168,7 @@ export type Dict = {
     outputHint: string
     shortest: string
   }
-  presets: { title: string; lede: string; open: string }
+  presets: { title: string; lede: string; open: string; linkFragment: string }
   a11y: {
     skipToContent: string
     graphLabel: string
@@ -375,6 +375,7 @@ const id: Dict = {
     title: 'Contoh',
     lede: 'Tiap contoh memuat fenomena yang ingin ditunjukkan. Buka salah satu, lalu tekan putar.',
     open: 'Buka di edit graph',
+    linkFragment: 'Potongan tautan untuk contoh ini',
   },
   a11y: {
     skipToContent: 'Lompat ke konten',
@@ -582,6 +583,7 @@ const en: Dict = {
     title: 'Presets',
     lede: 'Each preset carries the phenomenon it exists to show. Open one, then press play.',
     open: 'Open in the edit graph',
+    linkFragment: 'The link fragment for this preset',
   },
   a11y: {
     skipToContent: 'Skip to content',
