@@ -245,8 +245,16 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       <section className="mt-12">
         <StepHeading step={2} title={t.stepWatch} hint={t.stepWatchHint} />
 
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
-          <div className="flex flex-col gap-4">
+        {/*
+          Two columns from lg; on a phone the same content is one column and
+          the order matters. The legend is a full card of four rows, and left
+          in source order it sat between the player and the first number — so
+          reading D on a 390px screen meant scrolling past the whole player
+          and the legend, and then scrolling again to reach the result. The
+          aside moves up and the legend goes last, where a reference belongs.
+        */}
+        <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
+          <div className="flex flex-col gap-4 lg:col-start-1 lg:row-start-1">
             {tooLarge ? (
               // An unreadable graph is not a visualisation. Say so, and show the
               // result instead. §6.1
@@ -341,13 +349,9 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 onSpeed={setSpeed}
               />
             ) : null}
-
-            <Panel title={dict.legend.title}>
-              <Legend dict={dict} />
-            </Panel>
           </div>
 
-          <aside className="flex flex-col gap-5">
+          <aside className="flex flex-col gap-5 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             <StatBar
               dict={dict}
               d={state.status === 'done' ? state.stats.d : 0}
@@ -394,6 +398,11 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
               }}
             />
           </aside>
+
+          {/* A reference, so it comes after the numbers on a narrow screen. */}
+          <Panel title={dict.legend.title}>
+            <Legend dict={dict} />
+          </Panel>
         </div>
       </section>
 
