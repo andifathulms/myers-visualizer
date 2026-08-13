@@ -20,6 +20,7 @@ describe('the hero figure', () => {
   const { a, b } = tokenizePair(example.a.join('\n'), example.b.join('\n'), {
     granularity: 'line',
     ignoreWhitespace: false,
+    ignoreCase: false,
   })
 
   it('draws the route this implementation actually finds', () => {
@@ -29,7 +30,7 @@ describe('the hero figure', () => {
     // The drawn polyline is the corners; the real path is every node. Walking
     // the corners has to reproduce it exactly.
     const corners = FIGURE.path
-    const walked: [number, number][] = []
+    const walked: (readonly [number, number])[] = []
     for (let i = 0; i < corners.length - 1; i++) {
       const [x0, y0] = corners[i]
       const [x1, y1] = corners[i + 1]
