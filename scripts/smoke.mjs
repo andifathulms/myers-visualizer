@@ -262,6 +262,13 @@ try {
   const declared = await page.evaluate(() => ({
     manifest: document.querySelector('link[rel="manifest"]')?.getAttribute('href') ?? '',
     icon: document.querySelector('link[rel="icon"]')?.getAttribute('href') ?? '',
+    // Every declared icon, because one of them is the Safari fallback: Safari
+    // does not support SVG favicons, so an SVG on its own leaves the tab
+    // showing whatever /favicon.ico the *domain* serves — on Pages, GitHub's.
+    icons: [...document.querySelectorAll('link[rel="icon"]')].map((l) => ({
+      href: l.getAttribute('href') ?? '',
+      type: l.getAttribute('type') ?? '',
+    })),
     apple: document.querySelector('link[rel="apple-touch-icon"]')?.getAttribute('href') ?? '',
     og: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? '',
   }))
@@ -281,6 +288,14 @@ try {
   }
 
   check('the favicon and apple touch icon resolve', (await resolves(declared.icon)) && (await resolves(declared.apple)), `${declared.icon} · ${declared.apple}`)
+
+  let everyIconResolves = declared.icons.length > 0
+  for (const icon of declared.icons) if (!(await resolves(icon.href))) everyIconResolves = false
+  check('the tab icon has a raster fallback for Safari',
+    declared.icons.some((i) => i.type === 'image/svg+xml') &&
+      declared.icons.some((i) => i.type === 'image/png') &&
+      everyIconResolves,
+    declared.icons.map((i) => i.type).join(' + '))
 
   const manifestOk = await resolves(declared.manifest)
   let iconsOk = false
