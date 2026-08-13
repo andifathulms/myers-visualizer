@@ -6,6 +6,7 @@ import { READING } from '@/lib/links'
 import { EXAMPLE, type ExampleLine } from '@/data/example'
 import { Panel } from '@/components/ui/Panel'
 import { Note } from '@/components/ui/controls'
+import { HeroFigure } from '@/components/home/HeroFigure'
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -30,34 +31,49 @@ export default function Home({ params }: { params: { locale: string } }) {
 
   return (
     <main>
-      {/* Hero */}
-      <section className="mx-auto max-w-5xl px-5 pb-10 pt-14 sm:pt-20">
-        <p className="font-sans text-fine font-semibold uppercase tracking-[0.14em] text-madder">
-          {t.kicker}
-        </p>
-        <h1 className="mt-4 max-w-3xl font-serif text-hero font-semibold">
-          {t.tagline}
-        </h1>
-        <p className="measure mt-6 font-sans text-lg text-indigo">{t.lede}</p>
+      {/*
+        Hero. Two columns from lg, because the picture is the argument and
+        putting it under a full-width headline pushes it below the fold —
+        which is where it was doing no work at all.
+      */}
+      <section className="mx-auto max-w-5xl px-gutter pb-stack pt-8 sm:pt-hero">
+        {/*
+          Three blocks, so that the narrow layout can put the picture between
+          the promise and the buttons: on a phone the figure would otherwise
+          sit under two screens of prose, which is the same as not having it.
+        */}
+        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-center lg:gap-10">
+          <div className="lg:col-start-1 lg:row-start-1">
+            <p className="font-sans text-fine font-semibold uppercase tracking-[0.14em] text-madder">
+              {t.kicker}
+            </p>
+            <h1 className="mt-3 max-w-2xl font-serif text-hero font-semibold">{t.tagline}</h1>
+            <p className="measure mt-4 font-sans text-lg text-indigo">{t.lede}</p>
+          </div>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href={`/${locale}/graf`}
-            className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-base font-medium text-paper transition-colors hover:bg-deepIndigo"
-          >
-            {t.ctaGraph}
-          </Link>
-          <Link
-            href={`/${locale}/banding`}
-            className="inline-flex h-11 items-center rounded-lg border border-rule bg-paper px-5 font-sans text-base font-medium text-deepIndigo transition-colors hover:border-indigo/60"
-          >
-            {t.ctaCompare}
-          </Link>
+          <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+            <HeroFigure dict={dict} />
+          </div>
+
+          <div className="flex flex-wrap gap-3 lg:col-start-1 lg:row-start-2">
+            <Link
+              href={`/${locale}/graf`}
+              className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-base font-medium text-paper transition-colors hover:bg-deepIndigo"
+            >
+              {t.ctaGraph}
+            </Link>
+            <Link
+              href={`/${locale}/banding`}
+              className="inline-flex h-11 items-center rounded-lg border border-rule bg-paper px-5 font-sans text-base font-medium text-deepIndigo transition-colors hover:border-indigo/60"
+            >
+              {t.ctaCompare}
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* What a diff is, before any word of algorithm. */}
-      <section className="mx-auto max-w-5xl px-5 py-12">
+      <section className="mx-auto max-w-5xl px-gutter py-section">
         <h2 className="font-serif text-h2 font-semibold">{t.exampleTitle}</h2>
         <p className="measure mt-3 font-sans text-lg text-indigo">{t.exampleLede}</p>
 
@@ -83,7 +99,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       </section>
 
       {/* The idea, with no notation in it at all. */}
-      <section className="mx-auto max-w-5xl px-5 py-12">
+      <section className="mx-auto max-w-5xl px-gutter py-section">
         <h2 className="font-serif text-h2 font-semibold">{t.stepsTitle}</h2>
         <p className="measure mt-3 font-sans text-lg text-indigo">{t.stepsLede}</p>
 
@@ -113,10 +129,10 @@ export default function Home({ params }: { params: { locale: string } }) {
       </section>
 
       {/* The practical payoff. */}
-      <section className="mx-auto max-w-5xl px-5 py-12">
+      <section className="mx-auto max-w-5xl px-gutter py-section">
         <div className="card border-l-[3px] border-l-madder p-6 sm:p-8">
           <h2 className="font-serif text-h2 font-semibold">{t.ambiguityTitle}</h2>
-          <p className="measure mt-4 font-sans text-indigo">{t.ambiguity}</p>
+          <p className="measure mt-4 font-sans text-lg text-indigo">{t.ambiguity}</p>
           <Link
             href={`/${locale}/contoh`}
             className="mt-5 inline-flex h-10 items-center rounded-lg border border-rule bg-cotton px-4 font-sans text-sm font-medium text-deepIndigo transition-colors hover:border-madder hover:text-madder"
@@ -127,7 +143,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       </section>
 
       {/* Only now the notation. */}
-      <section className="mx-auto max-w-5xl px-5 py-12">
+      <section className="mx-auto max-w-5xl px-gutter py-section">
         <h2 className="font-serif text-h2 font-semibold">{t.whatTitle}</h2>
         <p className="measure mt-3 font-sans text-lg text-indigo">{t.what}</p>
 
@@ -156,7 +172,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       </section>
 
       {/* The English terms, translated into human. */}
-      <section className="mx-auto max-w-5xl px-5 py-12">
+      <section className="mx-auto max-w-5xl px-gutter py-section">
         <h2 className="font-serif text-h2 font-semibold">{t.glossaryTitle}</h2>
         <p className="measure mt-3 font-sans text-lg text-indigo">{t.glossaryLede}</p>
 
@@ -171,7 +187,7 @@ export default function Home({ params }: { params: { locale: string } }) {
       </section>
 
       {/* Sources. */}
-      <section className="mx-auto max-w-5xl px-5 pb-16 pt-12">
+      <section className="mx-auto max-w-5xl px-gutter pb-16 pt-section">
         <h2 className="font-serif text-h2 font-semibold">{t.creditsTitle}</h2>
         <p className="measure mt-3 font-sans text-lg text-indigo">{t.creditsLede}</p>
 

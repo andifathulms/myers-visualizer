@@ -20,6 +20,17 @@ export type Dict = {
     lede: string
     ctaGraph: string
     ctaCompare: string
+    /** The hero's still edit graph — the picture the page opens with. */
+    figure: {
+      alt: string
+      axisA: string
+      axisB: string
+      deleted: string
+      inserted: string
+      keyMatch: string
+      keySearch: string
+      keyPath: string
+    }
     /** The 20-second "what even is a diff" worked example. */
     exampleTitle: string
     exampleLede: string
@@ -169,6 +180,16 @@ const id: Dict = {
     lede: 'Setiap kali Anda menyimpan berkas, Git membandingkan versi lama dan versi baru, lalu menampilkan baris mana yang ditambah dan mana yang dihapus. Di balik itu ada satu algoritma dari 1986. Situs ini menjalankannya pelan-pelan supaya bisa ditonton.',
     ctaGraph: 'Tonton algoritmanya bekerja',
     ctaCompare: 'Bandingkan algoritma',
+    figure: {
+      alt: 'Edit graph untuk dua daftar belanja: rute terpendek menuruni kisi, empat langkah diagonal gratis, satu langkah ke kanan yang menghapus satu baris, dan satu langkah ke bawah yang menyisipkan satu baris.',
+      axisA: 'teks lama',
+      axisB: 'teks baru',
+      deleted: '− dihapus',
+      inserted: '+ disisipkan',
+      keyMatch: 'baris yang sama — gratis',
+      keySearch: 'yang sempat dicoba',
+      keyPath: 'rute terpendek',
+    },
 
     exampleTitle: 'Apa itu diff?',
     exampleLede: 'Diff adalah daftar perubahan terkecil yang mengubah satu teks menjadi teks lain. Dua daftar belanja ini hampir sama — hanya satu baris yang berbeda.',
@@ -349,6 +370,16 @@ const en: Dict = {
     lede: 'Every time you save a file, Git compares the old version with the new one and shows you which lines were added and which were removed. Behind that is a single algorithm from 1986. This site runs it slowly enough to watch.',
     ctaGraph: 'Watch the algorithm run',
     ctaCompare: 'Compare algorithms',
+    figure: {
+      alt: 'An edit graph for two shopping lists: the shortest route down the grid, four free diagonal steps, one step right that deletes a line, and one step down that inserts one.',
+      axisA: 'old text',
+      axisB: 'new text',
+      deleted: '− deleted',
+      inserted: '+ inserted',
+      keyMatch: 'identical line — free',
+      keySearch: 'what it tried',
+      keyPath: 'shortest route',
+    },
 
     exampleTitle: 'What is a diff?',
     exampleLede: 'A diff is the smallest list of changes that turns one text into another. These two shopping lists are nearly identical — one line differs.',
