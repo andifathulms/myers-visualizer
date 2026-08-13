@@ -136,7 +136,7 @@ export function Stepper({
         </span>
       </div>
 
-      <p className="mt-2 font-sans text-fine text-muted/80">{t.keys}</p>
+      <p className="mt-2 font-sans text-fine text-muted">{t.keys}</p>
     </div>
   )
 }

@@ -92,7 +92,7 @@ function Line({
       ? 'bg-removed/8 text-removed'
       : line.type === 'insert'
         ? 'bg-added/8 text-added'
-        : 'text-deepIndigo/75'
+        : 'text-muted'
   return (
     <li>
       <button
@@ -103,10 +103,10 @@ function Line({
           selected ? 'bg-turmeric/30 text-deepIndigo' : `${tone} hover:brightness-[0.97]`,
         ].join(' ')}
       >
-        <span className="w-7 shrink-0 select-none text-right tabular-nums text-muted/60">
+        <span className="w-7 shrink-0 select-none text-right tabular-nums text-muted">
           {line.aIndex === null ? '' : line.aIndex + 1}
         </span>
-        <span className="w-7 shrink-0 select-none text-right tabular-nums text-muted/60">
+        <span className="w-7 shrink-0 select-none text-right tabular-nums text-muted">
           {line.bIndex === null ? '' : line.bIndex + 1}
         </span>
         <span className="w-3 shrink-0 select-none font-medium">{LINE_PREFIX[line.type]}</span>

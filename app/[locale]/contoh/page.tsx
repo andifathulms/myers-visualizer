@@ -42,7 +42,7 @@ export default function ContohPage({ params }: { params: { locale: string } }) {
               >
                 {dict.presets.open} →
               </Link>
-              <code className="font-mono text-micro text-muted/70">{preset.id}</code>
+              <code className="font-mono text-micro text-muted">{preset.id}</code>
             </div>
           </li>
         ))}

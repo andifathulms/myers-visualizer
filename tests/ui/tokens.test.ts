@@ -100,6 +100,27 @@ describe('design tokens', () => {
     expect(offenders).toEqual([])
   })
 
+  /*
+   * A text tone thinned with opacity is not a tone, it is a contrast failure
+   * waiting to be measured: `text-muted/60` came out at 2.54:1 on the diff's
+   * line numbers, well under the floor the tokens above are held to. The rule
+   * was already written down in CLAUDE.md and still shipped four times, so it
+   * is a test now rather than a paragraph.
+   *
+   * Only `text-`. A background, a border, a stroke or a fill at partial alpha
+   * is a legitimate wash — the explored region and the hero's path band both
+   * depend on it.
+   */
+  it('never fakes a text tone with opacity', () => {
+    const offenders: string[] = []
+    for (const file of sources()) {
+      for (const match of readFileSync(file, 'utf8').matchAll(/\btext-([a-zA-Z]+)\/(\d+)/g)) {
+        offenders.push(`${file}: text-${match[1]}/${match[2]}`)
+      }
+    }
+    expect(offenders).toEqual([])
+  })
+
   it('declares one type scale, and nothing in it is below 11px', () => {
     const steps = ['micro', 'fine', 'sm', 'base', 'lg', 'h3', 'h2', 'h1', 'hero']
     for (const step of steps) expect(CSS).toMatch(new RegExp(`--text-${step}:`))

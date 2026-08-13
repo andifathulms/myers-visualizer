@@ -177,7 +177,7 @@ function Pane({
         >
           {label}
         </label>
-        <span aria-hidden className="font-mono text-micro tabular-nums text-muted/70">
+        <span aria-hidden className="font-mono text-micro tabular-nums text-muted">
           {lines}
         </span>
       </div>
