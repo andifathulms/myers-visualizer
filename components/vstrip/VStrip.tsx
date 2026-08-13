@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { Panel } from '@/components/ui/Panel'
 
 /**
@@ -11,6 +12,13 @@ import { Panel } from '@/components/ui/Panel'
  *
  * k is negative for half the strip, and it is labelled as such — the offset is
  * an implementation detail of the array, not of the idea.
+ *
+ * The strip is one tab stop, not one per cell. Every cell used to be
+ * separately tabbable, which on the worst-case preset put 81 stops between
+ * the player and everything below it — the ambiguity panel and the result
+ * were the far side of eighty presses. Cells are peers in a list, so they get
+ * the roving-tabindex treatment that applies to any such set: Tab reaches the
+ * strip, arrows move within it, Home and End jump to the ends, Tab leaves.
  */
 export type VCell = { readonly k: number; readonly x: number; readonly y: number }
 
@@ -24,24 +32,102 @@ type Props = {
   hint: string
   /** Shown before the first step, in place of a bare em dash. */
   idle: string
+  /** Named because a group of controls with no name is announced as nothing. */
+  groupLabel: string
 }
 
-export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint, idle }: Props) {
+export function VStrip({
+  cells,
+  currentD,
+  highlightK,
+  onHighlight,
+  label,
+  hint,
+  idle,
+  groupLabel,
+}: Props) {
+  /** Which cell carries the tab stop. Index, not k, so it survives a resize. */
+  const [focused, setFocused] = useState(0)
+  const listRef = useRef<HTMLOListElement>(null)
+
+  // A new search rebuilds the strip; the old position may not exist any more.
+  useEffect(() => {
+    setFocused((index) => (index < cells.length ? index : 0))
+  }, [cells.length])
+
+  const move = (next: number) => {
+    if (cells.length === 0) return
+    const clamped = Math.max(0, Math.min(next, cells.length - 1))
+    setFocused(clamped)
+    // The tabindex has already moved with the state; focus follows it.
+    const buttons = listRef.current?.querySelectorAll('button')
+    buttons?.[clamped]?.focus()
+  }
+
+  /*
+   * stopPropagation as well as preventDefault: the stepper listens for the
+   * same arrows on the window to move the animation, and preventDefault does
+   * not stop a bubbling event reaching it. Without this, one press moved the
+   * cell *and* stepped the frame — which only looked fine in testing because
+   * the timeline happened to be at its end and could not advance.
+   */
+  const handled = (event: React.KeyboardEvent<HTMLOListElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  const onKeyDown = (event: React.KeyboardEvent<HTMLOListElement>) => {
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        handled(event)
+        move(focused + 1)
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        handled(event)
+        move(focused - 1)
+        break
+      case 'Home':
+        handled(event)
+        move(0)
+        break
+      case 'End':
+        handled(event)
+        move(cells.length - 1)
+        break
+      default:
+        break
+    }
+  }
+
   return (
     <Panel title={label} hint={hint}>
       <ol
+        ref={listRef}
+        // A set of related controls navigated as one. Native grouping elements
+        // carry no keyboard semantics, and without a role the arrow keys would
+        // be an undocumented behaviour on a plain list.
+        role="toolbar"
+        aria-label={groupLabel}
+        aria-orientation="horizontal"
         className="flex flex-wrap gap-1.5"
+        onKeyDown={onKeyDown}
         onMouseLeave={() => onHighlight(null)}
       >
-        {cells.map((cell) => {
+        {cells.map((cell, index) => {
           const live = Math.abs(cell.k % 2) === Math.abs(currentD % 2)
           const active = highlightK === cell.k
           return (
             <li key={cell.k}>
               <button
                 type="button"
+                tabIndex={index === focused ? 0 : -1}
                 onMouseEnter={() => onHighlight(cell.k)}
-                onFocus={() => onHighlight(cell.k)}
+                onFocus={() => {
+                  setFocused(index)
+                  onHighlight(cell.k)
+                }}
                 onBlur={() => onHighlight(null)}
                 aria-label={`k = ${cell.k}, x = ${cell.x}, y = ${cell.y}`}
                 className={[

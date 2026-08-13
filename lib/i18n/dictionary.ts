@@ -89,6 +89,8 @@ export type Dict = {
     axisB: string
     vstrip: string
     vstripHint: string
+    /** Names the strip as one navigable group. */
+    vstripGroup: string
     noVStrip: string
     /** Before the first step: the lattice and the strip are honestly empty. */
     idleCanvas: string
@@ -320,6 +322,7 @@ const id: Dict = {
     axisA: 'A — sebelum →',
     axisB: 'B — sesudah ↓',
     vstrip: 'Array V',
+    vstripGroup: 'Sel V per diagonal — panah untuk berpindah',
     vstripHint: 'Satu sel per diagonal k. Arahkan kursor ke sebuah k untuk menyorot diagonalnya di lattice.',
     idleCanvas: 'Belum ada yang dicari. Tekan putar di bawah, atau melangkah satu per satu.',
     idleVStrip: 'Masih kosong — V baru terisi setelah langkah pertama.',
@@ -538,6 +541,7 @@ const en: Dict = {
     axisA: 'A — before →',
     axisB: 'B — after ↓',
     vstrip: 'The V array',
+    vstripGroup: 'V cells by diagonal — arrow keys to move',
     vstripHint: 'One cell per diagonal k. Hover a k cell to highlight that diagonal in the lattice.',
     idleCanvas: 'Nothing has been searched yet. Press play below, or step through it one move at a time.',
     idleVStrip: 'Empty until the first step — V fills in as d advances.',

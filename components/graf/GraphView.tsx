@@ -378,6 +378,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 label={t.vstrip}
                 hint={t.vstripHint}
                 idle={t.idleVStrip}
+                groupLabel={t.vstripGroup}
               />
             ) : (
               // Showing a V strip for an algorithm that has no V would be a lie
