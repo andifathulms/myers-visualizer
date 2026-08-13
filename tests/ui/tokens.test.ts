@@ -112,10 +112,21 @@ describe('design tokens', () => {
    * depend on it.
    */
   it('never fakes a text tone with opacity', () => {
+    const SCALE = /\btext-(micro|fine|sm|base|lg|h[123]|hero)\b/
     const offenders: string[] = []
     for (const file of sources()) {
-      for (const match of readFileSync(file, 'utf8').matchAll(/\btext-([a-zA-Z]+)\/(\d+)/g)) {
+      const source = readFileSync(file, 'utf8')
+      for (const match of source.matchAll(/\btext-([a-zA-Z]+)\/(\d+)/g)) {
         offenders.push(`${file}: text-${match[1]}/${match[2]}`)
+      }
+      // `opacity-40` on a disabled control fades the whole control and is
+      // fine; on an element that sets a type size it is the same trick under
+      // another name, and that is how the V strip's k labels got to 3.3:1.
+      for (const attr of source.matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\})/g)) {
+        const value = attr[1] ?? attr[2] ?? ''
+        if (SCALE.test(value) && /\bopacity-\d+/.test(value)) {
+          offenders.push(`${file}: type size with opacity — ${value.trim().slice(0, 60)}`)
+        }
       }
     }
     expect(offenders).toEqual([])

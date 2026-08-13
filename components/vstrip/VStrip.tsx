@@ -52,7 +52,7 @@ export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint }
                       : 'border-rule bg-cotton/40 text-muted',
                 ].join(' ')}
               >
-                <span className="text-micro tracking-wide opacity-70">k{cell.k}</span>
+                <span className="text-micro tracking-wide">k{cell.k}</span>
                 <span className="text-fine tabular-nums">{cell.x}</span>
               </button>
             </li>
