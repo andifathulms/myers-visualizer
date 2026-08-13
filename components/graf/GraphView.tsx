@@ -142,6 +142,25 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const currentStep = timeline?.steps[Math.min(frame, timeline.searchFrames - 1)] ?? null
 
   /**
+   * Past the last search frame the player is drawing the recovered path
+   * backwards from (N,M). That is a second phase, not more searching, and the
+   * readout says so rather than continuing to describe a step that finished
+   * several frames ago.
+   */
+  const backtrack = useMemo(() => {
+    if (timeline === null || frame <= timeline.searchFrames) return null
+    const points = timeline.path.length
+    const drawn = Math.min(frame - timeline.searchFrames, points)
+    // The path is walked from the end, so the point reached is counted back
+    // from (N,M) — the same slice pathAt draws.
+    const at = timeline.path[Math.max(0, points - drawn)] ?? { x: n, y: m }
+    // Moves, not points: a seven-point path is six moves, and it is the moves
+    // that become diff lines. Counting points here said "7 of 7 recovered"
+    // for a six-operation script.
+    return { done: Math.max(0, drawn - 1), total: Math.max(0, points - 1), x: at.x, y: at.y }
+  }, [timeline, frame, n, m])
+
+  /**
    * Was the step under the cursor decided by a tie? Read back out of the
    * recorded V rather than stored in the trace. Greedy Myers only — the
    * linear-space variant's predecessors come from two frontiers meeting, not
@@ -331,6 +350,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 move={currentStep.move}
                 tied={stepTied}
                 available={tieReadable}
+                backtrack={backtrack}
               />
             ) : null}
 

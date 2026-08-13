@@ -25,6 +25,7 @@ export function StepReadout({
   move,
   tied,
   available,
+  backtrack,
 }: {
   dict: Dict
   d: number
@@ -33,8 +34,44 @@ export function StepReadout({
   tied: boolean
   /** False for algorithms with no V to read the tie back out of. */
   available: boolean
+  /**
+   * Set once the search is over and the path is being recovered. Null during
+   * the search itself.
+   */
+  backtrack: { done: number; total: number; x: number; y: number } | null
 }) {
   const t = dict.graph
+
+  /*
+   * The backtrack was animated and never named. Past the last search frame
+   * the panel went on describing a forward step that had finished several
+   * frames earlier, while the path drew itself across the lattice — so the
+   * one thing that justifies recording the whole of V per d, and half of what
+   * the paper describes, happened in front of the reader unannounced.
+   */
+  if (backtrack !== null) {
+    const finished = backtrack.done >= backtrack.total
+    return (
+      <Panel title={t.backtrackTitle} hint={t.backtrackHint}>
+        <p className="font-sans text-sm text-muted">
+          <span className="font-mono tabular-nums text-deepIndigo">
+            {format(t.backtrackAt, {
+              done: backtrack.done,
+              total: backtrack.total,
+              x: backtrack.x,
+              y: backtrack.y,
+            })}
+          </span>
+          {finished ? (
+            <>
+              <span aria-hidden> · </span>
+              {t.backtrackDone}
+            </>
+          ) : null}
+        </p>
+      </Panel>
+    )
+  }
 
   if (!available) {
     return (

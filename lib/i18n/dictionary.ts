@@ -143,6 +143,12 @@ export type Dict = {
     stepTied: string
     stepNoTie: string
     stepNoSteps: string
+    /** The second phase: reading the recorded V backwards to recover the script. */
+    backtrackTitle: string
+    backtrackHint: string
+    /** Placeholders {done} {total} {x} {y}. */
+    backtrackAt: string
+    backtrackDone: string
     linearSpace: string
     forward: string
     backward: string
@@ -363,6 +369,10 @@ const id: Dict = {
     stepTied: 'seri — k−1 mencapai titik yang sama, dan tie-breaking yang memilih.',
     stepNoTie: 'bukan seri — pendahulu satunya tidak sejauh ini.',
     stepNoSteps: 'Hanya untuk Myers greedy — algoritma lain tidak memakai V.',
+    backtrackTitle: 'Menelusuri balik',
+    backtrackHint: 'Pencarian sudah selesai; ini fase kedua. Jalur digambar dari (N,M) mundur ke (0,0) dengan membaca V yang tadi direkam: pada tiap d, baris V memberi tahu dari diagonal mana langkah itu datang. Inilah sebabnya seluruh V per d harus disimpan — jalur maju saja tidak cukup untuk memulihkan script. Myers §2.',
+    backtrackAt: 'langkah {done} dari {total} dipulihkan · sekarang di ({x}, {y})',
+    backtrackDone: 'Jalur lengkap. Diff di bawah adalah jalur ini, ditulis ulang sebagai baris.',
     linearSpace: 'Ruang linear',
     forward: 'Frontier maju',
     backward: 'Frontier mundur',
@@ -582,6 +592,10 @@ const en: Dict = {
     stepTied: 'a tie — k−1 reached the same point, and the tie-break chose.',
     stepNoTie: 'not a tie — the other predecessor fell short.',
     stepNoSteps: 'Myers greedy only — the other algorithms keep no V.',
+    backtrackTitle: 'Walking it back',
+    backtrackHint: 'The search is over; this is the second phase. The path is drawn from (N,M) back to (0,0) by reading the V that was recorded on the way out: at each d, the stored row says which diagonal the step came from. This is why the whole of V has to be kept per d — the forward pass alone cannot recover the script. Myers §2.',
+    backtrackAt: '{done} of {total} moves recovered · now at ({x}, {y})',
+    backtrackDone: 'The path is complete. The diff below is this path, written back out as lines.',
     linearSpace: 'Linear space',
     forward: 'Forward frontier',
     backward: 'Backward frontier',
