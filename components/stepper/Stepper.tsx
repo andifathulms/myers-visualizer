@@ -28,6 +28,8 @@ type Props = {
   onPreviousLevel: () => void
   onNextSnake: () => void
   onSpeed: (speed: number) => void
+  /** Autoplay is off under prefers-reduced-motion; the controls say so. */
+  reducedMotion: boolean
 }
 
 const SPEEDS = [0.5, 1, 2, 4, 16]
@@ -44,6 +46,7 @@ export function Stepper({
   onPreviousLevel,
   onNextSnake,
   onSpeed,
+  reducedMotion,
 }: Props) {
   const t = dict.stepper
 
@@ -86,7 +89,20 @@ export function Stepper({
         <Button onClick={() => onSeek(frame - 1)} label={t.stepBack}>
           <Glyph>◀</Glyph>
         </Button>
-        <Button onClick={onPlayToggle} label={playing ? t.pause : t.play} tone="primary" size="md">
+        {/*
+          Under prefers-reduced-motion the hook refuses to start the clock, so
+          the button did nothing at all while still reporting itself as
+          available — press it and the frame stayed at 0, with no explanation.
+          Disabled is the honest state, and the reason is printed below with
+          the keyboard hints where the working controls are described.
+        */}
+        <Button
+          onClick={onPlayToggle}
+          label={playing ? t.pause : t.play}
+          tone="primary"
+          size="md"
+          disabled={reducedMotion}
+        >
           <span aria-hidden className="text-base leading-none">
             {playing ? '❚❚' : '▶'}
           </span>
@@ -136,7 +152,9 @@ export function Stepper({
         </span>
       </div>
 
-      <p className="mt-2 font-sans text-fine text-muted">{t.keys}</p>
+      <p className="mt-2 font-sans text-fine text-muted">
+        {reducedMotion ? `${t.reducedMotion} ${t.keys}` : t.keys}
+      </p>
     </div>
   )
 }

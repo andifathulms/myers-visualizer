@@ -62,7 +62,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     setSelectedOp(null)
   }, [timeline])
 
-  const { playing, speed, setSpeed, toggle, stop } = usePlayback(
+  const { playing, speed, setSpeed, toggle, stop, reducedMotion } = usePlayback(
     timeline?.totalFrames ?? 0,
     setFrame,
   )
@@ -347,6 +347,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 onPreviousLevel={() => seek(previousLevelFrame(timeline, frame))}
                 onNextSnake={() => seek(nextSnakeFrame(timeline, frame))}
                 onSpeed={setSpeed}
+                reducedMotion={reducedMotion}
               />
             ) : null}
           </div>

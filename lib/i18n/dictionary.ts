@@ -154,6 +154,8 @@ export type Dict = {
     end: string
     speed: string
     keys: string
+    /** Said when the OS asks for reduced motion and autoplay is therefore off. */
+    reducedMotion: string
     progress: string
   }
   compare: {
@@ -364,6 +366,7 @@ const id: Dict = {
     end: 'Akhir',
     speed: 'Kecepatan',
     keys: 'Papan ketik: spasi untuk putar, ← → untuk melangkah, ↑ ↓ untuk lompat per d.',
+    reducedMotion: 'Sistem Anda meminta gerak dikurangi, jadi putar otomatis dimatikan — melangkah tetap berfungsi.',
     progress: 'Posisi',
   },
   compare: {
@@ -577,6 +580,7 @@ const en: Dict = {
     end: 'End',
     speed: 'Speed',
     keys: 'Keyboard: space to play, ← → to step, ↑ ↓ to jump by d.',
+    reducedMotion: 'Your system asks for reduced motion, so autoplay is off — stepping still works.',
     progress: 'Position',
   },
   compare: {

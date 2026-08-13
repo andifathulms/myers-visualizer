@@ -35,6 +35,7 @@ export function Button({
   label,
   title,
   pressed,
+  disabled = false,
   className = '',
   children,
 }: {
@@ -45,6 +46,8 @@ export function Button({
   label?: string
   title?: string
   pressed?: boolean
+  /** Native disabled — BASE already carries the disabled: styles. */
+  disabled?: boolean
   className?: string
   children: ReactNode
 }) {
@@ -52,6 +55,7 @@ export function Button({
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       aria-label={label}
       aria-pressed={pressed}
       title={title ?? label}
