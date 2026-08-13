@@ -107,6 +107,21 @@ export type Dict = {
     ambiguityMany: string
     altScript: string
     altScriptHint: string
+    /** Per-line contestedness in the diff output. §6.4 */
+    contested: string
+    /** Placeholders {used} {total}. */
+    contestedShare: string
+    contestedNone: string
+    /** The tie-break, at the step where it fires. §6.4 */
+    step: string
+    /** Placeholders {d} {k}. */
+    stepAt: string
+    stepDown: string
+    stepRight: string
+    stepStart: string
+    stepTied: string
+    stepNoTie: string
+    stepNoSteps: string
     linearSpace: string
     forward: string
     backward: string
@@ -293,6 +308,17 @@ const id: Dict = {
     ambiguityMany: 'Beberapa script sama-sama minimal. Algoritma memilih satu lewat tie-breaking.',
     altScript: 'Script alternatif',
     altScriptHint: 'Sama-sama sependek yang dipilih algoritma. Coba beralih dan lihat diff di bawah berubah.',
+    contested: 'Angka di kanan sebuah baris berarti baris itu diperdebatkan: sekian dari sekian script terpendek mengaitkan perubahan seperti ini. Baris tanpa angka ada di semua script terpendek — bagian diff itu bukan pilihan.',
+    contestedShare: '{used} dari {total}',
+    contestedNone: 'Setiap baris di bawah ada di semua script terpendek.',
+    step: 'Langkah ini',
+    stepAt: 'd = {d} · k = {k}',
+    stepDown: 'turun dari k+1 — menyisipkan satu baris',
+    stepRight: 'ke kanan dari k−1 — menghapus satu baris',
+    stepStart: 'titik awal (0,0)',
+    stepTied: 'Seri: k−1 mencapai titik yang sama persis. Pemenangnya ditentukan tie-breaking — implementasi ini membandingkan dengan < bukan ≤, bukan dengan menilai mana yang lebih enak dibaca.',
+    stepNoTie: 'Tidak seri: pendahulu yang lain tidak mencapai sejauh ini.',
+    stepNoSteps: 'Hanya untuk Myers greedy — algoritma lain tidak memakai V.',
     linearSpace: 'Ruang linear',
     forward: 'Frontier maju',
     backward: 'Frontier mundur',
@@ -483,6 +509,17 @@ const en: Dict = {
     ambiguityMany: 'Several scripts are equally minimal. The algorithm picks one by tie-breaking.',
     altScript: 'Alternative script',
     altScriptHint: 'Every bit as short as the one the algorithm chose. Switch between them and watch the diff below change.',
+    contested: 'A number beside a line means that line is contested: that many of the shortest scripts attribute the change this way. Lines without one appear in every shortest script — that part of the diff is not a choice.',
+    contestedShare: '{used} of {total}',
+    contestedNone: 'Every line below appears in all of the shortest scripts.',
+    step: 'This step',
+    stepAt: 'd = {d} · k = {k}',
+    stepDown: 'down from k+1 — inserts a line',
+    stepRight: 'right from k−1 — deletes a line',
+    stepStart: 'the starting point (0,0)',
+    stepTied: 'A tie: k−1 reached exactly the same point. Which one wins is decided by tie-breaking — this implementation compares with < rather than ≤, not by judging which reads better.',
+    stepNoTie: 'Not a tie: the other predecessor did not reach this far.',
+    stepNoSteps: 'Myers greedy only — the other algorithms keep no V.',
     linearSpace: 'Linear space',
     forward: 'Forward frontier',
     backward: 'Backward frontier',

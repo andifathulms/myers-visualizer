@@ -29,7 +29,9 @@ import {
 import { AmbiguityPanel } from '@/components/ambiguity/AmbiguityPanel'
 import { buildHunks } from '@/lib/hunks'
 import { pathOf } from '@/lib/diff/backtrack'
-import { analyseAmbiguity, minimalScripts } from '@/lib/diff/ambiguity'
+import { analyseAmbiguity, minimalScripts, sharesOfScript } from '@/lib/diff/ambiguity'
+import { tiedAt } from '@/lib/diff/trace'
+import { StepReadout } from '@/components/stepper/StepReadout'
 import { VIEWABLE_CAP } from '@/layout/lattice'
 import { format, type Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
@@ -115,6 +117,20 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     return alternatives[Math.min(altIndex, alternatives.length - 1)] ?? state.script
   }, [state, altIndex, alternatives])
 
+  /**
+   * How many of the minimal scripts agree with each line of the one on screen.
+   * Computed for whichever script is shown, so switching to an alternative
+   * re-reads the shares rather than keeping the first script's. §6.4
+   */
+  const shares = useMemo(
+    () => (shownScript === null ? null : sharesOfScript(a.tokens, b.tokens, shownScript)),
+    [a.tokens, b.tokens, shownScript],
+  )
+  const contestedLines = useMemo(
+    () => (shares === null ? 0 : shares.filter((share) => !share.forced).length),
+    [shares],
+  )
+
   const matches = useMemo(
     () => (tooLarge ? null : buildMatchGrid(a.tokens, b.tokens)),
     [a.tokens, b.tokens, tooLarge],
@@ -124,6 +140,20 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const maintainsV = algorithm === 'myers' || algorithm === 'myers-linear'
   const currentD = timeline === null ? 0 : levelAt(timeline, frame)
   const currentStep = timeline?.steps[Math.min(frame, timeline.searchFrames - 1)] ?? null
+
+  /**
+   * Was the step under the cursor decided by a tie? Read back out of the
+   * recorded V rather than stored in the trace. Greedy Myers only — the
+   * linear-space variant's predecessors come from two frontiers meeting, not
+   * from one recorded history.
+   */
+  const tieReadable = algorithm === 'myers' && state.status === 'done'
+  const stepTied = useMemo(() => {
+    if (!tieReadable || currentStep === null || state.status !== 'done') return false
+    const snapshots = state.trace.snapshots
+    if (snapshots === null) return false
+    return tiedAt(snapshots, currentD, currentStep.k, n, m)
+  }, [tieReadable, currentStep, state, currentD, n, m])
 
   // Clicking a diff line highlights the move that produced it. §6.3
   const selectedPath = useMemo(() => {
@@ -276,6 +306,17 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                   })}
             </p>
 
+            {timeline !== null && currentStep !== null ? (
+              <StepReadout
+                dict={dict}
+                d={currentD}
+                k={currentStep.k}
+                move={currentStep.move}
+                tied={stepTied}
+                available={tieReadable}
+              />
+            ) : null}
+
             {timeline !== null ? (
               <Stepper
                 frame={frame}
@@ -349,11 +390,24 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       <section className="mt-12">
         <StepHeading step={3} title={t.stepResult} hint={t.stepResultHint} />
         <div className="max-w-4xl">
+          {/*
+            Said once, above the diff, and only when there is something to say.
+            A per-line number nobody has been told how to read is worse than
+            no number, and on an unambiguous input there is nothing to explain.
+          */}
+          {shares !== null && hunks.length > 0 ? (
+            <p className="mb-3 measure font-sans text-sm text-muted">
+              {contestedLines > 0 ? t.contested : t.contestedNone}
+            </p>
+          ) : null}
           <Hunks
             hunks={hunks}
             selectedOp={selectedOp}
             onSelectOp={setSelectedOp}
             emptyLabel={locale === 'id' ? 'Tidak ada perbedaan.' : 'No differences.'}
+            shares={shares}
+            totalScripts={ambiguity.count}
+            shareLabel={t.contestedShare}
           />
         </div>
       </section>
