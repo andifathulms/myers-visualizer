@@ -55,3 +55,33 @@ describe('framing', () => {
     }
   })
 })
+
+describe('the glossary', () => {
+  /*
+   * Algorithm terms stay in English by policy, so the glossary is the only
+   * place they are explained. It is not decoration: a term used in the
+   * interface and missing here is a term the reader has no way to look up.
+   */
+  it('defines as many terms in one locale as the other', () => {
+    // Not term-for-term identical: "the V array" is "array V" in Indonesian,
+    // because the article moves. The count and the order are what must match.
+    const [en, id] = [getDict('en').glossary, getDict('id').glossary]
+    expect(id).toHaveLength(en.length)
+  })
+
+  it('covers the notation the interface actually uses', () => {
+    const terms = getDict('en').glossary.map((entry) => entry.term)
+    for (const term of ['D', 'diagonal k', 'snake', 'frontier', 'backtrack', 'tie-breaking', 'hunk', 'tokenize', 'O(...)']) {
+      expect(terms, `${term} is used in the interface`).toContain(term)
+    }
+    expect(terms.some((term) => /V array/.test(term))).toBe(true)
+  })
+
+  it('says something for every term, in both locales', () => {
+    for (const locale of ['en', 'id'] as const) {
+      for (const entry of getDict(locale).glossary) {
+        expect(entry.plain.length, `${locale}: ${entry.term}`).toBeGreaterThan(30)
+      }
+    }
+  })
+})

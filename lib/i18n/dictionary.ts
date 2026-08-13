@@ -330,6 +330,11 @@ const id: Dict = {
     { term: 'frontier', plain: 'Sejauh mana pencarian sudah sampai. Ia memuai selangkah demi selangkah — itu bagian yang bergerak.' },
     { term: 'diagonal k', plain: 'Nomor jalur miring pada kisi, k = x − y. Cara algoritma menyebut "sedang di garis miring yang mana".' },
     { term: 'array V', plain: 'Catatan kecil berisi titik terjauh yang dicapai pada setiap diagonal. Ini satu-satunya data yang benar-benar disimpan algoritma.' },
+    { term: 'backtrack', plain: 'Fase kedua. Setelah pencarian sampai di pojok, jalurnya dibaca mundur dari V yang direkam — itulah yang mengubah "jaraknya sekian" menjadi daftar baris yang sebenarnya.' },
+    { term: 'tie-breaking', plain: 'Apa yang terjadi ketika dua langkah sama-sama bagus. Aturannya sewenang-wenang tetapi tetap — dan aturan itulah yang menentukan diff mana dari beberapa yang sama pendeknya yang Anda lihat.' },
+    { term: 'hunk', plain: 'Satu blok perubahan yang berdekatan dalam sebuah diff, beserta beberapa baris konteks di sekitarnya. Diff yang sama bisa muncul sebagai satu hunk atau beberapa; lebih sedikit biasanya lebih enak dibaca.' },
+    { term: 'tokenize', plain: 'Mengubah teks menjadi daftar angka sebelum dibandingkan — satu angka per baris, kata, atau karakter. Yang dihitung sebagai "elemen" adalah pilihan Anda, dan pilihan itu mengubah jawabannya.' },
+    { term: 'O(...)', plain: 'Cara ringkas menyebut pertumbuhan biaya seiring membesarnya masukan, mengabaikan konstanta. O(N·M) berarti "sebanding dengan hasil kali kedua panjang"; O((N+M)·D) berarti "sebanding dengan jumlahnya dikali besar perubahan" — jauh lebih kecil bila perubahannya kecil.' },
   ],
   input: {
     title: 'Masukan',
@@ -571,6 +576,11 @@ const en: Dict = {
     { term: 'frontier', plain: 'How far the search has reached so far. It expands one step at a time — it is the part that moves.' },
     { term: 'diagonal k', plain: 'Which diagonal of the grid you are on, k = x − y. The algorithm’s way of saying "which slanted lane".' },
     { term: 'the V array', plain: 'A small note of the furthest point reached on each diagonal. It is the only data the algorithm really keeps.' },
+    { term: 'backtrack', plain: 'The second phase. Once the search reaches the corner, the route is read back out of the recorded V — that is what turns "the distance is 2" into the actual list of lines.' },
+    { term: 'tie-breaking', plain: 'What happens when two moves are equally good. The rule is arbitrary but fixed — and it is that rule, not any judgement, that decides which of several equally short diffs you are shown.' },
+    { term: 'hunk', plain: 'One block of nearby changes in a diff, with a few lines of context around it. The same diff can come out as one hunk or several; fewer is usually easier to read.' },
+    { term: 'tokenize', plain: 'Turning text into a list of numbers before comparing it — one number per line, word or character. What counts as an "element" is your choice, and the choice changes the answer.' },
+    { term: 'O(...)', plain: 'Shorthand for how the cost grows as the input grows, ignoring constants. O(N·M) means "proportional to the two lengths multiplied"; O((N+M)·D) means "proportional to their sum times the size of the change" — far smaller when the change is small.' },
   ],
   input: {
     title: 'Input',
