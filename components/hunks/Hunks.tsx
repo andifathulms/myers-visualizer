@@ -31,7 +31,7 @@ export function Hunks({ hunks, selectedOp, onSelectOp, emptyLabel }: Props) {
     <div className="overflow-x-auto rounded-xl border border-rule bg-paper">
       {hunks.map((hunk, index) => (
         <div key={index} className="border-b border-rule last:border-0">
-          <div className="border-b border-rule bg-cotton/50 px-3 py-1.5 font-mono text-[11px] text-muted">
+          <div className="border-b border-rule bg-cotton/50 px-3 py-1.5 font-mono text-micro text-muted">
             {formatHunkHeader(hunk)}
           </div>
           <ol className="py-1">
@@ -71,7 +71,7 @@ function Line({
         type="button"
         onClick={() => onSelect(selected ? null : line.opIndex)}
         className={[
-          'flex w-full gap-2 whitespace-pre px-3 text-left font-mono text-[13px] leading-6',
+          'flex w-full gap-2 whitespace-pre px-3 text-left font-mono text-fine leading-6',
           selected ? 'bg-turmeric/30 text-deepIndigo' : `${tone} hover:brightness-[0.97]`,
         ].join(' ')}
       >

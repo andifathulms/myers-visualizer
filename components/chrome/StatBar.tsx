@@ -44,14 +44,14 @@ export function StatBar({
   return (
     <Panel title={t.stats} hint={t.statsHint} ariaLabel={t.stats}>
       <div className="flex items-baseline gap-3 border-b border-rule pb-3">
-        <span className="font-mono text-3xl tabular-nums leading-none text-deepIndigo">
+        <span className="font-mono text-h2 tabular-nums leading-none text-deepIndigo">
           {currentD}
           <span className="text-muted">/{d}</span>
         </span>
-        <span className="font-sans text-[13px] leading-snug text-muted">{t.d}</span>
+        <span className="font-sans text-fine text-muted">{t.d}</span>
       </div>
 
-      <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1.5 font-sans text-[13px]">
+      <dl className="mt-3 grid grid-cols-[1fr_auto] gap-x-4 gap-y-1.5 font-sans text-fine">
         {rows.map((row) => (
           <div key={row.label} className="contents">
             <dt className="text-muted">{row.label}</dt>

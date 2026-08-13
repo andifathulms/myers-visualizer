@@ -40,11 +40,11 @@ export function Panel({
           }`}
         >
           <div>
-            <h3 className="font-sans text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+            <h3 className="font-sans text-micro font-semibold uppercase tracking-[0.08em] text-muted">
               {title}
             </h3>
             {hint === undefined ? null : (
-              <p className="mt-1 max-w-prose font-sans text-[13px] leading-relaxed text-muted">
+              <p className="mt-1 max-w-prose font-sans text-sm text-muted">
                 {hint}
               </p>
             )}
@@ -77,16 +77,16 @@ export function StepHeading({
     <div className="mb-3 flex items-start gap-3">
       <span
         aria-hidden
-        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-indigo/25 bg-paper font-mono text-[13px] tabular-nums text-indigo"
+        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-indigo/25 bg-paper font-mono text-fine tabular-nums text-indigo"
       >
         {step}
       </span>
       <div>
-        <h2 id={id} className="font-serif text-xl font-semibold leading-snug">
+        <h2 id={id} className="font-serif text-h3 font-semibold">
           {title}
         </h2>
         {hint === undefined ? null : (
-          <p className="mt-1 measure font-sans text-sm leading-relaxed text-muted">{hint}</p>
+          <p className="mt-1 measure font-sans text-base text-muted">{hint}</p>
         )}
       </div>
     </div>

@@ -32,24 +32,24 @@ export default function Home({ params }: { params: { locale: string } }) {
     <main>
       {/* Hero */}
       <section className="mx-auto max-w-5xl px-5 pb-10 pt-14 sm:pt-20">
-        <p className="font-sans text-[13px] font-semibold uppercase tracking-[0.14em] text-madder">
+        <p className="font-sans text-fine font-semibold uppercase tracking-[0.14em] text-madder">
           {t.kicker}
         </p>
-        <h1 className="mt-4 max-w-3xl font-serif text-[2.5rem] font-semibold leading-[1.08] sm:text-6xl">
+        <h1 className="mt-4 max-w-3xl font-serif text-hero font-semibold">
           {t.tagline}
         </h1>
-        <p className="measure mt-6 font-sans text-lg leading-relaxed text-indigo">{t.lede}</p>
+        <p className="measure mt-6 font-sans text-lg text-indigo">{t.lede}</p>
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href={`/${locale}/graf`}
-            className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-[15px] font-medium text-paper transition-colors hover:bg-deepIndigo"
+            className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-base font-medium text-paper transition-colors hover:bg-deepIndigo"
           >
             {t.ctaGraph}
           </Link>
           <Link
             href={`/${locale}/banding`}
-            className="inline-flex h-11 items-center rounded-lg border border-rule bg-paper px-5 font-sans text-[15px] font-medium text-deepIndigo transition-colors hover:border-indigo/60"
+            className="inline-flex h-11 items-center rounded-lg border border-rule bg-paper px-5 font-sans text-base font-medium text-deepIndigo transition-colors hover:border-indigo/60"
           >
             {t.ctaCompare}
           </Link>
@@ -58,8 +58,8 @@ export default function Home({ params }: { params: { locale: string } }) {
 
       {/* What a diff is, before any word of algorithm. */}
       <section className="mx-auto max-w-5xl px-5 py-12">
-        <h2 className="font-serif text-3xl font-semibold">{t.exampleTitle}</h2>
-        <p className="measure mt-3 font-sans leading-relaxed text-indigo">{t.exampleLede}</p>
+        <h2 className="font-serif text-h2 font-semibold">{t.exampleTitle}</h2>
+        <p className="measure mt-3 font-sans text-lg text-indigo">{t.exampleLede}</p>
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <Panel title={t.exampleBefore}>
@@ -69,7 +69,7 @@ export default function Home({ params }: { params: { locale: string } }) {
             <List items={example.b} />
           </Panel>
           <Panel title={t.exampleResult}>
-            <ol className="font-mono text-[13px] leading-6">
+            <ol className="font-mono text-fine leading-6">
               {example.diff.map((line, index) => (
                 <ExampleDiffLine key={index} line={line} />
               ))}
@@ -77,15 +77,15 @@ export default function Home({ params }: { params: { locale: string } }) {
           </Panel>
         </div>
 
-        <p className="measure mt-5 font-sans text-sm leading-relaxed text-muted">
+        <p className="measure mt-5 font-sans text-base text-muted">
           {t.exampleCaption}
         </p>
       </section>
 
       {/* The idea, with no notation in it at all. */}
       <section className="mx-auto max-w-5xl px-5 py-12">
-        <h2 className="font-serif text-3xl font-semibold">{t.stepsTitle}</h2>
-        <p className="measure mt-3 font-sans leading-relaxed text-indigo">{t.stepsLede}</p>
+        <h2 className="font-serif text-h2 font-semibold">{t.stepsTitle}</h2>
+        <p className="measure mt-3 font-sans text-lg text-indigo">{t.stepsLede}</p>
 
         <ol className="mt-8 grid gap-5 md:grid-cols-3">
           {t.steps.map((step, index) => (
@@ -96,8 +96,8 @@ export default function Home({ params }: { params: { locale: string } }) {
               >
                 {index + 1}
               </span>
-              <h3 className="mt-4 font-serif text-xl font-semibold">{step.title}</h3>
-              <p className="mt-2 font-sans text-sm leading-relaxed text-muted">{step.body}</p>
+              <h3 className="mt-4 font-serif text-h3 font-semibold">{step.title}</h3>
+              <p className="mt-2 font-sans text-base text-muted">{step.body}</p>
             </li>
           ))}
         </ol>
@@ -105,7 +105,7 @@ export default function Home({ params }: { params: { locale: string } }) {
         <div className="mt-8">
           <Link
             href={`/${locale}/graf`}
-            className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-[15px] font-medium text-paper transition-colors hover:bg-deepIndigo"
+            className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-base font-medium text-paper transition-colors hover:bg-deepIndigo"
           >
             {t.ctaGraph}
           </Link>
@@ -115,8 +115,8 @@ export default function Home({ params }: { params: { locale: string } }) {
       {/* The practical payoff. */}
       <section className="mx-auto max-w-5xl px-5 py-12">
         <div className="card border-l-[3px] border-l-madder p-6 sm:p-8">
-          <h2 className="font-serif text-3xl font-semibold">{t.ambiguityTitle}</h2>
-          <p className="measure mt-4 font-sans leading-relaxed text-indigo">{t.ambiguity}</p>
+          <h2 className="font-serif text-h2 font-semibold">{t.ambiguityTitle}</h2>
+          <p className="measure mt-4 font-sans text-indigo">{t.ambiguity}</p>
           <Link
             href={`/${locale}/contoh`}
             className="mt-5 inline-flex h-10 items-center rounded-lg border border-rule bg-cotton px-4 font-sans text-sm font-medium text-deepIndigo transition-colors hover:border-madder hover:text-madder"
@@ -128,20 +128,20 @@ export default function Home({ params }: { params: { locale: string } }) {
 
       {/* Only now the notation. */}
       <section className="mx-auto max-w-5xl px-5 py-12">
-        <h2 className="font-serif text-3xl font-semibold">{t.whatTitle}</h2>
-        <p className="measure mt-3 font-sans leading-relaxed text-indigo">{t.what}</p>
+        <h2 className="font-serif text-h2 font-semibold">{t.whatTitle}</h2>
+        <p className="measure mt-3 font-sans text-lg text-indigo">{t.what}</p>
 
         <div className="card mt-6 max-w-2xl overflow-hidden">
-          <table className="w-full border-collapse font-sans text-sm">
+          <table className="w-full border-collapse font-sans text-base">
             <thead>
               <tr className="border-b border-rule bg-cotton/50 text-left">
-                <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.07em] text-muted">
+                <th className="px-4 py-2.5 text-micro font-semibold uppercase tracking-[0.07em] text-muted">
                   {t.moves.move}
                 </th>
-                <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.07em] text-muted">
+                <th className="px-4 py-2.5 text-micro font-semibold uppercase tracking-[0.07em] text-muted">
                   {t.moves.meaning}
                 </th>
-                <th className="px-4 py-2.5 text-right text-[11px] font-semibold uppercase tracking-[0.07em] text-muted">
+                <th className="px-4 py-2.5 text-right text-micro font-semibold uppercase tracking-[0.07em] text-muted">
                   {t.moves.cost}
                 </th>
               </tr>
@@ -157,14 +157,14 @@ export default function Home({ params }: { params: { locale: string } }) {
 
       {/* The English terms, translated into human. */}
       <section className="mx-auto max-w-5xl px-5 py-12">
-        <h2 className="font-serif text-3xl font-semibold">{t.glossaryTitle}</h2>
-        <p className="measure mt-3 font-sans leading-relaxed text-indigo">{t.glossaryLede}</p>
+        <h2 className="font-serif text-h2 font-semibold">{t.glossaryTitle}</h2>
+        <p className="measure mt-3 font-sans text-lg text-indigo">{t.glossaryLede}</p>
 
         <dl className="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2">
           {dict.glossary.map((entry) => (
             <div key={entry.term}>
-              <dt className="font-mono text-sm font-medium text-deepIndigo">{entry.term}</dt>
-              <dd className="mt-1 font-sans text-sm leading-relaxed text-muted">{entry.plain}</dd>
+              <dt className="font-mono text-base font-medium text-deepIndigo">{entry.term}</dt>
+              <dd className="mt-1 font-sans text-base text-muted">{entry.plain}</dd>
             </div>
           ))}
         </dl>
@@ -172,8 +172,8 @@ export default function Home({ params }: { params: { locale: string } }) {
 
       {/* Sources. */}
       <section className="mx-auto max-w-5xl px-5 pb-16 pt-12">
-        <h2 className="font-serif text-3xl font-semibold">{t.creditsTitle}</h2>
-        <p className="measure mt-3 font-sans leading-relaxed text-indigo">{t.creditsLede}</p>
+        <h2 className="font-serif text-h2 font-semibold">{t.creditsTitle}</h2>
+        <p className="measure mt-3 font-sans text-lg text-indigo">{t.creditsLede}</p>
 
         <ul className="mt-6 grid gap-4 sm:grid-cols-2">
           {READING.map((entry) => (
@@ -181,11 +181,11 @@ export default function Home({ params }: { params: { locale: string } }) {
               <a
                 href={entry.href}
                 rel="noreferrer noopener"
-                className="font-sans text-[15px] font-medium underline decoration-rule underline-offset-4 hover:text-madder"
+                className="font-sans text-base font-medium underline decoration-rule underline-offset-4 hover:text-madder"
               >
                 {entry.title}
               </a>
-              <p className="mt-2 font-sans text-sm leading-relaxed text-muted">
+              <p className="mt-2 font-sans text-base text-muted">
                 {entry.note[locale]}
               </p>
             </li>
@@ -202,7 +202,7 @@ export default function Home({ params }: { params: { locale: string } }) {
 
 function List({ items }: { items: readonly string[] }) {
   return (
-    <ol className="font-mono text-[13px] leading-6 text-deepIndigo">
+    <ol className="font-mono text-fine leading-6 text-deepIndigo">
       {items.map((item, index) => (
         <li key={index} className="flex gap-2">
           {/* A hairline mark, so it uses the hairline token rather than
@@ -249,7 +249,7 @@ function MoveRow({
 }) {
   return (
     <tr className="border-b border-rule/60 last:border-0">
-      <td className="px-4 py-2.5 font-mono text-[13px] text-deepIndigo">{move}</td>
+      <td className="px-4 py-2.5 font-mono text-fine text-deepIndigo">{move}</td>
       <td className="px-4 py-2.5 text-muted">{meaning}</td>
       <td
         className={`px-4 py-2.5 text-right font-mono tabular-nums ${

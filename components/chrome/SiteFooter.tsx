@@ -29,7 +29,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
 
         <nav
           aria-label={dict.home.creditsTitle}
-          className="flex flex-col gap-2 text-[13px] sm:text-right"
+          className="flex flex-col gap-2 text-fine sm:text-right"
         >
           {READING.map((entry) => (
             <a
@@ -53,7 +53,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
 
       <div className="border-t border-rule">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-5 sm:flex-row sm:items-start sm:justify-between">
-          <p className="measure font-sans text-[13px] leading-relaxed text-muted">
+          <p className="measure font-sans text-fine text-muted">
             {locale === 'id'
               ? 'Git menerapkan heuristik tambahan di atas Myers. Situs ini tidak mengklaim keluaran identik dengan git diff.'
               : 'Git applies additional heuristics on top of Myers. This site makes no claim of output identical to git diff.'}

@@ -108,7 +108,7 @@ export function Stepper({
         </Button>
 
         <div className="ml-auto flex items-center gap-2">
-          <label htmlFor="speed" className="font-sans text-[13px] text-muted">
+          <label htmlFor="speed" className="font-sans text-fine text-muted">
             {t.speed}
           </label>
           <Select id="speed" value={speed} onChange={(event) => onSpeed(Number(event.target.value))}>
@@ -131,19 +131,19 @@ export function Stepper({
           onChange={(event) => onSeek(Number(event.target.value))}
           className="h-1.5 flex-1 accent-madder"
         />
-        <span className="font-mono text-[13px] tabular-nums text-muted">
+        <span className="font-mono text-fine tabular-nums text-muted">
           {frame}/{total}
         </span>
       </div>
 
-      <p className="mt-2 font-sans text-[12px] leading-relaxed text-muted/80">{t.keys}</p>
+      <p className="mt-2 font-sans text-fine text-muted/80">{t.keys}</p>
     </div>
   )
 }
 
 function Glyph({ children }: { children: string }) {
   return (
-    <span aria-hidden className="text-[13px] leading-none">
+    <span aria-hidden className="text-fine leading-none">
       {children}
     </span>
   )

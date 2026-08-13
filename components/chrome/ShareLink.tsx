@@ -32,7 +32,7 @@ export function ShareLink({ url, dict }: { url: string; dict: Dict }) {
     <button
       type="button"
       onClick={copy}
-      className="rounded border border-indigo/30 px-2 py-1 font-sans text-xs hover:border-indigo focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-madder"
+      className="rounded border border-indigo/30 px-2 py-1 font-sans text-fine hover:border-indigo focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-madder"
     >
       {copied ? dict.a11y.copied : dict.a11y.copyLink}
     </button>

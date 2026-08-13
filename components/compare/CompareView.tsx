@@ -75,10 +75,10 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
   return (
     <main className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
       <header className="max-w-3xl">
-        <h1 className="font-serif text-4xl font-semibold">{t.title}</h1>
+        <h1 className="font-serif text-h1 font-semibold">{t.title}</h1>
         {/* The plain reading first; the precise one directly under it. */}
-        <p className="measure mt-3 font-sans text-[15px] leading-relaxed text-indigo">{t.plain}</p>
-        <p className="measure mt-3 font-sans text-sm leading-relaxed text-muted">{t.lede}</p>
+        <p className="measure mt-3 font-sans text-lg text-indigo">{t.plain}</p>
+        <p className="measure mt-3 font-sans text-base text-muted">{t.lede}</p>
       </header>
 
       <section className="mt-10">
@@ -125,7 +125,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                         {LABELS[result.algorithm]}
                       </span>
                       {shortest && contested ? (
-                        <span className="ml-2 rounded border border-rule bg-cotton px-1.5 py-0.5 font-sans text-[11px] uppercase tracking-wide text-muted">
+                        <span className="ml-2 rounded border border-rule bg-cotton px-1.5 py-0.5 font-sans text-micro uppercase tracking-wide text-muted">
                           {t.shortest}
                         </span>
                       ) : null}
@@ -157,7 +157,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
           The column names are terms of art. Reading them off in plain language
           costs three lines and saves the reader guessing what "hunk" means.
         */}
-        <dl className="mt-4 grid max-w-4xl gap-x-8 gap-y-2 font-sans text-[13px] sm:grid-cols-3">
+        <dl className="mt-4 grid max-w-4xl gap-x-8 gap-y-2 font-sans text-fine sm:grid-cols-3">
           {[
             { label: t.scriptLength, hint: t.scriptLengthHint },
             { label: t.hunks, hint: t.hunksHint },
@@ -198,7 +198,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                     emptyLabel={locale === 'id' ? 'Tidak ada perbedaan.' : 'No differences.'}
                   />
                 ) : (
-                  <p className="px-3 py-4 font-sans text-[13px] text-madder">{result.error}</p>
+                  <p className="px-3 py-4 font-sans text-fine text-madder">{result.error}</p>
                 )}
               </div>
             </Panel>
@@ -218,7 +218,7 @@ function Th({
 }) {
   return (
     <th
-      className={`px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.07em] text-muted ${
+      className={`px-4 py-2.5 text-micro font-semibold uppercase tracking-[0.07em] text-muted ${
         align === 'right' ? 'text-right' : ''
       }`}
     >

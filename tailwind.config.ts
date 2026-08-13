@@ -25,25 +25,25 @@ const colors = Object.fromEntries(
 const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
+    /*
+     * Replaced, not extended. Leaving Tailwind's default sizes in place would
+     * leave `text-xl` and `text-[13px]` working, and a scale you can opt out
+     * of by accident is not a scale. Anything off it is now a build error in
+     * the only sense that matters: the class produces nothing.
+     */
+    fontSize: {
+      micro: ['var(--text-micro)', { lineHeight: '1.45' }],
+      fine: ['var(--text-fine)', { lineHeight: '1.5' }],
+      sm: ['var(--text-sm)', { lineHeight: '1.55' }],
+      base: ['var(--text-base)', { lineHeight: '1.65' }],
+      lg: ['var(--text-lg)', { lineHeight: '1.6' }],
+      h3: ['var(--text-h3)', { lineHeight: '1.3' }],
+      h2: ['var(--text-h2)', { lineHeight: '1.2' }],
+      h1: ['var(--text-h1)', { lineHeight: '1.15' }],
+      hero: ['var(--text-hero)', { lineHeight: '1.08' }],
+    },
     extend: {
       colors,
-      /*
-       * One scale. Roles, not t-shirt sizes — a component picks the size that
-       * matches what the text *is*, which is what keeps the page consistent
-       * when a new panel is added. Line heights ride along so that body copy
-       * cannot accidentally ship at leading-none.
-       */
-      fontSize: {
-        micro: ['var(--text-micro)', { lineHeight: '1.45' }],
-        fine: ['var(--text-fine)', { lineHeight: '1.5' }],
-        sm: ['var(--text-sm)', { lineHeight: '1.55' }],
-        base: ['var(--text-base)', { lineHeight: '1.65' }],
-        lg: ['var(--text-lg)', { lineHeight: '1.6' }],
-        h3: ['var(--text-h3)', { lineHeight: '1.3' }],
-        h2: ['var(--text-h2)', { lineHeight: '1.2' }],
-        h1: ['var(--text-h1)', { lineHeight: '1.15' }],
-        hero: ['var(--text-hero)', { lineHeight: '1.08' }],
-      },
       spacing: {
         gutter: 'var(--space-gutter)',
         stack: 'var(--space-stack)',

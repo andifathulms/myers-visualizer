@@ -18,7 +18,7 @@ export function Legend({ dict }: { dict: Dict }) {
     { label: t.path, hint: t.pathHint, className: 'bg-madder' },
   ]
   return (
-    <ul aria-label={t.title} className="flex flex-wrap gap-x-5 gap-y-2 font-sans text-[13px]">
+    <ul aria-label={t.title} className="flex flex-wrap gap-x-5 gap-y-2 font-sans text-fine">
       {items.map((item) => (
         <li key={item.label} className="flex items-baseline gap-2">
           <span

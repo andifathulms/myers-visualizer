@@ -25,7 +25,7 @@ export function MakerSignature() {
   const year = new Date().getFullYear()
 
   return (
-    <div className="flex flex-col gap-1.5 font-sans text-[13px] text-muted sm:items-end">
+    <div className="flex flex-col gap-1.5 font-sans text-fine text-muted sm:items-end">
       <p>
         Designed &amp; built by{' '}
         <a

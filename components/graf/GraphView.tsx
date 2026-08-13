@@ -172,8 +172,8 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   return (
     <main className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
       <header className="max-w-3xl">
-        <h1 className="font-serif text-4xl font-semibold">{t.title}</h1>
-        <p className="measure mt-3 font-sans text-[15px] leading-relaxed text-indigo">{t.lede}</p>
+        <h1 className="font-serif text-h1 font-semibold">{t.title}</h1>
+        <p className="measure mt-3 font-sans text-lg text-indigo">{t.lede}</p>
       </header>
 
       {/*
@@ -220,7 +220,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
             {tooLarge ? (
               // An unreadable graph is not a visualisation. Say so, and show the
               // result instead. §6.1
-              <p className="rounded-xl border border-dashed border-indigo/40 bg-paper p-5 font-sans text-sm leading-relaxed text-indigo">
+              <p className="rounded-xl border border-dashed border-indigo/40 bg-paper p-5 font-sans text-sm text-indigo">
                 {format(dict.input.tooLarge, { n, m, cap: VIEWABLE_CAP })}
               </p>
             ) : (
@@ -237,10 +237,10 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                   an 800px void that pushes the controls below the fold.
                 */}
                 <div className="mx-auto w-full max-w-[38rem] px-4 pb-4">
-                  <p className="pb-1 font-mono text-[11px] text-muted">{t.axisA}</p>
+                  <p className="pb-1 font-mono text-micro text-muted">{t.axisA}</p>
                   <div className="flex gap-2">
                     <div className="flex items-center" aria-hidden>
-                      <p className="font-mono text-[11px] text-muted [writing-mode:vertical-rl]">
+                      <p className="font-mono text-micro text-muted [writing-mode:vertical-rl]">
                         {t.axisB}
                       </p>
                     </div>
@@ -327,7 +327,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
               // Showing a V strip for an algorithm that has no V would be a lie
               // dressed as a visualisation.
               <Panel title={t.vstrip} ariaLabel={t.vstrip}>
-                <p className="font-sans text-[13px] leading-relaxed text-muted">{t.noVStrip}</p>
+                <p className="font-sans text-fine text-muted">{t.noVStrip}</p>
               </Panel>
             )}
             <AmbiguityPanel

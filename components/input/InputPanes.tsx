@@ -142,7 +142,7 @@ export function InputPanes({
         <button
           type="button"
           onClick={onSwap}
-          className="flex h-9 items-center gap-1.5 rounded-lg border border-rule bg-paper px-3 text-[13px] text-deepIndigo hover:border-indigo/60 sm:hidden"
+          className="flex h-9 items-center gap-1.5 rounded-lg border border-rule bg-paper px-3 text-fine text-deepIndigo hover:border-indigo/60 sm:hidden"
         >
           <span aria-hidden>⇄</span>
           {t.swap}
@@ -173,11 +173,11 @@ function Pane({
       <div className="flex items-baseline justify-between gap-2">
         <label
           htmlFor={id}
-          className="font-sans text-[11px] font-semibold uppercase tracking-[0.07em] text-muted"
+          className="font-sans text-micro font-semibold uppercase tracking-[0.07em] text-muted"
         >
           {label}
         </label>
-        <span aria-hidden className="font-mono text-[11px] tabular-nums text-muted/70">
+        <span aria-hidden className="font-mono text-micro tabular-nums text-muted/70">
           {lines}
         </span>
       </div>
@@ -187,7 +187,7 @@ function Pane({
         onChange={(event) => onChange(event.target.value)}
         spellCheck={false}
         rows={8}
-        className="w-full resize-y rounded-xl border border-rule bg-paper p-3 font-mono text-[13px] leading-relaxed text-deepIndigo focus:border-indigo focus:outline-none"
+        className="w-full resize-y rounded-xl border border-rule bg-paper p-3 font-mono text-fine text-deepIndigo focus:border-indigo focus:outline-none"
       />
     </div>
   )

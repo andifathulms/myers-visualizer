@@ -39,27 +39,27 @@ export function AmbiguityPanel({
   return (
     <Panel title={t.ambiguityTitle} hint={t.ambiguityHint} ariaLabel={t.ambiguityTitle}>
       {unique ? (
-        <p className="font-sans text-[13px] leading-relaxed text-muted">{t.ambiguityUnique}</p>
+        <p className="font-sans text-fine text-muted">{t.ambiguityUnique}</p>
       ) : (
         <>
-          <p className="font-mono text-2xl leading-none tabular-nums text-deepIndigo">
+          <p className="font-mono text-h2 leading-none tabular-nums text-deepIndigo">
             {ambiguity.truncated
               ? `≥ ${COUNT_CAP.toLocaleString(tag)}`
               : ambiguity.count.toLocaleString(tag)}
           </p>
-          <p className="mt-1.5 font-sans text-[13px] leading-snug text-deepIndigo">
+          <p className="mt-1.5 font-sans text-fine text-deepIndigo">
             {t.ambiguityCount}
           </p>
-          <p className="mt-2 font-sans text-[13px] leading-relaxed text-muted">{t.ambiguityMany}</p>
+          <p className="mt-2 font-sans text-fine text-muted">{t.ambiguityMany}</p>
         </>
       )}
 
       {alternatives > 1 ? (
         <div className="mt-4 border-t border-rule pt-3">
-          <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.07em] text-muted">
+          <p className="font-sans text-micro font-semibold uppercase tracking-[0.07em] text-muted">
             {t.altScript}
           </p>
-          <p className="mt-1 font-sans text-[13px] leading-relaxed text-muted">{t.altScriptHint}</p>
+          <p className="mt-1 font-sans text-fine text-muted">{t.altScriptHint}</p>
           <ol className="mt-2 flex flex-wrap gap-1.5">
             {Array.from({ length: alternatives }, (_, index) => (
               <li key={index}>
@@ -68,7 +68,7 @@ export function AmbiguityPanel({
                   onClick={() => onSelect(index)}
                   aria-pressed={selected === index}
                   className={[
-                    'h-8 w-8 rounded-lg border font-mono text-[13px] tabular-nums transition-colors',
+                    'h-8 w-8 rounded-lg border font-mono text-fine tabular-nums transition-colors',
                     selected === index
                       ? 'border-madder bg-madder/10 text-madder'
                       : 'border-rule bg-cotton/40 text-muted hover:border-indigo/60 hover:text-deepIndigo',

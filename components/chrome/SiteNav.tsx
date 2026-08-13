@@ -61,7 +61,7 @@ export function SiteNav({ locale, dict }: { locale: Locale; dict: Dict }) {
           href={`/${other}`}
           title={dict.a11y.switchLocale}
           aria-label={`${dict.a11y.switchLocale}: ${other.toUpperCase()}`}
-          className="ml-2 shrink-0 rounded-lg border border-rule bg-paper px-2.5 py-1 text-xs font-medium uppercase tracking-wider text-muted transition-colors hover:border-indigo/60 hover:text-deepIndigo"
+          className="ml-2 shrink-0 rounded-lg border border-rule bg-paper px-2.5 py-1 text-fine font-medium uppercase tracking-wider text-muted transition-colors hover:border-indigo/60 hover:text-deepIndigo"
         >
           {other}
         </Link>

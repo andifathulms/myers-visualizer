@@ -20,9 +20,9 @@ const TONE = {
 } as const
 
 const SIZE = {
-  sm: 'h-8 px-2.5 text-[13px]',
+  sm: 'h-8 px-2.5 text-fine',
   md: 'h-10 px-4 text-sm',
-  lg: 'h-11 px-5 text-[15px]',
+  lg: 'h-11 px-5 text-base',
 } as const
 
 export type ButtonTone = keyof typeof TONE
@@ -80,7 +80,7 @@ export function Field({
     <div className="flex flex-col gap-1">
       <label
         htmlFor={htmlFor}
-        className="font-sans text-[11px] font-semibold uppercase tracking-[0.07em] text-muted"
+        className="font-sans text-micro font-semibold uppercase tracking-[0.07em] text-muted"
       >
         {label}
       </label>
@@ -97,7 +97,7 @@ export function Select({
   return (
     <select
       {...rest}
-      className={`h-9 rounded-lg border border-rule bg-paper px-2.5 font-sans text-[13px] text-deepIndigo hover:border-indigo/60 ${className}`}
+      className={`h-9 rounded-lg border border-rule bg-paper px-2.5 font-sans text-fine text-deepIndigo hover:border-indigo/60 ${className}`}
     >
       {children}
     </select>
@@ -115,7 +115,7 @@ export function Toggle({
   children: ReactNode
 }) {
   return (
-    <label className="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-rule bg-paper px-3 font-sans text-[13px] text-deepIndigo hover:border-indigo/60">
+    <label className="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-rule bg-paper px-3 font-sans text-fine text-deepIndigo hover:border-indigo/60">
       <input
         type="checkbox"
         checked={checked}
@@ -140,7 +140,7 @@ export function Note({
 }) {
   return (
     <p
-      className={`measure border-l-2 pl-4 font-sans text-sm leading-relaxed ${
+      className={`measure border-l-2 pl-4 font-sans text-sm ${
         tone === 'accent' ? 'border-madder text-deepIndigo' : 'border-rule text-muted'
       }`}
     >

@@ -44,7 +44,7 @@ export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint }
                 aria-label={`k = ${cell.k}, x = ${cell.x}, y = ${cell.y}`}
                 aria-pressed={active}
                 className={[
-                  'flex w-[3.25rem] flex-col items-center rounded-lg border py-1 font-mono leading-tight transition-colors',
+                  'flex w-[3.25rem] flex-col items-center rounded-lg border py-1 font-mono transition-colors',
                   active
                     ? 'border-madder bg-madder/10 text-madder'
                     : live
@@ -52,14 +52,14 @@ export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint }
                       : 'border-rule bg-cotton/40 text-muted',
                 ].join(' ')}
               >
-                <span className="text-[10px] tracking-wide opacity-70">k{cell.k}</span>
-                <span className="text-[13px] tabular-nums">{cell.x}</span>
+                <span className="text-micro tracking-wide opacity-70">k{cell.k}</span>
+                <span className="text-fine tabular-nums">{cell.x}</span>
               </button>
             </li>
           )
         })}
         {cells.length === 0 ? (
-          <li className="font-mono text-[13px] text-muted">—</li>
+          <li className="font-mono text-fine text-muted">—</li>
         ) : null}
       </ol>
     </Panel>

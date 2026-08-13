@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { PALETTE } from '@/lib/palette'
@@ -14,6 +14,16 @@ import { PALETTE } from '@/lib/palette'
  * 4.34:1 until it was measured.
  */
 const CSS = readFileSync(join(process.cwd(), 'app', 'globals.css'), 'utf8')
+
+/** Every file Tailwind scans — the same two roots as `content` in the config. */
+function sources(dir = '', roots = ['app', 'components']): string[] {
+  if (dir === '') return roots.flatMap((root) => sources(join(process.cwd(), root)))
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) return sources(path)
+    return entry.name.endsWith('.tsx') ? [path] : []
+  })
+}
 
 const kebab = (token: string) => token.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 
@@ -67,6 +77,27 @@ describe('design tokens', () => {
   it('keeps madder legible as an accent on both surfaces', () => {
     expect(contrast(PALETTE.madder, PALETTE.cotton)).toBeGreaterThanOrEqual(4.5)
     expect(contrast(PALETTE.madder, PALETTE.paper)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  /*
+   * The scale is only a scale if nothing opts out of it. Tailwind's own sizes
+   * are replaced rather than extended, so `text-xl` silently produces nothing
+   * — which is a rendering bug that no other test would catch.
+   */
+  it('uses no font size off the scale', () => {
+    const SCALE = ['micro', 'fine', 'sm', 'base', 'lg', 'h3', 'h2', 'h1', 'hero']
+    const offenders: string[] = []
+    for (const file of sources()) {
+      const source = readFileSync(file, 'utf8')
+      for (const match of source.matchAll(/(?:^|[\s"'`:])(?:[a-z]+:)?text-([a-z0-9[\].]+)/g)) {
+        const size = match[1]
+        // Colours, alignment and the rest of the `text-` namespace pass through.
+        if (!/^(xs|sm|base|lg|[0-9]?xl|\[.*\])$/.test(size)) continue
+        if (SCALE.includes(size)) continue
+        offenders.push(`${file}: text-${size}`)
+      }
+    }
+    expect(offenders).toEqual([])
   })
 
   it('declares one type scale, and nothing in it is below 11px', () => {
