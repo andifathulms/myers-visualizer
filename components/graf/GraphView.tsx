@@ -388,6 +388,17 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                   ? (state.stats.d + 2) ** 2
                   : null
               }
+              memoryWhy={
+                // Greedy Myers records one row per level and nothing else, so
+                // the identity holds exactly. The linear-space variant does
+                // not record that way and the same sentence would be false.
+                algorithm === 'myers' && state.status === 'done'
+                  ? format(t.memoryWhy, {
+                      side: state.stats.d + 2,
+                      cells: state.stats.vCells,
+                    })
+                  : null
+              }
             />
             {maintainsV ? (
               <VStrip

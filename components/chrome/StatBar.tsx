@@ -19,6 +19,7 @@ export function StatBar({
   steps,
   vCells,
   naiveVCells,
+  memoryWhy,
 }: {
   dict: Dict
   d: number
@@ -30,6 +31,8 @@ export function StatBar({
   vCells: number
   /** What the greedy recording would have retained, for linear-space mode. */
   naiveVCells: number | null
+  /** The arithmetic behind `vCells`, when there is an honest one to state. */
+  memoryWhy: string | null
 }) {
   const t = dict.graph
   const rows: { label: string; value: string }[] = [
@@ -68,6 +71,17 @@ export function StatBar({
           </div>
         ))}
       </dl>
+
+      {/*
+        The one figure on this panel that carries a claim rather than reporting
+        a count. "16" said nothing about why the recording is quadratic; the
+        arithmetic does, and it is the same square the paper's O(D²) refers to.
+        Only for greedy Myers — the linear-space variant does not record this
+        way, and printing the identity beside its number would be false.
+      */}
+      {memoryWhy === null ? null : (
+        <p className="mt-3 border-t border-rule pt-3 font-sans text-fine text-muted">{memoryWhy}</p>
+      )}
     </Panel>
   )
 }

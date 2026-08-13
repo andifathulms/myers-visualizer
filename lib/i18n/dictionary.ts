@@ -125,6 +125,10 @@ export type Dict = {
     tokens: string
     memory: string
     memoryNaive: string
+    /** The arithmetic behind the memory figure. Placeholders {d} {side} {cells}. */
+    memoryWhy: string
+    /** Where the ambiguity count comes from, since the search does not produce it. */
+    ambiguityWhy: string
     ambiguityCount: string
     ambiguityTitle: string
     ambiguityHint: string
@@ -376,6 +380,8 @@ const id: Dict = {
     tokens: 'Token',
     memory: 'Sel V tersimpan',
     memoryNaive: 'Sel V bila naif',
+    memoryWhy: 'Satu baris V per tingkat, dan baris ke-d selebar 2d+1 diagonal. Dijumlahkan dari d = 0 sampai D+1 hasilnya (D+2)² = {side}² = {cells}. Itulah O(D²) yang disebut-sebut, terlihat sebagai persegi.',
+    ambiguityWhy: 'Dihitung dengan pemrograman dinamis di atas edit graph, terpisah dari pencarian — jadi angkanya tidak bisa mewarisi kesalahan algoritma yang sedang ia gambarkan. Pencarian itu sendiri hanya menemukan satu script; ia tidak pernah tahu ada berapa banyak.',
     ambiguityCount: 'edit script minimal ditemukan',
     ambiguityTitle: 'Ambiguitas',
     ambiguityHint: 'Berapa banyak jawaban sependek ini yang sebenarnya ada.',
@@ -615,6 +621,8 @@ const en: Dict = {
     tokens: 'Tokens',
     memory: 'V cells stored',
     memoryNaive: 'V cells if naive',
+    memoryWhy: 'One V row per level, and row d is 2d+1 diagonals wide. Summed from d = 0 to D+1 that is (D+2)² = {side}² = {cells}. That is the O(D²) everyone quotes, visible as a square.',
+    ambiguityWhy: 'Counted by dynamic programming over the edit graph, separately from the search — so the number cannot inherit a bug from the thing it describes. The search itself only ever finds one script; it never knows how many there were.',
     ambiguityCount: 'minimal edit scripts found',
     ambiguityTitle: 'Ambiguity',
     ambiguityHint: 'How many answers this short actually exist.',

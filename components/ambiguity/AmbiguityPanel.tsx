@@ -51,6 +51,12 @@ export function AmbiguityPanel({
             {t.ambiguityCount}
           </p>
           <p className="mt-2 font-sans text-fine text-muted">{t.ambiguityMany}</p>
+          {/*
+            Where the number came from. The search never produces it — it finds
+            one script and stops — so a count sitting beside the search invites
+            the reading that the search counted them.
+          */}
+          <p className="mt-2 font-sans text-fine text-muted">{t.ambiguityWhy}</p>
         </>
       )}
 
