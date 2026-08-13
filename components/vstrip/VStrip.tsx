@@ -131,7 +131,7 @@ export function VStrip({
                 onBlur={() => onHighlight(null)}
                 aria-label={`k = ${cell.k}, x = ${cell.x}, y = ${cell.y}`}
                 className={[
-                  'flex w-[3.25rem] flex-col items-center rounded-lg border py-1 font-mono transition-colors',
+                  'flex w-[4rem] flex-col items-center rounded-lg border py-1 font-mono transition-colors',
                   active
                     ? 'border-madder bg-madder/10 text-madder'
                     : live
@@ -139,8 +139,20 @@ export function VStrip({
                       : 'border-rule bg-cotton/40 text-muted',
                 ].join(' ')}
               >
+                {/*
+                  x is labelled because an unlabelled integer taught nothing:
+                  the cell read "k0 / 5" and 5 could have been anything. y is
+                  shown too, but as a plainly secondary value — the hint says
+                  it is never stored and is recovered as x − k, which is the
+                  reason V is one number per diagonal at all. Myers §2.
+
+                  The subtraction itself is deliberately not printed in every
+                  cell: at the input cap it would read "y=300−(-40)" eighty-one
+                  times over, and the rule belongs stated once, not repeated.
+                */}
                 <span className="text-micro tracking-wide">k{cell.k}</span>
-                <span className="text-fine tabular-nums">{cell.x}</span>
+                <span className="text-fine tabular-nums">x {cell.x}</span>
+                <span className="text-micro tabular-nums text-muted">y {cell.y}</span>
               </button>
             </li>
           )
