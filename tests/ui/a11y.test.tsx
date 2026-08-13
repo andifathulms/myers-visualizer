@@ -27,8 +27,9 @@ describe('accessibility', () => {
 
     // The same state, readable: stats and the V array.
     expect(screen.getByText(dict.graph.d)).toBeDefined()
-    expect(screen.getByLabelText(dict.graph.stats)).toBeDefined()
-    expect(screen.getByLabelText(dict.graph.vstrip)).toBeDefined()
+    // Named by their headings, not by a duplicate region label on the section.
+    expect(screen.getByRole('heading', { name: dict.graph.stats })).toBeDefined()
+    expect(screen.getByRole('heading', { name: dict.graph.vstrip })).toBeDefined()
   })
 
   it('announces the current step politely as the user steps', async () => {

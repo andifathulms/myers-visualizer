@@ -381,7 +381,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
             ) : (
               // Showing a V strip for an algorithm that has no V would be a lie
               // dressed as a visualisation.
-              <Panel title={t.vstrip} ariaLabel={t.vstrip}>
+              <Panel title={t.vstrip}>
                 <p className="font-sans text-fine text-muted">{t.noVStrip}</p>
               </Panel>
             )}

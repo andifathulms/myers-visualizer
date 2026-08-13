@@ -13,26 +13,25 @@ export function Panel({
   title,
   hint,
   action,
-  labelledBy,
-  ariaLabel,
   padded = true,
   children,
 }: {
   title?: ReactNode
   hint?: ReactNode
   action?: ReactNode
-  /** Passed through when a test or a screen reader needs a stable name. */
-  labelledBy?: string
-  ariaLabel?: string
   padded?: boolean
   children: ReactNode
 }) {
+  /*
+   * Deliberately unnamed. Naming the <section> turns it into a region
+   * landmark, and every call site named it exactly what its own heading
+   * already says — so a screen reader announced "Stats, region. Stats,
+   * heading level 3." Four of those on the graph page and none anywhere
+   * else. The heading is the group's name and the heading list is the way
+   * to navigate between them.
+   */
   return (
-    <section
-      aria-label={ariaLabel}
-      aria-labelledby={labelledBy}
-      className={`card ${padded ? 'p-4 sm:p-5' : ''}`}
-    >
+    <section className={`card ${padded ? 'p-4 sm:p-5' : ''}`}>
       {title === undefined ? null : (
         <div
           className={`mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 ${

@@ -19,7 +19,6 @@ export function BrandMark({ size = 20 }: { size?: number }) {
       height={size}
       viewBox="0 0 100 100"
       className="shrink-0"
-      role="presentation"
     >
       <rect width="100" height="100" rx="22" fill={BRAND.ink} />
       <polyline

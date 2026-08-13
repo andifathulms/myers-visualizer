@@ -197,10 +197,15 @@ try {
 
   await page.waitForFunction(() => document.body.textContent?.includes('@@ '), { timeout: 60_000 })
   // The whole stats panel, not just its <dl>: D is now set above the list,
-  // at a size that matches how much it matters.
-  const worstStats = await page.evaluate(
-    () => document.querySelector('[aria-label="Stats"]')?.innerText ?? '',
-  )
+  // at a size that matches how much it matters. Located by its heading —
+  // the section is deliberately unnamed, because naming it made a region
+  // landmark that just repeated the heading.
+  const worstStats = await page.evaluate(() => {
+    const heading = [...document.querySelectorAll('h3')].find(
+      (h) => h.textContent?.trim() === 'Stats',
+    )
+    return heading?.closest('section')?.innerText ?? ''
+  })
   check(
     'worst case reports D = 600 and the O(D²) recording',
     worstStats.includes('600') && worstStats.includes('362404'),

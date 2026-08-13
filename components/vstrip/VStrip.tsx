@@ -28,7 +28,7 @@ type Props = {
 
 export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint, idle }: Props) {
   return (
-    <Panel title={label} hint={hint} ariaLabel={label}>
+    <Panel title={label} hint={hint}>
       <ol
         className="flex flex-wrap gap-1.5"
         onMouseLeave={() => onHighlight(null)}
@@ -44,7 +44,6 @@ export function VStrip({ cells, currentD, highlightK, onHighlight, label, hint, 
                 onFocus={() => onHighlight(cell.k)}
                 onBlur={() => onHighlight(null)}
                 aria-label={`k = ${cell.k}, x = ${cell.x}, y = ${cell.y}`}
-                aria-pressed={active}
                 className={[
                   'flex w-[3.25rem] flex-col items-center rounded-lg border py-1 font-mono transition-colors',
                   active

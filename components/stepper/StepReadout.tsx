@@ -38,7 +38,7 @@ export function StepReadout({
 
   if (!available) {
     return (
-      <Panel title={t.step} ariaLabel={t.step}>
+      <Panel title={t.step}>
         <p className="font-sans text-sm text-muted">{t.stepNoSteps}</p>
       </Panel>
     )
@@ -53,7 +53,7 @@ export function StepReadout({
     is left is one short line that changes as you step.
   */
   return (
-    <Panel title={t.step} hint={t.stepHint} ariaLabel={t.step}>
+    <Panel title={t.step} hint={t.stepHint}>
       <p className="font-sans text-sm text-muted">
         <span className="font-mono tabular-nums text-deepIndigo">{format(t.stepAt, { d, k })}</span>
         <span aria-hidden> · </span>

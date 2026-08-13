@@ -42,7 +42,7 @@ export function StatBar({
   if (naiveVCells !== null) rows.push({ label: t.memoryNaive, value: String(naiveVCells) })
 
   return (
-    <Panel title={t.stats} hint={t.statsHint} ariaLabel={t.stats}>
+    <Panel title={t.stats} hint={t.statsHint}>
       {/*
         The figure is D itself — the answer — and progress toward it is said in
         words underneath. It used to read `0/2`, which put a third unrelated

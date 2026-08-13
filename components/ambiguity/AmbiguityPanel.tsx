@@ -37,7 +37,7 @@ export function AmbiguityPanel({
   const tag = locale === 'id' ? 'id-ID' : 'en-GB'
 
   return (
-    <Panel title={t.ambiguityTitle} hint={t.ambiguityHint} ariaLabel={t.ambiguityTitle}>
+    <Panel title={t.ambiguityTitle} hint={t.ambiguityHint}>
       {unique ? (
         <p className="font-sans text-fine text-muted">{t.ambiguityUnique}</p>
       ) : (
