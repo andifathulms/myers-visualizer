@@ -28,6 +28,33 @@ type Props = {
   totalScripts?: number
   /** Rendered into the badge with {used} and {total}. */
   shareLabel?: string
+  /** Copy for the composed accessible name. Defaults keep the plain reading. */
+  labels?: LineLabels
+}
+
+/**
+ * A diff line's accessible name is composed, not scraped off the screen.
+ *
+ * Read straight, the row announced as "3 - three 1 of 2": two gutter numbers,
+ * a sign glyph, the text and the contestedness badge run together with no
+ * punctuation, so the count sounded like part of the line. The numbers are a
+ * visual alignment aid, the sign is already said by the word, and the badge
+ * needs to be a sentence.
+ */
+export type LineLabels = {
+  readonly label: string
+  readonly kept: string
+  readonly deleted: string
+  readonly inserted: string
+  readonly share: string
+}
+
+const PLAIN: LineLabels = {
+  label: '{kind} {line}: {text}{share}',
+  kept: 'unchanged',
+  deleted: 'removed',
+  inserted: 'added',
+  share: ' — in {used} of {total} shortest scripts',
 }
 
 export function Hunks({
@@ -38,6 +65,7 @@ export function Hunks({
   shares = null,
   totalScripts = 1,
   shareLabel = '{used}/{total}',
+  labels = PLAIN,
 }: Props) {
   if (hunks.length === 0) {
     return (
@@ -63,6 +91,7 @@ export function Hunks({
                 share={shares === null ? null : (shares[line.opIndex] ?? null)}
                 totalScripts={totalScripts}
                 shareLabel={shareLabel}
+                labels={labels}
               />
             ))}
           </ol>
@@ -79,6 +108,7 @@ function Line({
   share,
   totalScripts,
   shareLabel,
+  labels,
 }: {
   line: HunkLine
   selected: boolean
@@ -86,6 +116,7 @@ function Line({
   share: OpShare | null
   totalScripts: number
   shareLabel: string
+  labels: LineLabels
 }) {
   const tone =
     line.type === 'delete'
@@ -93,24 +124,50 @@ function Line({
       : line.type === 'insert'
         ? 'bg-added/8 text-added'
         : 'text-muted'
+
+  const kind =
+    line.type === 'delete' ? labels.deleted : line.type === 'insert' ? labels.inserted : labels.kept
+  // The line's own number on the side it belongs to: a deletion has no b index.
+  const number = (line.type === 'insert' ? line.bIndex : line.aIndex) ?? 0
+  const name = format(labels.label, {
+    kind,
+    line: number + 1,
+    text: line.text === '' ? '' : line.text,
+    share:
+      share === null || share.forced
+        ? ''
+        : format(labels.share, { used: share.scripts, total: totalScripts }),
+  })
+
   return (
     <li>
       <button
         type="button"
+        aria-label={name}
         onClick={() => onSelect(selected ? null : line.opIndex)}
         className={[
           'flex w-full gap-2 whitespace-pre px-3 text-left font-mono text-fine leading-6',
           selected ? 'bg-turmeric/30 text-deepIndigo' : `${tone} hover:brightness-[0.97]`,
         ].join(' ')}
       >
-        <span className="w-7 shrink-0 select-none text-right tabular-nums text-muted">
+        <span
+          aria-hidden
+          className="w-7 shrink-0 select-none text-right tabular-nums text-muted"
+        >
           {line.aIndex === null ? '' : line.aIndex + 1}
         </span>
-        <span className="w-7 shrink-0 select-none text-right tabular-nums text-muted">
+        <span
+          aria-hidden
+          className="w-7 shrink-0 select-none text-right tabular-nums text-muted"
+        >
           {line.bIndex === null ? '' : line.bIndex + 1}
         </span>
-        <span className="w-3 shrink-0 select-none font-medium">{LINE_PREFIX[line.type]}</span>
-        <span className="flex-1">{line.text === '' ? ' ' : line.text}</span>
+        <span aria-hidden className="w-3 shrink-0 select-none font-medium">
+          {LINE_PREFIX[line.type]}
+        </span>
+        <span aria-hidden className="flex-1">
+          {line.text === '' ? ' ' : line.text}
+        </span>
         {/*
           Only contested lines are marked. Badging every line would be noise
           and would bury the finding: on a typical input almost the whole diff
@@ -118,7 +175,7 @@ function Line({
           "why did it blame that line".
         */}
         {share === null || share.forced ? null : (
-          <span className="shrink-0 select-none pl-3 text-micro tabular-nums text-muted">
+          <span aria-hidden className="shrink-0 select-none pl-3 text-micro tabular-nums text-muted">
             {format(shareLabel, { used: share.scripts, total: totalScripts })}
           </span>
         )}

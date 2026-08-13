@@ -116,6 +116,16 @@ export type Dict = {
     contested: string
     /** Placeholders {used} {total}. */
     contestedShare: string
+    /**
+     * The accessible name of a diff line. Placeholders {kind} {line} {text},
+     * plus {share} which is either empty or lineShare.
+     */
+    lineLabel: string
+    lineKept: string
+    lineDeleted: string
+    lineInserted: string
+    /** Placeholders {used} {total}. Appended to lineLabel when contested. */
+    lineShare: string
     contestedNone: string
     /** The tie-break, at the step where it fires. §6.4 */
     step: string
@@ -323,6 +333,11 @@ const id: Dict = {
     altScriptHint: 'Sama-sama sependek yang dipilih algoritma. Coba beralih dan lihat diff di bawah berubah.',
     contested: 'Angka di kanan sebuah baris berarti baris itu diperdebatkan: sekian dari sekian script terpendek mengaitkan perubahan seperti ini. Baris tanpa angka ada di semua script terpendek — bagian diff itu bukan pilihan.',
     contestedShare: '{used} dari {total}',
+    lineLabel: 'Baris {line}, {kind}: {text}{share}',
+    lineKept: 'tetap',
+    lineDeleted: 'dihapus',
+    lineInserted: 'disisipkan',
+    lineShare: ' — ada di {used} dari {total} script terpendek',
     contestedNone: 'Setiap baris di bawah ada di semua script terpendek.',
     step: 'Langkah ini',
     stepHint: 'Dari mana langkah di bawah kursor datang, dan apakah pilihannya seri. Saat seri, yang menang ditentukan tie-breaking — implementasi ini membandingkan dengan < bukan ≤, bukan dengan menilai mana yang lebih enak dibaca.',
@@ -531,6 +546,11 @@ const en: Dict = {
     altScriptHint: 'Every bit as short as the one the algorithm chose. Switch between them and watch the diff below change.',
     contested: 'A number beside a line means that line is contested: that many of the shortest scripts attribute the change this way. Lines without one appear in every shortest script — that part of the diff is not a choice.',
     contestedShare: '{used} of {total}',
+    lineLabel: 'Line {line}, {kind}: {text}{share}',
+    lineKept: 'unchanged',
+    lineDeleted: 'removed',
+    lineInserted: 'added',
+    lineShare: ' — in {used} of {total} shortest scripts',
     contestedNone: 'Every line below appears in all of the shortest scripts.',
     step: 'This step',
     stepHint: 'Where the step under the cursor came from, and whether the choice was a tie. When it is, the winner is decided by tie-breaking — this implementation compares with < rather than ≤, not by judging which reads better.',

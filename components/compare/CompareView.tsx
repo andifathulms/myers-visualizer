@@ -87,6 +87,16 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
     results.every((r) => r.d === results[0].d && r.hunks === results[0].hunks)
   const showcase = findPreset('patience-wins')
 
+  /* Four copies of the diff on this page; all four name their lines in the
+     reader's language rather than falling back to the English default. */
+  const lineLabels = {
+    label: dict.graph.lineLabel,
+    kept: dict.graph.lineKept,
+    deleted: dict.graph.lineDeleted,
+    inserted: dict.graph.lineInserted,
+    share: dict.graph.lineShare,
+  }
+
   /*
    * §6.6 sells the linear-space variant on memory, and on a five-line input it
    * stores *more* than greedy — true, and read bare it looks like the page
@@ -231,6 +241,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                     selectedOp={selectedOp}
                     onSelectOp={setSelectedOp}
                     emptyLabel={locale === 'id' ? 'Tidak ada perbedaan.' : 'No differences.'}
+                    labels={lineLabels}
                   />
                 ) : (
                   <p className="px-3 py-4 font-sans text-fine text-madder">{result.error}</p>

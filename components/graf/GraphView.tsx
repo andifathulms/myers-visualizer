@@ -427,6 +427,13 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
             shares={shares}
             totalScripts={ambiguity.count}
             shareLabel={t.contestedShare}
+            labels={{
+              label: t.lineLabel,
+              kept: t.lineKept,
+              deleted: t.lineDeleted,
+              inserted: t.lineInserted,
+              share: t.lineShare,
+            }}
           />
         </div>
       </section>
