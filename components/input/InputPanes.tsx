@@ -152,6 +152,14 @@ export function InputPanes({
           <ShareLink url={shareUrl} dict={dict} />
         </div>
       </div>
+
+      {/*
+        Granularity looks like a display preference and is not one: it decides
+        what the search compares at all, and so what "the same" means. Said
+        beside the control rather than left to one preset's description, which
+        was the only place on the site that mentioned it.
+      */}
+      <p className="measure mt-2 font-sans text-fine text-muted">{t.granularityWhy}</p>
     </section>
   )
 }

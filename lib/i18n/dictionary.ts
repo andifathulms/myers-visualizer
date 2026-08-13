@@ -77,6 +77,8 @@ export type Dict = {
     sideA: string
     sideB: string
     granularity: string
+    /** Equality is a choice, said next to the control that makes it. */
+    granularityWhy: string
     line: string
     char: string
     word: string
@@ -342,6 +344,7 @@ const id: Dict = {
     sideA: 'A — sebelum',
     sideB: 'B — sesudah',
     granularity: 'Granularitas',
+    granularityWhy: 'Sebelum dibandingkan, teks diubah menjadi daftar angka — satu angka per baris, kata, atau karakter. Pilihan itulah yang menentukan apa yang dianggap sama, jadi ia mengubah kisinya, D-nya, dan diff yang keluar. Diff bukan satu hal: ia jawaban atas pertanyaan yang Anda ajukan.',
     line: 'Baris',
     char: 'Karakter',
     word: 'Kata',
@@ -370,7 +373,7 @@ const id: Dict = {
     vstrip: 'Array V',
     vstripGroup: 'Sel V per diagonal — panah untuk berpindah',
     vstripHint: 'Satu sel per diagonal k. Angkanya adalah x: titik terjauh di sepanjang A yang bisa dicapai pada diagonal itu dengan d suntingan. y tidak disimpan — ia selalu bisa dihitung ulang sebagai x − k, dan justru itu sebabnya V cukup satu angka per diagonal. Arahkan kursor ke sebuah k untuk menyorot diagonalnya di lattice.',
-    idleCanvas: 'Belum ada yang dicari. Tekan putar di bawah, atau melangkah satu per satu.',
+    idleCanvas: 'Belum ada yang dicari. Garis miring yang sudah terlihat adalah baris yang sama di kedua sisi — langkah gratis, dan pencarian akan berusaha menyambungkannya sebanyak mungkin. Tekan putar di bawah, atau melangkah satu per satu, dan perhatikan tepi kuning memuai: itu semua titik yang bisa dicapai dengan d suntingan.',
     idleVStrip: 'Masih kosong — V baru terisi setelah langkah pertama.',
     noVStrip: 'Algoritma ini tidak memelihara array V. Ia berlabuh pada elemen dan membelah rekursif, jadi tidak ada frontier untuk ditonton.',
     output: 'Keluaran diff',
@@ -588,6 +591,7 @@ const en: Dict = {
     sideA: 'A — before',
     sideB: 'B — after',
     granularity: 'Granularity',
+    granularityWhy: 'Before anything is compared the text becomes a list of numbers — one per line, word or character. That choice is what counts as being the same, so it changes the grid, the D, and the diff that comes out. A diff is not one thing: it is the answer to the question you asked.',
     line: 'Line',
     char: 'Character',
     word: 'Word',
@@ -616,7 +620,7 @@ const en: Dict = {
     vstrip: 'The V array',
     vstripGroup: 'V cells by diagonal — arrow keys to move',
     vstripHint: 'One cell per diagonal k. The number is x: the furthest point along A that d edits can reach on that diagonal. y is never stored — it can always be recovered as x − k, which is exactly why V needs only one number per diagonal. Hover a k cell to highlight that diagonal in the lattice.',
-    idleCanvas: 'Nothing has been searched yet. Press play below, or step through it one move at a time.',
+    idleCanvas: 'Nothing has been searched yet. The diagonals already drawn are the lines that are identical on both sides — the free steps, and the search will try to string together as many as it can. Press play below, or step one move at a time, and watch the yellow edge expand: that is every point reachable with d edits.',
     idleVStrip: 'Empty until the first step — V fills in as d advances.',
     noVStrip: 'This algorithm maintains no V array. It anchors on elements and splits recursively, so there is no frontier to watch.',
     output: 'Diff output',
