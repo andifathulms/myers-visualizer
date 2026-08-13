@@ -119,7 +119,7 @@ export function HeroFigure({ dict }: { dict: Dict }) {
           <polyline
             points={PATH.map(([x, y]) => `${px(x)},${py(y)}`).join(' ')}
             fill="none"
-            className="stroke-madder/25"
+            className="stroke-madder/30"
             strokeWidth={11}
             strokeLinecap="round"
             strokeLinejoin="round"
