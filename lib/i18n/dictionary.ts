@@ -155,6 +155,8 @@ export type Dict = {
     yes: string
     no: string
     note: string
+    /** Shown only when every algorithm returns the same shape of answer. Placeholder {preset}. */
+    allAgree: string
     tableTitle: string
     outputTitle: string
     outputHint: string
@@ -353,6 +355,7 @@ const id: Dict = {
     yes: 'Ya',
     no: 'Tidak',
     note: 'Hanya Myers yang menjamin D minimal. Patience dan histogram menukar minimalitas dengan keterbacaan.',
+    allAgree: 'Pada masukan ini keempatnya sepakat: D sama, jumlah hunk sama. Itu biasa pada suntingan kecil — perbedaannya muncul ketika ada baris berulang yang memberi Myers tempat berlabuh lain. Coba contoh "{preset}".',
     tableTitle: 'Angkanya',
     outputTitle: 'Keluarannya, berdampingan',
     outputHint: 'Masukan yang sama, empat cara membacanya.',
@@ -555,6 +558,7 @@ const en: Dict = {
     yes: 'Yes',
     no: 'No',
     note: 'Only Myers guarantees a minimal D. Patience and histogram trade minimality for readability.',
+    allAgree: 'On this input all four agree: same D, same number of hunks. That is the common case on small edits — the differences appear when a repeated line gives Myers somewhere else to anchor. Try the "{preset}" preset.',
     tableTitle: 'The numbers',
     outputTitle: 'The output, side by side',
     outputHint: 'One input, four ways of reading it.',

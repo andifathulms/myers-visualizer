@@ -9,7 +9,8 @@ import { useDiffInputs } from '@/lib/client/useDiffInputs'
 import { diff } from '@/lib/diff'
 import { hunkCount, isMinimal, type AlgorithmId } from '@/lib/diff/types'
 import { buildHunks } from '@/lib/hunks'
-import type { Dict } from '@/lib/i18n/dictionary'
+import { findPreset } from '@/data/presets'
+import { format, type Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
 
 /**
@@ -71,6 +72,20 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
    * when something is longer — which is exactly the case the page is about.
    */
   const contested = results.some((r) => r.error === null && r.d > best)
+
+  /*
+   * The page's lede says patience usually produces a longer script. On a small
+   * edit it usually does not, and four identical rows under that sentence read
+   * as a contradiction rather than as the common case it is. Say which one the
+   * reader is looking at.
+   *
+   * Deliberately the weaker claim — same D and same hunk count, not identical
+   * output — because that is what the table actually shows.
+   */
+  const allAgree =
+    results.every((r) => r.error === null) &&
+    results.every((r) => r.d === results[0].d && r.hunks === results[0].hunks)
+  const showcase = findPreset('patience-wins')
 
   return (
     <main className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
@@ -169,6 +184,12 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
             </div>
           ))}
         </dl>
+
+        {allAgree && showcase !== undefined ? (
+          <p className="measure mt-5 font-sans text-base text-muted">
+            {format(t.allAgree, { preset: showcase.title[locale] })}
+          </p>
+        ) : null}
 
         <div className="mt-5">
           <Note tone="accent">{t.note}</Note>
