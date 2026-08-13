@@ -1,5 +1,6 @@
 'use client'
 
+import { Panel } from '@/components/ui/Panel'
 import { format, type Dict } from '@/lib/i18n/dictionary'
 
 /**
@@ -37,31 +38,39 @@ export function StepReadout({
 
   if (!available) {
     return (
-      <p className="rounded-lg border border-rule bg-paper px-4 py-2.5 font-sans text-sm text-muted">
-        {t.stepNoSteps}
-      </p>
+      <Panel title={t.step} ariaLabel={t.step}>
+        <p className="font-sans text-sm text-muted">{t.stepNoSteps}</p>
+      </Panel>
     )
   }
 
   const direction = move === 'down' ? t.stepDown : move === 'right' ? t.stepRight : t.stepStart
 
+  /*
+    A card like everything around it — it was the one bordered box on the page
+    that was not one — and the long half of the sentence now lives in the
+    panel hint, which is where every other panel keeps its explanation. What
+    is left is one short line that changes as you step.
+  */
   return (
-    <p className="rounded-lg border border-rule bg-paper px-4 py-2.5 font-sans text-sm text-muted">
-      <span className="font-mono tabular-nums text-deepIndigo">{format(t.stepAt, { d, k })}</span>
-      <span aria-hidden> · </span>
-      {direction}
-      {move === 'start' ? null : (
-        <>
-          {' — '}
-          {/*
-            Weight, not colour. A tie is neither the frontier nor the answer,
-            and madder is reserved for the answer.
-          */}
-          <span className={tied ? 'font-medium text-deepIndigo' : undefined}>
-            {tied ? t.stepTied : t.stepNoTie}
-          </span>
-        </>
-      )}
-    </p>
+    <Panel title={t.step} hint={t.stepHint} ariaLabel={t.step}>
+      <p className="font-sans text-sm text-muted">
+        <span className="font-mono tabular-nums text-deepIndigo">{format(t.stepAt, { d, k })}</span>
+        <span aria-hidden> · </span>
+        {direction}
+        {move === 'start' ? null : (
+          <>
+            {' · '}
+            {/*
+              Weight, not colour. A tie is neither the frontier nor the answer,
+              and madder is reserved for the answer.
+            */}
+            <span className={tied ? 'font-medium text-deepIndigo' : undefined}>
+              {tied ? t.stepTied : t.stepNoTie}
+            </span>
+          </>
+        )}
+      </p>
+    </Panel>
   )
 }

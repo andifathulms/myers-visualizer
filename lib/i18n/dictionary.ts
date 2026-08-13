@@ -119,6 +119,7 @@ export type Dict = {
     contestedNone: string
     /** The tie-break, at the step where it fires. §6.4 */
     step: string
+    stepHint: string
     /** Placeholders {d} {k}. */
     stepAt: string
     stepDown: string
@@ -324,12 +325,13 @@ const id: Dict = {
     contestedShare: '{used} dari {total}',
     contestedNone: 'Setiap baris di bawah ada di semua script terpendek.',
     step: 'Langkah ini',
+    stepHint: 'Dari mana langkah di bawah kursor datang, dan apakah pilihannya seri. Saat seri, yang menang ditentukan tie-breaking — implementasi ini membandingkan dengan < bukan ≤, bukan dengan menilai mana yang lebih enak dibaca.',
     stepAt: 'd = {d} · k = {k}',
     stepDown: 'turun dari k+1 — menyisipkan satu baris',
     stepRight: 'ke kanan dari k−1 — menghapus satu baris',
     stepStart: 'titik awal (0,0)',
-    stepTied: 'Seri: k−1 mencapai titik yang sama persis. Pemenangnya ditentukan tie-breaking — implementasi ini membandingkan dengan < bukan ≤, bukan dengan menilai mana yang lebih enak dibaca.',
-    stepNoTie: 'Tidak seri: pendahulu yang lain tidak mencapai sejauh ini.',
+    stepTied: 'seri — k−1 mencapai titik yang sama, dan tie-breaking yang memilih.',
+    stepNoTie: 'bukan seri — pendahulu satunya tidak sejauh ini.',
     stepNoSteps: 'Hanya untuk Myers greedy — algoritma lain tidak memakai V.',
     linearSpace: 'Ruang linear',
     forward: 'Frontier maju',
@@ -530,12 +532,13 @@ const en: Dict = {
     contestedShare: '{used} of {total}',
     contestedNone: 'Every line below appears in all of the shortest scripts.',
     step: 'This step',
+    stepHint: 'Where the step under the cursor came from, and whether the choice was a tie. When it is, the winner is decided by tie-breaking — this implementation compares with < rather than ≤, not by judging which reads better.',
     stepAt: 'd = {d} · k = {k}',
     stepDown: 'down from k+1 — inserts a line',
     stepRight: 'right from k−1 — deletes a line',
     stepStart: 'the starting point (0,0)',
-    stepTied: 'A tie: k−1 reached exactly the same point. Which one wins is decided by tie-breaking — this implementation compares with < rather than ≤, not by judging which reads better.',
-    stepNoTie: 'Not a tie: the other predecessor did not reach this far.',
+    stepTied: 'a tie — k−1 reached the same point, and the tie-break chose.',
+    stepNoTie: 'not a tie — the other predecessor fell short.',
     stepNoSteps: 'Myers greedy only — the other algorithms keep no V.',
     linearSpace: 'Linear space',
     forward: 'Forward frontier',
