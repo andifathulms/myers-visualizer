@@ -47,6 +47,17 @@ export type Dict = {
     moveRight: string
     moveDown: string
     moveDiag: string
+    /** The same five lines, searched, with every intermediate value shown. */
+    walkTitle: string
+    walkLede: string
+    /** Placeholder {d}. */
+    walkLevel: string
+    walkV: string
+    walkSteps: readonly string[]
+    /** Placeholder {d}. */
+    walkResult: string
+    walkTie: string
+    walkCta: string
     ambiguityTitle: string
     ambiguity: string
     glossaryTitle: string
@@ -276,6 +287,19 @@ const id: Dict = {
     moveDown: 'sisip B[y]',
     moveDiag: 'pertahankan — hanya bila A[x] == B[y]',
 
+    walkTitle: 'Satu pencarian, dengan angkanya',
+    walkLede: 'Dua daftar belanja yang tadi, dijalankan sampai selesai. Tidak ada kontrol di bagian ini — hanya nilai yang benar-benar dihasilkan algoritma di tiap tingkat d.',
+    walkLevel: 'd = {d}',
+    walkV: 'V sesudahnya',
+    walkSteps: [
+      'Mulai dari (0,0). "susu" dan "telur" sama di kedua sisi, jadi keduanya dilalui gratis menuruni diagonal sampai (2,2). Belum ada yang dibayar, dua baris sudah beres.',
+      'Satu suntingan dibolehkan, jadi dua diagonal terbuka dari (2,2). Ke kanan berarti menghapus "gula" dan mendarat di (3,2); ke bawah berarti menyisipkan "garam" dan mendarat di (2,3). Tidak ada yang cocok sesudahnya, jadi tidak ada yang meluncur, dan tidak satu pun sampai di (5,5).',
+      'Dua suntingan. Dari (3,2) langkah ke bawah menyisipkan "garam" dan mendarat di (3,3) — di sana "roti" dan "kopi" sama, jadi keduanya gratis sampai (5,5). Selesai.',
+    ],
+    walkResult: 'D = {d}: satu baris dihapus, satu disisipkan, empat dibiarkan. Itulah diff yang Anda lihat di atas.',
+    walkTie: 'Perhatikan tingkat terakhir. Pada k = 0 kedua pendahulunya sama-sama mencapai x = 3 — lewat kanan dari k−1 atau lewat bawah dari k+1. Yang menang ditentukan tie-breaking, bukan penilaian. Pilih yang satunya dan Anda mendapat script yang sama pendeknya dengan "garam" disisipkan sebelum "gula" dihapus. Di sinilah, pada masukan sekecil ini, diff mulai bisa salah alamat.',
+    walkCta: 'Buka pencarian ini di edit graph',
+
     ambiguityTitle: 'Kenapa diff kadang menyalahkan baris yang keliru',
     ambiguity: 'Sering ada beberapa jalur yang sama-sama terpendek. Semuanya benar, dan semuanya sama singkat — jadi algoritma memilih satu lewat aturan tie-breaking, bukan lewat penilaian mana yang lebih masuk akal bagi manusia. Di sinilah kurung kurawal penutup bisa dikaitkan ke fungsi yang salah. Situs ini menghitung berapa banyak jalur minimal yang ada dan membiarkan Anda melihat alternatifnya.',
 
@@ -498,6 +522,19 @@ const en: Dict = {
     moveRight: 'delete A[x]',
     moveDown: 'insert B[y]',
     moveDiag: 'keep — only when A[x] == B[y]',
+
+    walkTitle: 'One search, with the numbers',
+    walkLede: 'The two shopping lists from earlier, run to completion. No controls in this part — just the values the algorithm actually produces at each level of d.',
+    walkLevel: 'd = {d}',
+    walkV: 'V afterwards',
+    walkSteps: [
+      'Start at (0,0). "milk" and "eggs" are the same on both sides, so both are taken for free down the diagonal, as far as (2,2). Nothing paid for yet, two lines already accounted for.',
+      'One edit allowed, so two diagonals open from (2,2). Going right deletes "sugar" and lands on (3,2); going down inserts "salt" and lands on (2,3). Nothing matches after either, so neither slides, and neither has reached (5,5).',
+      'Two edits. From (3,2), a step down inserts "salt" and lands on (3,3) — where "bread" and "coffee" match, so both are free through to (5,5). Done.',
+    ],
+    walkResult: 'D = {d}: one line deleted, one inserted, four left alone. That is the diff you read at the top of this page.',
+    walkTie: 'Look at that last level. On k = 0 both predecessors reach x = 3 — right from k−1, or down from k+1. Which one wins is settled by tie-breaking, not by judgement. Take the other and you get an equally short script with "salt" inserted before "sugar" is deleted. This, on five lines of shopping, is where a diff starts being able to blame the wrong line.',
+    walkCta: 'Open this search in the edit graph',
 
     ambiguityTitle: 'Why a diff sometimes blames the wrong line',
     ambiguity: 'Several routes are often equally short. All of them are correct and all of them are the same length — so the algorithm picks one by a tie-breaking rule, not by any judgement about which reads better to a human. That is how a closing brace ends up attributed to the wrong function. This site counts how many minimal routes exist and lets you look at the alternatives.',

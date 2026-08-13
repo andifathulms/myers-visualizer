@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { LOCALES, isLocale } from '@/lib/i18n/locales'
-import { getDict } from '@/lib/i18n/dictionary'
+import { format, getDict } from '@/lib/i18n/dictionary'
 import { READING } from '@/lib/links'
 import { EXAMPLE, type ExampleLine } from '@/data/example'
+import { WALKTHROUGH, WALKTHROUGH_D } from '@/data/walkthrough'
 import { Panel } from '@/components/ui/Panel'
 import { Note } from '@/components/ui/controls'
 import { HeroFigure } from '@/components/home/HeroFigure'
@@ -168,6 +169,72 @@ export default function Home({ params }: { params: { locale: string } }) {
               <MoveRow move="(x,y) → (x+1,y+1)" meaning={t.moveDiag} cost="0" free />
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/*
+        The notation, immediately used. Until now the first place a reader met
+        a real d, k or V was the live tool, where they had to know what to
+        press before anything happened at all. This is the same five lines
+        from the top of the page, searched to completion, with every
+        intermediate value on screen and nothing to operate.
+      */}
+      <section className="mx-auto max-w-5xl px-gutter py-section">
+        <h2 className="font-serif text-h2 font-semibold">{t.walkTitle}</h2>
+        <p className="measure mt-3 font-sans text-lg text-indigo">{t.walkLede}</p>
+
+        <ol className="mt-6 grid gap-4">
+          {WALKTHROUGH.map((level, index) => (
+            <li key={level.d} className="card p-5">
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+                <h3 className="font-mono text-h3 font-semibold tabular-nums text-deepIndigo">
+                  {format(t.walkLevel, { d: level.d })}
+                </h3>
+                {level.reached === null ? null : (
+                  <span className="font-mono text-fine text-madder">
+                    ({level.reached[0]}, {level.reached[1]})
+                  </span>
+                )}
+              </div>
+
+              <p className="measure mt-2 font-sans text-base text-muted">{t.walkSteps[index]}</p>
+
+              {/* The stored state itself, in the same shape the tool shows it. */}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <span className="font-sans text-micro font-semibold uppercase tracking-[0.07em] text-muted">
+                  {t.walkV}
+                </span>
+                {level.v.map(([k, x]) => (
+                  <span
+                    key={k}
+                    className="rounded-lg border border-rule bg-cotton/40 px-2 py-1 font-mono text-fine tabular-nums text-deepIndigo"
+                  >
+                    k{k} x {x}
+                  </span>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <p className="measure mt-5 font-sans text-base text-deepIndigo">
+          {format(t.walkResult, { d: WALKTHROUGH_D })}
+        </p>
+
+        {/*
+          The tie is the whole point of the site and it is present in the
+          smallest example there is, so it is named here rather than saved for
+          the tool. Madder rule down the side: this is the answer's own
+          ambiguity, and it is the same claim the ambiguity card makes above.
+        */}
+        <div className="card mt-5 border-l-[3px] border-l-madder p-5">
+          <p className="measure font-sans text-base text-muted">{t.walkTie}</p>
+          <Link
+            href={`/${locale}/graf#p=minimal-edit`}
+            className="mt-4 inline-flex h-10 items-center rounded-lg border border-rule bg-cotton px-4 font-sans text-sm font-medium text-deepIndigo transition-colors hover:border-madder hover:text-madder"
+          >
+            {t.walkCta} →
+          </Link>
         </div>
       </section>
 
