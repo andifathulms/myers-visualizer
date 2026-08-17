@@ -18,6 +18,16 @@ import type { Dict } from '@/lib/i18n/dictionary'
  * milk/eggs/salt/bread/coffee: four free diagonals, one step right, one step
  * down, D = 2. The two paid steps carry the − and + they become, which is
  * what ties the picture to the diff a reader already recognises.
+ *
+ * DESIGN.md §6: this example is also genuinely ambiguous — two equally short
+ * routes exist, delete-then-insert or insert-then-delete — and the graph
+ * page draws every alternative together (§4) rather than making a reader
+ * click to find that out. Because this route is fixed, its one alternative
+ * and the square of contested edges between them are known in advance and
+ * pre-authored into the same static SVG: no engine, no JS, no cost, and the
+ * front page states the product's central claim in the first screen instead
+ * of arriving at it four sections later under "why diffs blame the wrong
+ * line".
  */
 
 /** Node spacing, in user units. The viewBox scales; this is just the grid. */
@@ -56,9 +66,32 @@ export const FIGURE = {
     [3, 3],
     [5, 5],
   ],
+  /**
+   * The one other minimal route: down then right instead of right then
+   * down — insert salt before deleting sugar, rather than after. Same four
+   * free diagonals, same D = 2, a different attribution of the same change.
+   */
+  altPath: [
+    [0, 0],
+    [2, 2],
+    [2, 3],
+    [3, 3],
+    [5, 5],
+  ],
 } as const satisfies Record<string, readonly (readonly [number, number])[]>
 
-const { matches: MATCHES, explored: EXPLORED, path: PATH } = FIGURE
+/**
+ * The single cell both routes disagree about — every one of its four edges
+ * is on one minimal route and not the other. Asserted against
+ * `contestedEdges` in tests/ui/hero-figure.test.tsx, the same as every other
+ * coordinate in this file.
+ */
+export const CONTESTED = { from: [2, 2], to: [3, 3] } as const satisfies {
+  from: readonly [number, number]
+  to: readonly [number, number]
+}
+
+const { matches: MATCHES, explored: EXPLORED, path: PATH, altPath: ALT_PATH } = FIGURE
 
 export function HeroFigure({ dict }: { dict: Dict }) {
   const t = dict.home.figure
@@ -109,6 +142,35 @@ export function HeroFigure({ dict }: { dict: Dict }) {
               strokeWidth={1}
             />
           ))}
+
+          {/*
+            The contested cell, beneath every other layer — structure the
+            answer sits inside, not the answer itself, same as the graph
+            page's tint (§4.1). Both routes cross it; only the order differs.
+          */}
+          <rect
+            x={px(CONTESTED.from[0])}
+            y={py(CONTESTED.from[1])}
+            width={px(CONTESTED.to[0]) - px(CONTESTED.from[0])}
+            height={py(CONTESTED.to[1]) - py(CONTESTED.from[1])}
+            rx={3}
+            className="fill-madder/10"
+          />
+
+          {/*
+            The other equally minimal route, ghosted — indigo, not madder,
+            because it was not chosen (CLAUDE.md invariant 13). Whole and
+            still, the same as the graph page draws every alternative once
+            the search has an answer (§4.1, §4.5).
+          */}
+          <polyline
+            points={ALT_PATH.map(([x, y]) => `${px(x)},${py(y)}`).join(' ')}
+            fill="none"
+            className="stroke-indigo/40"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
 
           {/*
             The answer, as a band rather than a line. Every free diagonal in
@@ -222,6 +284,7 @@ export function HeroFigure({ dict }: { dict: Dict }) {
         <Key className="bg-indigo/70">{t.keyMatch}</Key>
         <Key className="bg-explored">{t.keySearch}</Key>
         <Key className="bg-madder">{t.keyPath}</Key>
+        <Key className="bg-indigo/40">{t.keyAlt}</Key>
       </figcaption>
     </figure>
   )

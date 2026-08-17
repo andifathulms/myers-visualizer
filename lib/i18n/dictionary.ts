@@ -30,6 +30,8 @@ export type Dict = {
       keyMatch: string
       keySearch: string
       keyPath: string
+      /** The ghosted alternative route — DESIGN.md §6. */
+      keyAlt: string
     }
     /** The 20-second "what even is a diff" worked example. */
     exampleTitle: string
@@ -268,7 +270,7 @@ const id: Dict = {
     ctaGraph: 'Tonton algoritmanya bekerja',
     ctaCompare: 'Bandingkan algoritma',
     figure: {
-      alt: 'Edit graph untuk dua daftar belanja: rute terpendek menuruni kisi, empat langkah diagonal gratis, satu langkah ke kanan yang menghapus satu baris, dan satu langkah ke bawah yang menyisipkan satu baris.',
+      alt: 'Edit graph untuk dua daftar belanja. Ada dua rute yang sama-sama terpendek untuk perubahan yang sama: rute penuh menghapus lalu menyisipkan, rute pudar menyisipkan lalu menghapus. Keduanya berbagi empat langkah diagonal gratis; hanya urutan satu penghapusan dan satu penyisipan yang berbeda.',
       axisA: 'teks lama',
       axisB: 'teks baru',
       deleted: '− dihapus',
@@ -276,6 +278,7 @@ const id: Dict = {
       keyMatch: 'baris yang sama — gratis',
       keySearch: 'yang sempat dicoba',
       keyPath: 'rute terpendek',
+      keyAlt: 'alternatif sama pendeknya',
     },
 
     exampleTitle: 'Apa itu diff?',
@@ -326,7 +329,7 @@ const id: Dict = {
     walkCta: 'Buka pencarian ini di edit graph',
 
     ambiguityTitle: 'Kenapa diff kadang menyalahkan baris yang keliru',
-    ambiguity: 'Sering ada beberapa jalur yang sama-sama terpendek. Semuanya benar, dan semuanya sama singkat — jadi algoritma memilih satu lewat aturan tie-breaking, bukan lewat penilaian mana yang lebih masuk akal bagi manusia. Di sinilah kurung kurawal penutup bisa dikaitkan ke fungsi yang salah. Situs ini menghitung berapa banyak jalur minimal yang ada dan membiarkan Anda melihat alternatifnya.',
+    ambiguity: 'Gambar di atas sudah menunjukkannya: dua rute sama-sama terpendek untuk perubahan yang sama persis. Itu bukan kasus langka — hal itu terjadi terus-menerus, dan di situlah kurung kurawal penutup bisa dikaitkan ke fungsi yang salah. Situs ini menghitung berapa banyak jalur minimal yang ada dan membiarkan Anda melihat alternatifnya.',
 
     glossaryTitle: 'Istilah',
     glossaryLede: 'Istilah algoritma sengaja dibiarkan dalam bahasa Inggris supaya Anda mengenalinya lagi di paper dan di kode. Ini terjemahannya ke bahasa manusia.',
@@ -524,7 +527,7 @@ const en: Dict = {
     ctaGraph: 'Watch the algorithm run',
     ctaCompare: 'Compare algorithms',
     figure: {
-      alt: 'An edit graph for two shopping lists: the shortest route down the grid, four free diagonal steps, one step right that deletes a line, and one step down that inserts one.',
+      alt: 'An edit graph for two shopping lists. Two equally short routes exist for the same change: the solid route deletes then inserts, the fainter one inserts then deletes. Both share four free diagonal steps; only the order of the one deletion and one insertion differs.',
       axisA: 'old text',
       axisB: 'new text',
       deleted: '− deleted',
@@ -532,6 +535,7 @@ const en: Dict = {
       keyMatch: 'identical line — free',
       keySearch: 'what it tried',
       keyPath: 'shortest route',
+      keyAlt: 'equally short alternative',
     },
 
     exampleTitle: 'What is a diff?',
@@ -582,7 +586,7 @@ const en: Dict = {
     walkCta: 'Open this search in the edit graph',
 
     ambiguityTitle: 'Why a diff sometimes blames the wrong line',
-    ambiguity: 'Several routes are often equally short. All of them are correct and all of them are the same length — so the algorithm picks one by a tie-breaking rule, not by any judgement about which reads better to a human. That is how a closing brace ends up attributed to the wrong function. This site counts how many minimal routes exist and lets you look at the alternatives.',
+    ambiguity: 'The picture above already showed it: two equally short routes existed for the exact same change. That is not a rare case — it happens constantly, and it is how a closing brace ends up attributed to the wrong function. This site counts how many minimal routes exist and lets you look at the alternatives.',
 
     glossaryTitle: 'Glossary',
     glossaryLede: 'The algorithm terms are deliberately left in English so you recognise them again in the paper and in real source code. Here they are in plain language.',
