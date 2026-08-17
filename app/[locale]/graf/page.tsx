@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { GraphView } from '@/components/graf/GraphView'
+import { GraphViewBoundary } from '@/components/graf/GraphViewBoundary'
 import { getDict } from '@/lib/i18n/dictionary'
 import { LOCALES, isLocale } from '@/lib/i18n/locales'
 import { metadataFor } from '@/lib/seo'
@@ -15,5 +15,5 @@ export function generateStaticParams() {
 
 export default function GrafPage({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale)) notFound()
-  return <GraphView locale={params.locale} dict={getDict(params.locale)} />
+  return <GraphViewBoundary locale={params.locale} dict={getDict(params.locale)} />
 }

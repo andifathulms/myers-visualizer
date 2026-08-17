@@ -253,6 +253,19 @@ export type Dict = {
     path: string
     pathHint: string
   }
+  /**
+   * Error boundary copy. DESIGN.md §8 — a route-level boundary and one
+   * around GraphView specifically, since a render-time throw in the canvas
+   * layer, the stepper or the hunks renderer would otherwise take the whole
+   * page down with no way back except a hard reload.
+   */
+  error: {
+    title: string
+    body: string
+    retry: string
+    /** Shown only by the GraphView-specific boundary, since only that page has a share link to keep. */
+    graphBody: string
+  }
 }
 
 const id: Dict = {
@@ -510,6 +523,13 @@ const id: Dict = {
     path: 'Jalur terpilih',
     pathHint: 'jawabannya',
   },
+  error: {
+    title: 'Ada yang tidak beres',
+    body: 'Bagian halaman ini gagal ditampilkan. Bukan salah Anda — coba lagi, atau kembali ke beranda.',
+    retry: 'Coba lagi',
+    graphBody:
+      'Bagian ini gagal ditampilkan. Masukan Anda masih ada di tautan halaman ini — salin sebelum mencoba lagi, atau mulai dari salah satu contoh.',
+  },
 }
 
 const en: Dict = {
@@ -766,6 +786,13 @@ const en: Dict = {
     frontierHint: 'how far the search has reached',
     path: 'Chosen path',
     pathHint: 'the answer',
+  },
+  error: {
+    title: 'Something went wrong',
+    body: "This part of the page failed to render. It isn't your fault — try again, or head back to the home page.",
+    retry: 'Try again',
+    graphBody:
+      "This part failed to render. Your input is still in this page's link — copy it before trying again, or start from one of the presets.",
   },
 }
 
