@@ -28,6 +28,7 @@ function renderStrip() {
       hint="hint"
       idle="idle"
       groupLabel="V cells by diagonal"
+      maxX={4}
     />,
   )
 }

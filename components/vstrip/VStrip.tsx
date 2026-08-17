@@ -34,6 +34,14 @@ type Props = {
   idle: string
   /** Named because a group of controls with no name is announced as nothing. */
   groupLabel: string
+  /**
+   * The length of A — the fixed reference each cell's bar is measured
+   * against, so the strip's own profile advances forward as the search
+   * does, the same way the frontier on the lattice does. Measuring against
+   * the row's own max instead would keep every row looking equally full.
+   * DESIGN.md §7.
+   */
+  maxX: number
 }
 
 export function VStrip({
@@ -45,6 +53,7 @@ export function VStrip({
   hint,
   idle,
   groupLabel,
+  maxX,
 }: Props) {
   /** Which cell carries the tab stop. Index, not k, so it survives a resize. */
   const [focused, setFocused] = useState(0)
@@ -118,6 +127,12 @@ export function VStrip({
         {cells.map((cell, index) => {
           const live = Math.abs(cell.k % 2) === Math.abs(currentD % 2)
           const active = highlightK === cell.k
+          // x is a magnitude — how far the frontier has reached along this
+          // diagonal — and it sat as a bare number beside a picture whose
+          // whole subject is how far the frontier has reached. Measured
+          // against maxX (the length of A), not this row's own max, so the
+          // strip's profile visibly advances as d grows. DESIGN.md §7.
+          const pct = Math.max(0, Math.min(100, Math.round((cell.x / Math.max(1, maxX)) * 100)))
           return (
             <li key={cell.k}>
               <button
@@ -151,7 +166,23 @@ export function VStrip({
                   times over, and the rule belongs stated once, not repeated.
                 */}
                 <span className="text-micro tracking-wide">k{cell.k}</span>
-                <span className="text-fine tabular-nums">x {cell.x}</span>
+                {/*
+                  Decorative: the bar restates x, which the text beneath
+                  already gives a screen reader via the button's own label.
+                */}
+                <span
+                  aria-hidden
+                  className="mt-1 h-1 w-full overflow-hidden rounded-full bg-cotton"
+                >
+                  <span
+                    className={[
+                      'block h-full rounded-full',
+                      active ? 'bg-madder' : live ? 'bg-turmeric' : 'bg-indigo/40',
+                    ].join(' ')}
+                    style={{ width: `${pct}%` }}
+                  />
+                </span>
+                <span className="mt-1 text-fine tabular-nums">x {cell.x}</span>
                 <span className="text-micro tabular-nums text-muted">y {cell.y}</span>
               </button>
             </li>

@@ -67,6 +67,21 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
 
   const t = dict.compare
   const best = Math.min(...results.map((r) => r.d))
+
+  /*
+   * A table of four numbers makes the reader do the comparing — this page's
+   * whole point is that the algorithms differ, so relative magnitude should
+   * be visible at a glance. Same treatment §7 gives the V strip: a bar
+   * alongside the number, never instead of it. Measured against the column's
+   * own max, unlike the V strip's fixed reference — there is no shared axis
+   * across rows here the way there is across diagonals, only a comparison
+   * within each column. DESIGN.md §8.
+   */
+  const okResults = results.filter((r) => r.error === null)
+  const maxD = Math.max(1, ...okResults.map((r) => r.d))
+  const maxHunks = Math.max(1, ...okResults.map((r) => r.hunks))
+  const maxVCells = Math.max(1, ...okResults.map((r) => r.vCells))
+  const barPct = (value: number, max: number) => Math.max(0, Math.min(100, Math.round((value / max) * 100)))
   /*
    * A "shortest" badge on all four rows says nothing. It is only information
    * when something is longer — which is exactly the case the page is about.
@@ -183,18 +198,27 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                         </span>
                       ) : null}
                     </th>
-                    <td
-                      className={`px-4 py-3 text-right font-mono tabular-nums ${
-                        shortest ? 'font-medium text-deepIndigo' : 'text-muted'
-                      }`}
-                    >
-                      {result.error === null ? result.d : '—'}
+                    <td className="px-4 py-3 text-right">
+                      <span
+                        className={`font-mono tabular-nums ${
+                          shortest ? 'font-medium text-deepIndigo' : 'text-muted'
+                        }`}
+                      >
+                        {result.error === null ? result.d : '—'}
+                      </span>
+                      {result.error === null ? <Bar pct={barPct(result.d, maxD)} /> : null}
                     </td>
-                    <td className="px-4 py-3 text-right font-mono tabular-nums text-muted">
-                      {result.error === null ? result.hunks : '—'}
+                    <td className="px-4 py-3 text-right">
+                      <span className="font-mono tabular-nums text-muted">
+                        {result.error === null ? result.hunks : '—'}
+                      </span>
+                      {result.error === null ? <Bar pct={barPct(result.hunks, maxHunks)} /> : null}
                     </td>
-                    <td className="px-4 py-3 text-right font-mono tabular-nums text-muted">
-                      {result.vCells === 0 ? '—' : result.vCells}
+                    <td className="px-4 py-3 text-right">
+                      <span className="font-mono tabular-nums text-muted">
+                        {result.vCells === 0 ? '—' : result.vCells}
+                      </span>
+                      {result.error === null ? <Bar pct={barPct(result.vCells, maxVCells)} /> : null}
                     </td>
                     <td className="px-4 py-3 text-right font-sans text-muted">
                       {isMinimal(result.algorithm) ? t.yes : t.no}
@@ -271,6 +295,21 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
         </div>
       </section>
     </main>
+  )
+}
+
+/**
+ * Restates the number beside it as a length, never instead of it — the
+ * number is exact and copyable, the bar is relative and immediate. §7, §8.
+ */
+function Bar({ pct }: { pct: number }) {
+  return (
+    <span
+      aria-hidden
+      className="ml-auto mt-1 block h-1 w-16 overflow-hidden rounded-full bg-cotton"
+    >
+      <span className="block h-full rounded-full bg-indigo/40" style={{ width: `${pct}%` }} />
+    </span>
   )
 }
 

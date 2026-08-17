@@ -576,6 +576,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 hint={t.vstripHint}
                 idle={t.idleVStrip}
                 groupLabel={t.vstripGroup}
+                maxX={n}
               />
             ) : (
               // Showing a V strip for an algorithm that has no V would be a lie
