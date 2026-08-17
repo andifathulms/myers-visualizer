@@ -118,6 +118,9 @@ export function RenderBench() {
         settledSnakes: [],
         region: null,
         highlightK: null,
+        ghostPaths: [],
+        ghostPathsCapped: false,
+        contestedEdges: null,
       })
 
       draws.push(performance.now() - started)

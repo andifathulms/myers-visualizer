@@ -21,7 +21,7 @@ import {
   type Point,
 } from '@/layout/lattice'
 import { matchAt, type FrontierPoint, type LatticeFrame, type MatchGrid, type Snake } from './frame'
-import type { Region } from '@/lib/diff/types'
+import type { Edge, Region } from '@/lib/diff/types'
 
 export type Layer = { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }
 
@@ -120,11 +120,15 @@ export class LatticeRenderer {
     ctx.drawImage(this.exploredLayer.canvas, 0, 0, this.cssWidth, this.cssHeight)
 
     if (frame.region !== null) drawRegion(ctx, g, frame.region)
+    // Beneath both path layers, per DESIGN.md §4.1: it is structure the
+    // answer sits inside, not the answer itself.
+    if (frame.contestedEdges !== null) drawContestedRegion(ctx, g, frame.contestedEdges)
     if (frame.highlightK !== null) drawDiagonalHighlight(ctx, g, frame.highlightK)
     drawFrontier(ctx, g, frame.frontier, frame.snakes, PALETTE.turmeric)
     if (frame.backwardFrontier !== null) {
       drawFrontier(ctx, g, frame.backwardFrontier, [], PALETTE.turmeric, true)
     }
+    drawGhostPaths(ctx, g, frame.ghostPaths)
     // madder last: it must sit above everything, because it is the answer.
     for (const settled of frame.settledSnakes) {
       drawSnakeThread(ctx, g, settled, PALETTE.madder, 1.6)
@@ -202,6 +206,61 @@ function drawRegion(ctx: CanvasRenderingContext2D, g: Geometry, region: Region):
     (region.right - region.left) * g.cell,
     (region.bottom - region.top) * g.cell,
   )
+  ctx.restore()
+}
+
+/**
+ * Cells some minimal paths traverse and others do not, DESIGN.md §4.1. One
+ * stroke call over every contested edge rather than per-edge strokes, the
+ * same batching `drawGrid` uses for the same reason: this can be a few
+ * thousand edges on a large ambiguous input.
+ */
+function drawContestedRegion(ctx: CanvasRenderingContext2D, g: Geometry, edges: readonly Edge[]): void {
+  if (edges.length === 0) return
+  ctx.save()
+  ctx.strokeStyle = PALETTE.madder
+  ctx.globalAlpha = 0.14
+  ctx.lineWidth = Math.max(3, g.cell * 0.8)
+  ctx.lineCap = 'round'
+  ctx.beginPath()
+  for (const e of edges) {
+    ctx.moveTo(px(g, e.x0), py(g, e.y0))
+    ctx.lineTo(px(g, e.x1), py(g, e.y1))
+  }
+  ctx.stroke()
+  ctx.restore()
+}
+
+/**
+ * Every other minimal path, ghosted. Indigo, not madder: madder is reserved
+ * for the chosen path and the middle snake, the two things that are the
+ * answer (CLAUDE.md invariant 13) — a ghost is a path that was *not*
+ * chosen. Drawn whole, not animated: an alternative was never searched
+ * for, only recovered by the same DP that counted it. DESIGN.md §4.1, §4.5.
+ */
+function drawGhostPaths(
+  ctx: CanvasRenderingContext2D,
+  g: Geometry,
+  paths: readonly (readonly Point[])[],
+): void {
+  if (paths.length === 0) return
+  ctx.save()
+  ctx.strokeStyle = PALETTE.indigo
+  ctx.globalAlpha = 0.3
+  ctx.lineWidth = Math.max(1, Math.min(2.5, g.cell * 0.22))
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  for (const path of paths) {
+    if (path.length === 0) continue
+    ctx.beginPath()
+    path.forEach((p, i) => {
+      const sx = px(g, p.x)
+      const sy = py(g, p.y)
+      if (i === 0) ctx.moveTo(sx, sy)
+      else ctx.lineTo(sx, sy)
+    })
+    ctx.stroke()
+  }
   ctx.restore()
 }
 

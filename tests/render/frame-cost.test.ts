@@ -93,6 +93,9 @@ describe('lattice frame cost', () => {
       settledSnakes: [],
       region: null,
       highlightK: null,
+      ghostPaths: [],
+      ghostPathsCapped: false,
+      contestedEdges: null,
     })
     const cost = target.ops - before
 
@@ -111,6 +114,9 @@ describe('lattice frame cost', () => {
       settledSnakes: [],
       region: null,
       highlightK: null,
+      ghostPaths: [],
+      ghostPathsCapped: false,
+      contestedEdges: null,
     })
     expect(target.drawImage).toBe(2)
   })

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LatticeCanvas } from '@/components/lattice/LatticeCanvas'
-import { buildMatchGrid, type LatticeFrame } from '@/components/lattice/frame'
+import { buildMatchGrid, GHOST_PATH_CAP, type LatticeFrame } from '@/components/lattice/frame'
 import { VStrip } from '@/components/vstrip/VStrip'
 import { Stepper } from '@/components/stepper/Stepper'
 import { Hunks } from '@/components/hunks/Hunks'
@@ -29,7 +29,13 @@ import {
 import { AmbiguityPanel } from '@/components/ambiguity/AmbiguityPanel'
 import { buildHunks } from '@/lib/hunks'
 import { pathOf } from '@/lib/diff/backtrack'
-import { analyseAmbiguity, minimalScripts, sharesOfScript } from '@/lib/diff/ambiguity'
+import {
+  analyseAmbiguity,
+  contestedEdges,
+  COUNT_CAP,
+  minimalScripts,
+  sharesOfScript,
+} from '@/lib/diff/ambiguity'
 import { tiedAt } from '@/lib/diff/trace'
 import { StepReadout } from '@/components/stepper/StepReadout'
 import { VIEWABLE_CAP } from '@/layout/lattice'
@@ -105,6 +111,34 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     [a.tokens, b.tokens, ambiguity.count],
   )
   useEffect(() => setAltIndex(0), [alternatives])
+
+  /**
+   * Every other minimal path, for the lattice overlay — independent of
+   * which one `AmbiguityPanel` currently shows solid. Above `GHOST_PATH_CAP`
+   * the polylines would be an unreadable mesh, so none are drawn and the
+   * contested region carries the fact instead. DESIGN.md §4.1, §4.4.
+   */
+  const ghostScripts = useMemo(
+    () =>
+      tooLarge || ambiguity.count <= 1 ? [] : minimalScripts(a.tokens, b.tokens, GHOST_PATH_CAP + 1),
+    [a.tokens, b.tokens, ambiguity.count, tooLarge],
+  )
+  const ghostPathsCapped = ghostScripts.length > GHOST_PATH_CAP
+  const ghostPaths = useMemo(
+    () => (ghostPathsCapped ? [] : ghostScripts.map(pathOf)),
+    [ghostScripts, ghostPathsCapped],
+  )
+
+  /**
+   * Cells some minimal paths take and others do not. A DP over the whole
+   * graph, so its cost does not depend on how many scripts actually exist —
+   * unlike `ghostScripts`, it stays exact and cheap even when the count is
+   * astronomical. Null when the true count is past COUNT_CAP. DESIGN.md §4.1.
+   */
+  const contestedRegion = useMemo(
+    () => (tooLarge || ambiguity.count <= 1 ? [] : contestedEdges(a.tokens, b.tokens)),
+    [a.tokens, b.tokens, ambiguity.count, tooLarge],
+  )
 
   /**
    * The script on screen. Index 0 is what Myers chose; picking another shows
@@ -187,22 +221,64 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     return pathOf(shownScript)
   }, [altIndex, shownScript])
 
+  const primaryPath = useMemo(
+    () => selectedPath ?? altPath ?? (timeline === null ? null : pathAt(timeline, frame)),
+    [selectedPath, altPath, timeline, frame],
+  )
+
+  // Ghosts and the contested tint are both facts about the answer, so they
+  // stay off the canvas until backtrack has actually produced one — the
+  // same rule that keeps madder off screen until then. §4.5
   const latticeFrame = useMemo<LatticeFrame>(
     () => ({
       frontier: vPoints,
       snakes:
         currentStep === null || currentStep.snake === null || frame === 0 ? [] : [currentStep.snake],
       backwardFrontier: frontiers.backward.length === 0 ? null : frontiers.backward,
-      path: selectedPath ?? altPath ?? (timeline === null ? null : pathAt(timeline, frame)),
+      path: primaryPath,
       // madder is reserved for the answer, and a middle snake is one: it is
       // the point both frontiers agreed on. §6.6
       middleSnake: timeline === null ? null : middleSnakeAt(timeline, frame),
       settledSnakes: timeline === null ? [] : settledSnakesAt(timeline, frame),
       region: timeline === null ? null : regionAt(timeline, frame),
       highlightK,
+      ghostPaths: primaryPath === null ? [] : ghostPaths,
+      ghostPathsCapped: primaryPath === null ? false : ghostPathsCapped,
+      contestedEdges: primaryPath === null ? null : contestedRegion,
     }),
-    [vPoints, frontiers.backward, currentStep, frame, timeline, highlightK, selectedPath, altPath],
+    [
+      vPoints,
+      frontiers.backward,
+      currentStep,
+      frame,
+      timeline,
+      highlightK,
+      primaryPath,
+      ghostPaths,
+      ghostPathsCapped,
+      contestedRegion,
+    ],
   )
+
+  const tag = locale === 'id' ? 'id-ID' : 'en-GB'
+  /**
+   * The canvas is opaque to a screen reader, so its label states the same
+   * fact the overlay draws: how many minimal paths exist and how many of
+   * them are actually shown. Silent before there is an answer to describe.
+   * DESIGN.md §4.5.
+   */
+  const graphLabel = useMemo(() => {
+    const base = dict.a11y.graphLabel
+    if (primaryPath === null) return base
+    if (ambiguity.count <= 1) return `${base} ${dict.a11y.graphLabelSingle}`
+    const countLabel = ambiguity.truncated
+      ? `≥ ${COUNT_CAP.toLocaleString(tag)}`
+      : ambiguity.count.toLocaleString(tag)
+    if (ghostPathsCapped) {
+      return `${base} ${format(dict.a11y.graphLabelCapped, { count: countLabel, cap: GHOST_PATH_CAP })}`
+    }
+    return `${base} ${format(dict.a11y.graphLabelMany, { count: countLabel, shown: ghostPaths.length })}`
+  }, [dict, primaryPath, ambiguity, ghostPathsCapped, ghostPaths.length, tag])
 
   // The canvas is told how far along it is and how to fetch each stamp, rather
   // than handed a freshly built prefix every frame.
@@ -309,7 +385,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                         frame={latticeFrame}
                         stampAt={stampAt}
                         stampCount={Math.min(frame, timeline?.searchFrames ?? 0)}
-                        label={dict.a11y.graphLabel}
+                        label={graphLabel}
                       />
                     </div>
                   </div>

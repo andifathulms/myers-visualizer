@@ -27,6 +27,14 @@ export type Region = {
   readonly bottom: number
 }
 
+/** A single step of the edit graph: (x0,y0) -> (x1,y1), one grid edge. */
+export type Edge = {
+  readonly x0: number
+  readonly y0: number
+  readonly x1: number
+  readonly y1: number
+}
+
 /**
  * Edit operations, discriminated on `type`. Every op carries its token so
  * that apply() is self-contained: it needs A and the script, nothing else.

@@ -220,6 +220,12 @@ export type Dict = {
   a11y: {
     skipToContent: string
     graphLabel: string
+    /** Appended to graphLabel when there is exactly one minimal path. */
+    graphLabelSingle: string
+    /** Appended to graphLabel when alternatives are ghosted on the canvas. Placeholders {count} {shown}. */
+    graphLabelMany: string
+    /** Appended to graphLabel when more minimal paths exist than the ghost cap draws. Placeholders {count} {cap}. */
+    graphLabelCapped: string
     /** Placeholders {d} {maxD} {k} {x} {y}. */
     stepAnnouncement: string
     copyLink: string
@@ -469,6 +475,11 @@ const id: Dict = {
     skipToContent: 'Lompat ke konten',
     graphLabel:
       'Edit graph — visualisasi kanvas. Angka yang sama tersedia di panel statistik dan array V di sebelahnya.',
+    graphLabelSingle: 'Hanya ada satu jalur minimal untuk masukan ini.',
+    graphLabelMany:
+      'Ada {count} jalur sama-sama minimal; {shown} di antaranya digambar sebagai alternatif bayangan.',
+    graphLabelCapped:
+      'Ada {count} jalur sama-sama minimal, lebih banyak dari {cap} yang digambar sebagai alternatif bayangan; kawasan yang diperdebatkan diarsir sebagai gantinya.',
     stepAnnouncement: 'd = {d} dari {maxD}, diagonal k = {k}, titik ({x}, {y})',
     copyLink: 'Salin tautan',
     copied: 'Tersalin',
@@ -716,6 +727,11 @@ const en: Dict = {
     skipToContent: 'Skip to content',
     graphLabel:
       'Edit graph — a canvas visualisation. The same numbers are available in the stats panel and the V array beside it.',
+    graphLabelSingle: 'A single minimal path exists for this input.',
+    graphLabelMany:
+      '{count} equally minimal paths exist; {shown} of them are drawn as ghosted alternatives.',
+    graphLabelCapped:
+      '{count} equally minimal paths exist, more than the {cap} drawn as ghosted alternatives; the contested region is shaded instead.',
     stepAnnouncement: 'd = {d} of {maxD}, diagonal k = {k}, point ({x}, {y})',
     copyLink: 'Copy link',
     copied: 'Copied',

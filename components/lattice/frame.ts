@@ -3,7 +3,7 @@
  * compute it. The engine's SearchTrace hydrates into exactly this shape.
  */
 import type { Point } from '@/layout/lattice'
-import type { Region } from '@/lib/diff/types'
+import type { Edge, Region } from '@/lib/diff/types'
 
 /** A maximal diagonal run of matches — the conceptual unit of the search. §6.1 */
 export type Snake = {
@@ -29,6 +29,14 @@ export type MatchGrid = {
   readonly m: number
   readonly flags: Uint8Array
 }
+
+/**
+ * Cap on ghosted alternative paths actually drawn on the lattice. Above it,
+ * the polylines would overlap into an unreadable mesh, so only the
+ * contested region is drawn and the total is stated in the canvas label —
+ * never truncated silently. DESIGN.md §4.4.
+ */
+export const GHOST_PATH_CAP = 10
 
 export function matchAt(grid: MatchGrid, x: number, y: number): boolean {
   if (x < 0 || y < 0 || x >= grid.n || y >= grid.m) return false
@@ -69,6 +77,24 @@ export type LatticeFrame = {
   readonly region: Region | null
   /** Diagonal k to emphasise, from a hovered V cell. §6.2 */
   readonly highlightK: number | null
+  /**
+   * Every other minimal path, ghosted in indigo beneath the chosen one.
+   * Where a ghost coincides with the chosen path or another ghost, they
+   * overdraw — a shared segment is a segment every minimal script agrees
+   * on, and it is correct for it to read as more solid. Empty whenever
+   * there is only one minimal script, or when there are more than
+   * `GHOST_PATH_CAP`. DESIGN.md §4.1, §4.4.
+   */
+  readonly ghostPaths: readonly (readonly Point[])[]
+  /** True when more minimal paths exist than `GHOST_PATH_CAP` allows drawing. */
+  readonly ghostPathsCapped: boolean
+  /**
+   * Edges some minimal paths take and others do not, as a madder tint
+   * beneath every other layer. Null before it has been computed, or when
+   * the true count is past `COUNT_CAP` and cannot be stated exactly.
+   * DESIGN.md §4.1.
+   */
+  readonly contestedEdges: readonly Edge[] | null
 }
 
 export const EMPTY_FRAME: LatticeFrame = {
@@ -80,4 +106,7 @@ export const EMPTY_FRAME: LatticeFrame = {
   settledSnakes: [],
   region: null,
   highlightK: null,
+  ghostPaths: [],
+  ghostPathsCapped: false,
+  contestedEdges: null,
 }

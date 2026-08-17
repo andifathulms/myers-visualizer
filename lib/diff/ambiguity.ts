@@ -9,7 +9,7 @@
  * This is a DP over the edit graph, not a search: it shares no code with
  * myers.ts, so the count cannot inherit a bug from the thing it describes.
  */
-import type { EditOp, EditScript, Token } from './types'
+import type { EditOp, EditScript, Edge, Token } from './types'
 
 /** Counting stops here; the true count can be astronomically large. */
 export const COUNT_CAP = 1_000_000
@@ -167,6 +167,66 @@ export function sharesOfScript(
     shares.push({ scripts, forced: scripts === total })
   }
   return shares
+}
+
+/**
+ * Every edge of the edit graph that lies on some minimal path but not on
+ * every minimal path — the region DESIGN.md §4.1 calls "the contested
+ * region". An edge u -> v is on a global minimal path exactly when
+ * prefix.best[u] + cost(u, v) + suffix.best[v] equals the global D; among
+ * those, it is contested when the minimal paths through it are a proper
+ * subset of all minimal paths (from > 0 and through < total).
+ *
+ * This is a DP over the whole graph, not an enumeration of scripts, so its
+ * cost is the same O(N·M) as `analyseAmbiguity` regardless of how many
+ * minimal scripts actually exist — unlike `minimalScripts`, it stays cheap
+ * even when the count is astronomical. Returns null under the same
+ * condition `sharesOfScript` does: a total past `COUNT_CAP` cannot be
+ * stated exactly, so nothing here is stated.
+ */
+export function contestedEdges(a: readonly Token[], b: readonly Token[]): readonly Edge[] | null {
+  const n = a.length
+  const m = b.length
+  const suffix = tables(a, b)
+  const total = suffix.counts[0]
+  if (total > COUNT_CAP) return null
+
+  const prefix = prefixTables(a, b)
+  const width = suffix.width
+  const d = suffix.best[0]
+  const edges: Edge[] = []
+
+  for (let y = 0; y <= m; y++) {
+    for (let x = 0; x <= n; x++) {
+      const here = y * width + x
+      const from = prefix.counts[here]
+      if (from === 0) continue
+      const reached = prefix.best[here]
+
+      if (x < n && y < m && a[x] === b[y]) {
+        const v = (y + 1) * width + (x + 1)
+        if (reached + suffix.best[v] === d) {
+          const through = from * suffix.counts[v]
+          if (through < total) edges.push({ x0: x, y0: y, x1: x + 1, y1: y + 1 })
+        }
+      }
+      if (x < n) {
+        const v = y * width + (x + 1)
+        if (reached + 1 + suffix.best[v] === d) {
+          const through = from * suffix.counts[v]
+          if (through < total) edges.push({ x0: x, y0: y, x1: x + 1, y1: y })
+        }
+      }
+      if (y < m) {
+        const v = (y + 1) * width + x
+        if (reached + 1 + suffix.best[v] === d) {
+          const through = from * suffix.counts[v]
+          if (through < total) edges.push({ x0: x, y0: y, x1: x, y1: y + 1 })
+        }
+      }
+    }
+  }
+  return edges
 }
 
 export function analyseAmbiguity(a: readonly Token[], b: readonly Token[]): Ambiguity {
