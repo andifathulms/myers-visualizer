@@ -135,6 +135,9 @@ export class LatticeRenderer {
     }
     if (frame.middleSnake !== null) drawSnakeThread(ctx, g, frame.middleSnake, PALETTE.madder, 3.2)
     if (frame.path !== null) drawPath(ctx, g, frame.path)
+    // Topmost: a hover highlight has to read over the answer it may sit on
+    // top of, since a contested line's own edge is often part of it.
+    if (frame.hoverEdge !== null) drawHoverEdge(ctx, g, frame.hoverEdge)
   }
 }
 
@@ -261,6 +264,25 @@ function drawGhostPaths(
     })
     ctx.stroke()
   }
+  ctx.restore()
+}
+
+/**
+ * The one edge a hovered or focused contested line corresponds to (or vice
+ * versa, from hovering the lattice). Indigo, like the diagonal highlight
+ * it borrows its weight from — a spotlight on structure, not a second
+ * answer. DESIGN.md §4.2.
+ */
+function drawHoverEdge(ctx: CanvasRenderingContext2D, g: Geometry, edge: Edge): void {
+  ctx.save()
+  ctx.strokeStyle = PALETTE.indigo
+  ctx.globalAlpha = 0.55
+  ctx.lineWidth = Math.max(3, g.cell * 0.55)
+  ctx.lineCap = 'round'
+  ctx.beginPath()
+  ctx.moveTo(px(g, edge.x0), py(g, edge.y0))
+  ctx.lineTo(px(g, edge.x1), py(g, edge.y1))
+  ctx.stroke()
   ctx.restore()
 }
 

@@ -95,6 +95,14 @@ export type LatticeFrame = {
    * DESIGN.md §4.1.
    */
   readonly contestedEdges: readonly Edge[] | null
+  /**
+   * The single contested edge under the pointer or focus, from hovering or
+   * focusing its line in `Hunks` — or, symmetrically, from hovering the
+   * lattice itself over a vertex that touches a contested edge. The line
+   * badge and this edge are the same fact stated twice, and this is the
+   * link between them. DESIGN.md §4.2.
+   */
+  readonly hoverEdge: Edge | null
 }
 
 export const EMPTY_FRAME: LatticeFrame = {
@@ -109,4 +117,5 @@ export const EMPTY_FRAME: LatticeFrame = {
   ghostPaths: [],
   ghostPathsCapped: false,
   contestedEdges: null,
+  hoverEdge: null,
 }

@@ -96,6 +96,7 @@ describe('lattice frame cost', () => {
       ghostPaths: [],
       ghostPathsCapped: false,
       contestedEdges: null,
+      hoverEdge: null,
     })
     const cost = target.ops - before
 
@@ -117,6 +118,7 @@ describe('lattice frame cost', () => {
       ghostPaths: [],
       ghostPathsCapped: false,
       contestedEdges: null,
+      hoverEdge: null,
     })
     expect(target.drawImage).toBe(2)
   })

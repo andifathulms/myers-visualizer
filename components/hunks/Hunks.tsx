@@ -18,6 +18,12 @@ type Props = {
   hunks: readonly Hunk[]
   selectedOp: number | null
   onSelectOp: (opIndex: number | null) => void
+  /**
+   * The contested op currently hovered or focused, from either this list or
+   * the lattice — the same fact stated twice, linked. DESIGN.md §4.2.
+   */
+  hoveredOp?: number | null
+  onHoverOp?: (opIndex: number | null) => void
   emptyLabel: string
   /**
    * Per-operation contestedness, parallel to the script. Null when the count
@@ -63,6 +69,8 @@ export function Hunks({
   hunks,
   selectedOp,
   onSelectOp,
+  hoveredOp = null,
+  onHoverOp,
   emptyLabel,
   shares = null,
   totalScripts = 1,
@@ -105,6 +113,8 @@ export function Hunks({
                 line={line}
                 selected={selectedOp === line.opIndex}
                 onSelect={onSelectOp}
+                hovered={hoveredOp === line.opIndex}
+                onHover={onHoverOp}
                 share={shares === null ? null : (shares[line.opIndex] ?? null)}
                 totalScripts={totalScripts}
                 shareLabel={shareLabel}
@@ -122,6 +132,8 @@ function Line({
   line,
   selected,
   onSelect,
+  hovered,
+  onHover,
   share,
   totalScripts,
   shareLabel,
@@ -130,6 +142,8 @@ function Line({
   line: HunkLine
   selected: boolean
   onSelect: (opIndex: number | null) => void
+  hovered: boolean
+  onHover?: (opIndex: number | null) => void
   share: OpShare | null
   totalScripts: number
   shareLabel: string
@@ -162,9 +176,16 @@ function Line({
         type="button"
         aria-label={name}
         onClick={() => onSelect(selected ? null : line.opIndex)}
+        onMouseEnter={() => onHover?.(line.opIndex)}
+        onMouseLeave={() => onHover?.(null)}
+        onFocus={() => onHover?.(line.opIndex)}
+        onBlur={() => onHover?.(null)}
         className={[
           'flex w-full gap-2 whitespace-pre px-3 text-left font-mono text-fine leading-6',
           selected ? 'bg-turmeric/30 text-deepIndigo' : `${tone} hover:brightness-[0.97]`,
+          // The lattice-linking counterpart to the badge: a ring, not a fill,
+          // so it never competes with `selected`'s turmeric wash. §4.2
+          !selected && hovered ? 'ring-1 ring-inset ring-indigo/50' : '',
         ].join(' ')}
       >
         <span

@@ -29,6 +29,8 @@ import {
 import { AmbiguityPanel } from '@/components/ambiguity/AmbiguityPanel'
 import { buildHunks } from '@/lib/hunks'
 import { pathOf } from '@/lib/diff/backtrack'
+import { edgeOfOp, pathEdgeMap, pointKey } from '@/lib/player/hoverLink'
+import type { Point } from '@/layout/lattice'
 import {
   analyseAmbiguity,
   contestedEdges,
@@ -56,6 +58,13 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const [selectedOp, setSelectedOp] = useState<number | null>(null)
   /** 0 is the script Myers actually chose; the rest are equally minimal. §6.4 */
   const [altIndex, setAltIndex] = useState(0)
+  /**
+   * The contested op currently under the pointer or focus, from either
+   * direction: a hovered/focused `Hunks` line, or a hovered lattice vertex
+   * that touches it. One shared piece of state is what makes the link
+   * symmetric without the two sides re-triggering each other. DESIGN.md §4.2.
+   */
+  const [hoveredOp, setHoveredOp] = useState<number | null>(null)
 
   const timeline = useMemo(() => {
     if (state.status !== 'done') return null
@@ -165,6 +174,52 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     [shares],
   )
 
+  /**
+   * The shown script's own path, independent of animation frame — Hunks
+   * already renders the full script as soon as it exists, so the hover
+   * link has to reach every line, not just the ones the frontier has
+   * passed. §4.2
+   */
+  const shownPath = useMemo(
+    () => (shownScript === null ? null : pathOf(shownScript)),
+    [shownScript],
+  )
+  const shownEdgeMap = useMemo(
+    () => (shownPath === null ? null : pathEdgeMap(shownPath)),
+    [shownPath],
+  )
+
+  /** A contested line, hovered or focused — the reverse direction sets this too. */
+  const handleLineHover = useCallback(
+    (opIndex: number | null) => {
+      if (opIndex === null || shares === null || shares[opIndex]?.forced !== false) {
+        setHoveredOp(null)
+        return
+      }
+      setHoveredOp(opIndex)
+    },
+    [shares],
+  )
+
+  /** A lattice vertex touching a contested edge, hovered — the reverse of the above. */
+  const handleHoverPoint = useCallback(
+    (point: Point | null) => {
+      if (point === null || shownEdgeMap === null || shares === null) {
+        setHoveredOp(null)
+        return
+      }
+      const candidates = shownEdgeMap.get(pointKey(point)) ?? []
+      const contested = candidates.find((op) => shares[op]?.forced === false) ?? null
+      setHoveredOp(contested)
+    },
+    [shownEdgeMap, shares],
+  )
+
+  const hoverEdge = useMemo(
+    () => (hoveredOp === null || shownPath === null ? null : edgeOfOp(shownPath, hoveredOp)),
+    [hoveredOp, shownPath],
+  )
+
   const matches = useMemo(
     () => (tooLarge ? null : buildMatchGrid(a.tokens, b.tokens)),
     [a.tokens, b.tokens, tooLarge],
@@ -245,6 +300,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       ghostPaths: primaryPath === null ? [] : ghostPaths,
       ghostPathsCapped: primaryPath === null ? false : ghostPathsCapped,
       contestedEdges: primaryPath === null ? null : contestedRegion,
+      hoverEdge,
     }),
     [
       vPoints,
@@ -257,6 +313,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       ghostPaths,
       ghostPathsCapped,
       contestedRegion,
+      hoverEdge,
     ],
   )
 
@@ -386,6 +443,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                         stampAt={stampAt}
                         stampCount={Math.min(frame, timeline?.searchFrames ?? 0)}
                         label={graphLabel}
+                        onHoverPoint={handleHoverPoint}
                       />
                     </div>
                   </div>
@@ -532,6 +590,8 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
             hunks={hunks}
             selectedOp={selectedOp}
             onSelectOp={setSelectedOp}
+            hoveredOp={hoveredOp}
+            onHoverOp={handleLineHover}
             emptyLabel={locale === 'id' ? 'Tidak ada perbedaan.' : 'No differences.'}
             shares={shares}
             totalScripts={ambiguity.count}

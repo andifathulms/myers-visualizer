@@ -121,6 +121,7 @@ export function RenderBench() {
         ghostPaths: [],
         ghostPathsCapped: false,
         contestedEdges: null,
+        hoverEdge: null,
       })
 
       draws.push(performance.now() - started)
