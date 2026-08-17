@@ -65,6 +65,8 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
    * symmetric without the two sides re-triggering each other. DESIGN.md §4.2.
    */
   const [hoveredOp, setHoveredOp] = useState<number | null>(null)
+  /** Default is show — the claim is the product, not opt-in. DESIGN.md §4.3. */
+  const [showAlternatives, setShowAlternatives] = useState(true)
 
   const timeline = useMemo(() => {
     if (state.status !== 'done') return null
@@ -297,9 +299,9 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       settledSnakes: timeline === null ? [] : settledSnakesAt(timeline, frame),
       region: timeline === null ? null : regionAt(timeline, frame),
       highlightK,
-      ghostPaths: primaryPath === null ? [] : ghostPaths,
-      ghostPathsCapped: primaryPath === null ? false : ghostPathsCapped,
-      contestedEdges: primaryPath === null ? null : contestedRegion,
+      ghostPaths: primaryPath === null || !showAlternatives ? [] : ghostPaths,
+      ghostPathsCapped: primaryPath === null || !showAlternatives ? false : ghostPathsCapped,
+      contestedEdges: primaryPath === null || !showAlternatives ? null : contestedRegion,
       hoverEdge,
     }),
     [
@@ -310,6 +312,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       timeline,
       highlightK,
       primaryPath,
+      showAlternatives,
       ghostPaths,
       ghostPathsCapped,
       contestedRegion,
@@ -331,11 +334,14 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     const countLabel = ambiguity.truncated
       ? `≥ ${COUNT_CAP.toLocaleString(tag)}`
       : ambiguity.count.toLocaleString(tag)
+    if (!showAlternatives) {
+      return `${base} ${format(dict.a11y.graphLabelHidden, { count: countLabel })}`
+    }
     if (ghostPathsCapped) {
       return `${base} ${format(dict.a11y.graphLabelCapped, { count: countLabel, cap: GHOST_PATH_CAP })}`
     }
     return `${base} ${format(dict.a11y.graphLabelMany, { count: countLabel, shown: ghostPaths.length })}`
-  }, [dict, primaryPath, ambiguity, ghostPathsCapped, ghostPaths.length, tag])
+  }, [dict, primaryPath, ambiguity, showAlternatives, ghostPathsCapped, ghostPaths.length, tag])
 
   // The canvas is told how far along it is and how to fetch each stamp, rather
   // than handed a freshly built prefix every frame.
@@ -563,6 +569,10 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 setSelectedOp(null)
                 seek(timeline?.totalFrames ?? 0)
               }}
+              showAlternatives={showAlternatives}
+              onToggleShow={setShowAlternatives}
+              ghostPathsCapped={ghostPathsCapped}
+              ghostCap={GHOST_PATH_CAP}
             />
           </aside>
 

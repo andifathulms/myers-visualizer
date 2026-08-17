@@ -138,6 +138,10 @@ export type Dict = {
     ambiguityMany: string
     altScript: string
     altScriptHint: string
+    /** Label of the show/hide toggle for the lattice overlay. Default is on — the claim is the product. */
+    ambiguityShowToggle: string
+    /** Shown under the toggle when GHOST_PATH_CAP is hit. Placeholders {count} {cap}. */
+    ambiguityCapped: string
     /** Per-line contestedness in the diff output. §6.4 */
     contested: string
     /** Placeholders {used} {total}. */
@@ -226,6 +230,8 @@ export type Dict = {
     graphLabelMany: string
     /** Appended to graphLabel when more minimal paths exist than the ghost cap draws. Placeholders {count} {cap}. */
     graphLabelCapped: string
+    /** Appended to graphLabel when the alternatives toggle is off. Placeholder {count}. */
+    graphLabelHidden: string
     /** Placeholders {d} {maxD} {k} {x} {y}. */
     stepAnnouncement: string
     copyLink: string
@@ -403,6 +409,9 @@ const id: Dict = {
     ambiguityMany: 'Beberapa script sama-sama minimal. Algoritma memilih satu lewat tie-breaking.',
     altScript: 'Script alternatif',
     altScriptHint: 'Sama-sama sependek yang dipilih algoritma. Coba beralih dan lihat diff di bawah berubah.',
+    ambiguityShowToggle: 'Tampilkan alternatif di kisi',
+    ambiguityCapped:
+      'Terlalu banyak untuk digambar satu per satu — ada {count}, lebih dari {cap} yang bisa ditampilkan sebagai garis. Kawasan yang diarsir di kisi tetap menandai perbedaannya.',
     contested: 'Angka di kanan sebuah baris berarti baris itu diperdebatkan: sekian dari sekian script terpendek mengaitkan perubahan seperti ini. Baris tanpa angka ada di semua script terpendek — bagian diff itu bukan pilihan.',
     contestedShare: '{used} dari {total}',
     lineLabel: 'Baris {line}, {kind}: {text}{share}',
@@ -480,6 +489,7 @@ const id: Dict = {
       'Ada {count} jalur sama-sama minimal; {shown} di antaranya digambar sebagai alternatif bayangan.',
     graphLabelCapped:
       'Ada {count} jalur sama-sama minimal, lebih banyak dari {cap} yang digambar sebagai alternatif bayangan; kawasan yang diperdebatkan diarsir sebagai gantinya.',
+    graphLabelHidden: 'Ada {count} jalur sama-sama minimal; alternatifnya sedang disembunyikan.',
     stepAnnouncement: 'd = {d} dari {maxD}, diagonal k = {k}, titik ({x}, {y})',
     copyLink: 'Salin tautan',
     copied: 'Tersalin',
@@ -655,6 +665,9 @@ const en: Dict = {
     ambiguityMany: 'Several scripts are equally minimal. The algorithm picks one by tie-breaking.',
     altScript: 'Alternative script',
     altScriptHint: 'Every bit as short as the one the algorithm chose. Switch between them and watch the diff below change.',
+    ambiguityShowToggle: 'Show alternatives on the graph',
+    ambiguityCapped:
+      'Too many to draw individually — {count} exist, more than the {cap} the graph can show as lines. The shaded region on the graph still marks where they differ.',
     contested: 'A number beside a line means that line is contested: that many of the shortest scripts attribute the change this way. Lines without one appear in every shortest script — that part of the diff is not a choice.',
     contestedShare: '{used} of {total}',
     lineLabel: 'Line {line}, {kind}: {text}{share}',
@@ -732,6 +745,7 @@ const en: Dict = {
       '{count} equally minimal paths exist; {shown} of them are drawn as ghosted alternatives.',
     graphLabelCapped:
       '{count} equally minimal paths exist, more than the {cap} drawn as ghosted alternatives; the contested region is shaded instead.',
+    graphLabelHidden: '{count} equally minimal paths exist; the alternatives are currently hidden.',
     stepAnnouncement: 'd = {d} of {maxD}, diagonal k = {k}, point ({x}, {y})',
     copyLink: 'Copy link',
     copied: 'Copied',
