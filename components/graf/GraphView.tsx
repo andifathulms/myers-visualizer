@@ -404,15 +404,21 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
         <StepHeading step={2} title={t.stepWatch} hint={t.stepWatchHint} />
 
         {/*
-          Two columns from lg; on a phone the same content is one column and
-          the order matters. The legend is a full card of four rows, and left
-          in source order it sat between the player and the first number — so
-          reading D on a 390px screen meant scrolling past the whole player
-          and the legend, and then scrolling again to reach the result. The
-          aside moves up and the legend goes last, where a reference belongs.
+          Two columns from xl only; below that — including tablet widths,
+          where a 21rem sidebar beside a squeezed lattice was worse than
+          either full-width alone — the sidebar moves beneath the lattice
+          instead of beside it. DESIGN.md §5: the core object is the
+          largest element, and it was getting under half the page on
+          desktop while a fixed sidebar took a quarter. On a phone the
+          same content is one column and the order matters: the legend is
+          a full card of four rows, and left in source order it sat
+          between the player and the first number — so reading D on a
+          390px screen meant scrolling past the whole player and the
+          legend, and then scrolling again to reach the result. The aside
+          moves up and the legend goes last, where a reference belongs.
         */}
-        <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:items-start">
-          <div className="flex flex-col gap-4 lg:col-start-1 lg:row-start-1">
+        <div className="flex flex-col gap-5 xl:grid xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
+          <div className="flex flex-col gap-4 xl:col-start-1 xl:row-start-1">
             {tooLarge ? (
               // An unreadable graph is not a visualisation. Say so, and show the
               // result instead. §6.1
@@ -428,11 +434,31 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                   picture read wrong.
                 */}
                 {/*
-                  Capped, and centred rather than stretched. The lattice is
-                  square, so a full-width column turns a five-line input into
-                  an 800px void that pushes the controls below the fold.
+                  Capped, and centred rather than stretched: the lattice is
+                  square, so an uncapped full-width column would turn a
+                  five-line input into a void sized by the input, not by
+                  the picture. The cap itself is raised well past its old
+                  38rem (608px) — DESIGN.md §5 measurements, the rendered
+                  canvas element's own box, read with getBoundingClientRect
+                  against the production build (`pnpm preview`):
+
+                    1280px viewport -> 872 x 872 px
+                    1440px viewport -> 872 x 872 px  (page caps at max-w-7xl)
+                    1920px viewport -> 872 x 872 px  (page caps at max-w-7xl)
+                     430px viewport -> 330 x 330 px
+                     390px viewport -> 300 x 300 px
+                     375px viewport -> 299 x 299 px
+
+                  Desktop is unchanged from 1280px up because the page's
+                  own max-w-7xl already saturates there — raising this cap
+                  further would do nothing until that outer width moves
+                  too. Below xl the sidebar moves beneath the lattice
+                  (below), so these three numbers are the same layout, not
+                  three points on a curve. Mobile numbers are close to the
+                  pre-change ones by construction: this cap never bound
+                  them, the viewport did.
                 */}
-                <div className="mx-auto w-full max-w-[38rem] px-4 pb-4">
+                <div className="mx-auto w-full max-w-[60rem] px-4 pb-4">
                   <p className="pb-1 font-mono text-micro text-muted">{t.axisA}</p>
                   <div className="flex gap-2">
                     <div className="flex items-center" aria-hidden>
@@ -512,7 +538,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
             ) : null}
           </div>
 
-          <aside className="flex flex-col gap-5 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <aside className="flex flex-col gap-5 xl:col-start-2 xl:row-span-2 xl:row-start-1">
             <StatBar
               dict={dict}
               d={state.status === 'done' ? state.stats.d : 0}
