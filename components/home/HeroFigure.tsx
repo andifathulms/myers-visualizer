@@ -98,7 +98,7 @@ export function HeroFigure({ dict }: { dict: Dict }) {
   const ticks = Array.from({ length: N + 1 }, (_, i) => i)
 
   return (
-    <figure className="card p-4 sm:p-5">
+    <figure className="card lift p-4 sm:p-6">
       <svg
         viewBox="0 0 260 250"
         role="img"
@@ -223,6 +223,25 @@ export function HeroFigure({ dict }: { dict: Dict }) {
 
           <circle cx={px(0)} cy={py(0)} r={4.5} className="fill-madder" />
           <circle cx={px(N)} cy={py(N)} r={4.5} className="fill-madder" />
+
+          {/*
+            The one moving thing on the page: a frontier dot walking the
+            chosen route, corner to corner, then resting before it goes
+            again. SMIL rather than script, so it is in the first paint and
+            costs nothing; hidden outright under reduced motion rather than
+            frozen part-way along the route. The picture is complete without
+            it — it only says "this is a search, and it moves".
+          */}
+          <circle r={4} className="fill-turmeric stroke-surface motion-reduce:hidden" strokeWidth={1.5}>
+            <animateMotion
+              dur="5s"
+              repeatCount="indefinite"
+              calcMode="linear"
+              keyPoints="0;0;1;1"
+              keyTimes="0;0.12;0.78;1"
+              path={`M ${PATH.map(([x, y]) => `${px(x)} ${py(y)}`).join(' L ')}`}
+            />
+          </circle>
 
           {/* The two paid steps, named as the diff lines they become. */}
           <text

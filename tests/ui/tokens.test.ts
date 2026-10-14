@@ -94,6 +94,17 @@ describe('design tokens', () => {
   })
 
   /*
+   * The home page's one inverted band sets `surface` and `explored` text on an
+   * `ink` ground. A pairing the palette was never measured for until it was
+   * used, so it is measured here.
+   */
+  it('keeps the inverted band legible', () => {
+    for (const tone of ['surface', 'explored'] as const) {
+      expect(contrast(PALETTE[tone], PALETTE.ink), `${tone} on ink`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  /*
    * The scale is only a scale if nothing opts out of it. Tailwind's own sizes
    * are replaced rather than extended, so `text-xl` silently produces nothing
    * — which is a rendering bug that no other test would catch.

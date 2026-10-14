@@ -12,6 +12,21 @@ import type { Locale } from './locales'
  * follow what the picture is doing. The technical detail is not diluted, it
  * is preceded.
  */
+export type GlossaryIcon =
+  | 'diff'
+  | 'script'
+  | 'graph'
+  | 'd'
+  | 'snake'
+  | 'frontier'
+  | 'k'
+  | 'v'
+  | 'backtrack'
+  | 'tie'
+  | 'hunk'
+  | 'tokenize'
+  | 'cost'
+
 export type Dict = {
   /**
    * The four destinations, named by what a visitor does there rather than by
@@ -25,6 +40,15 @@ export type Dict = {
     lede: string
     ctaGraph: string
     ctaCompare: string
+    /** Three plain facts under the hero buttons: a figure and what it is. */
+    facts: readonly { readonly figure: string; readonly label: string }[]
+    /** The chapter rail: its name, and one short label per chapter in page order. */
+    chaptersLabel: string
+    chapterNames: readonly string[]
+    /** The wrong-line band: its kicker and the two scripts' captions. */
+    bandKicker: string
+    twinChosen: string
+    twinAlt: string
     /** The hero's still edit graph — the picture the page opens with. */
     figure: {
       alt: string
@@ -77,7 +101,8 @@ export type Dict = {
     creditsLede: string
     notGit: string
   }
-  glossary: readonly { readonly term: string; readonly plain: string }[]
+  /** `icon` names the small lattice-vocabulary drawing beside the term. */
+  glossary: readonly { readonly term: string; readonly plain: string; readonly icon: GlossaryIcon }[]
   input: {
     title: string
     hint: string
@@ -296,6 +321,24 @@ const id: Dict = {
     lede: 'Setiap kali Anda menyimpan berkas, Git membandingkan versi lama dan versi baru, lalu menampilkan baris mana yang ditambah dan mana yang dihapus. Di balik itu ada satu algoritma dari 1986. Situs ini menjalankannya pelan-pelan supaya bisa ditonton.',
     ctaGraph: 'Tonton algoritmanya bekerja',
     ctaCompare: 'Bandingkan algoritma',
+    facts: [
+      { figure: '1986', label: 'Myers, Algorithmica' },
+      { figure: 'O(ND)', label: 'waktu, D = besar perubahan' },
+      { figure: '4', label: 'algoritma untuk dibandingkan' },
+    ],
+    chaptersLabel: 'Di halaman ini',
+    chapterNames: [
+      'Apa itu diff?',
+      'Tiga langkah',
+      'Baris yang salah',
+      'Notasi',
+      'Satu pencarian, dengan angka',
+      'Glosarium',
+      'Bacaan',
+    ],
+    bandKicker: 'Inti situs ini',
+    twinChosen: 'Yang dipilih implementasi ini',
+    twinAlt: 'Sama pendeknya',
     figure: {
       alt: 'Edit graph untuk dua daftar belanja. Ada dua rute yang sama-sama terpendek untuk perubahan yang sama: rute penuh menghapus lalu menyisipkan, rute pudar menyisipkan lalu menghapus. Keduanya berbagi empat langkah diagonal gratis; hanya urutan satu penghapusan dan satu penyisipan yang berbeda.',
       axisA: 'teks lama',
@@ -366,19 +409,19 @@ const id: Dict = {
     notGit: 'Ini bukan git. Implementasi Myers di git memakai heuristik dan fallback tambahan yang tidak direproduksi di sini; tidak ada klaim keluaran identik byte-per-byte dengan git diff.',
   },
   glossary: [
-    { term: 'diff', plain: 'Daftar perubahan antara dua teks — baris apa yang dihapus, apa yang ditambah.' },
-    { term: 'edit script', plain: 'Urutan langkah yang mengubah A menjadi B. Itulah "jawaban" yang dicari.' },
-    { term: 'edit graph', plain: 'Kisi yang menjadi papan pencariannya. Satu sumbu untuk teks lama, satu untuk teks baru.' },
-    { term: 'D', plain: 'Berapa banyak langkah berbayar dalam jawaban — jumlah baris yang dihapus ditambah yang disisipkan. Makin kecil makin ringkas.' },
-    { term: 'snake', plain: 'Deretan baris yang sama persis di kedua sisi, dilalui gratis. Di gambar tampak sebagai garis miring.' },
-    { term: 'frontier', plain: 'Sejauh mana pencarian sudah sampai. Ia memuai selangkah demi selangkah — itu bagian yang bergerak.' },
-    { term: 'diagonal k', plain: 'Nomor jalur miring pada kisi, k = x − y. Cara algoritma menyebut "sedang di garis miring yang mana".' },
-    { term: 'array V', plain: 'Catatan kecil berisi titik terjauh yang dicapai pada setiap diagonal. Ini satu-satunya data yang benar-benar disimpan algoritma.' },
-    { term: 'backtrack', plain: 'Fase kedua. Setelah pencarian sampai di pojok, jalurnya dibaca mundur dari V yang direkam — itulah yang mengubah "jaraknya sekian" menjadi daftar baris yang sebenarnya.' },
-    { term: 'tie-breaking', plain: 'Apa yang terjadi ketika dua langkah sama-sama bagus. Aturannya sewenang-wenang tetapi tetap — dan aturan itulah yang menentukan diff mana dari beberapa yang sama pendeknya yang Anda lihat.' },
-    { term: 'hunk', plain: 'Satu blok perubahan yang berdekatan dalam sebuah diff, beserta beberapa baris konteks di sekitarnya. Diff yang sama bisa muncul sebagai satu hunk atau beberapa; lebih sedikit biasanya lebih enak dibaca.' },
-    { term: 'tokenize', plain: 'Mengubah teks menjadi daftar angka sebelum dibandingkan — satu angka per baris, kata, atau karakter. Yang dihitung sebagai "elemen" adalah pilihan Anda, dan pilihan itu mengubah jawabannya.' },
-    { term: 'O(...)', plain: 'Cara ringkas menyebut pertumbuhan biaya seiring membesarnya masukan, mengabaikan konstanta. O(N·M) berarti "sebanding dengan hasil kali kedua panjang"; O((N+M)·D) berarti "sebanding dengan jumlahnya dikali besar perubahan" — jauh lebih kecil bila perubahannya kecil.' },
+    { term: 'diff', icon: 'diff', plain: 'Daftar perubahan antara dua teks — baris apa yang dihapus, apa yang ditambah.' },
+    { term: 'edit script', icon: 'script', plain: 'Urutan langkah yang mengubah A menjadi B. Itulah "jawaban" yang dicari.' },
+    { term: 'edit graph', icon: 'graph', plain: 'Kisi yang menjadi papan pencariannya. Satu sumbu untuk teks lama, satu untuk teks baru.' },
+    { term: 'D', icon: 'd', plain: 'Berapa banyak langkah berbayar dalam jawaban — jumlah baris yang dihapus ditambah yang disisipkan. Makin kecil makin ringkas.' },
+    { term: 'snake', icon: 'snake', plain: 'Deretan baris yang sama persis di kedua sisi, dilalui gratis. Di gambar tampak sebagai garis miring.' },
+    { term: 'frontier', icon: 'frontier', plain: 'Sejauh mana pencarian sudah sampai. Ia memuai selangkah demi selangkah — itu bagian yang bergerak.' },
+    { term: 'diagonal k', icon: 'k', plain: 'Nomor jalur miring pada kisi, k = x − y. Cara algoritma menyebut "sedang di garis miring yang mana".' },
+    { term: 'array V', icon: 'v', plain: 'Catatan kecil berisi titik terjauh yang dicapai pada setiap diagonal. Ini satu-satunya data yang benar-benar disimpan algoritma.' },
+    { term: 'backtrack', icon: 'backtrack', plain: 'Fase kedua. Setelah pencarian sampai di pojok, jalurnya dibaca mundur dari V yang direkam — itulah yang mengubah "jaraknya sekian" menjadi daftar baris yang sebenarnya.' },
+    { term: 'tie-breaking', icon: 'tie', plain: 'Apa yang terjadi ketika dua langkah sama-sama bagus. Aturannya sewenang-wenang tetapi tetap — dan aturan itulah yang menentukan diff mana dari beberapa yang sama pendeknya yang Anda lihat.' },
+    { term: 'hunk', icon: 'hunk', plain: 'Satu blok perubahan yang berdekatan dalam sebuah diff, beserta beberapa baris konteks di sekitarnya. Diff yang sama bisa muncul sebagai satu hunk atau beberapa; lebih sedikit biasanya lebih enak dibaca.' },
+    { term: 'tokenize', icon: 'tokenize', plain: 'Mengubah teks menjadi daftar angka sebelum dibandingkan — satu angka per baris, kata, atau karakter. Yang dihitung sebagai "elemen" adalah pilihan Anda, dan pilihan itu mengubah jawabannya.' },
+    { term: 'O(...)', icon: 'cost', plain: 'Cara ringkas menyebut pertumbuhan biaya seiring membesarnya masukan, mengabaikan konstanta. O(N·M) berarti "sebanding dengan hasil kali kedua panjang"; O((N+M)·D) berarti "sebanding dengan jumlahnya dikali besar perubahan" — jauh lebih kecil bila perubahannya kecil.' },
   ],
   input: {
     title: 'Masukan',
@@ -566,6 +609,24 @@ const en: Dict = {
     lede: 'Every time you save a file, Git compares the old version with the new one and shows you which lines were added and which were removed. Behind that is a single algorithm from 1986. This site runs it slowly enough to watch.',
     ctaGraph: 'Watch the algorithm run',
     ctaCompare: 'Compare algorithms',
+    facts: [
+      { figure: '1986', label: 'Myers, Algorithmica' },
+      { figure: 'O(ND)', label: 'time, D = size of the change' },
+      { figure: '4', label: 'algorithms to compare' },
+    ],
+    chaptersLabel: 'On this page',
+    chapterNames: [
+      'What is a diff?',
+      'Three steps',
+      'The wrong line',
+      'The notation',
+      'One search, in numbers',
+      'Glossary',
+      'Reading',
+    ],
+    bandKicker: 'The point of this site',
+    twinChosen: 'What this implementation picks',
+    twinAlt: 'Equally short',
     figure: {
       alt: 'An edit graph for two shopping lists. Two equally short routes exist for the same change: the solid route deletes then inserts, the fainter one inserts then deletes. Both share four free diagonal steps; only the order of the one deletion and one insertion differs.',
       axisA: 'old text',
@@ -636,19 +697,19 @@ const en: Dict = {
     notGit: 'This is not git. Git’s Myers implementation applies additional heuristics and fallbacks that are not reproduced here; no claim is made of byte-identical parity with git diff.',
   },
   glossary: [
-    { term: 'diff', plain: 'The list of changes between two texts — what was removed, what was added.' },
-    { term: 'edit script', plain: 'The sequence of steps that turns A into B. It is the answer being searched for.' },
-    { term: 'edit graph', plain: 'The grid the search happens on. One axis is the old text, the other is the new one.' },
-    { term: 'D', plain: 'How many paid steps the answer takes — lines deleted plus lines inserted. Smaller is tighter.' },
-    { term: 'snake', plain: 'A run of lines that are identical on both sides, travelled for free. It shows up as a diagonal.' },
-    { term: 'frontier', plain: 'How far the search has reached so far. It expands one step at a time — it is the part that moves.' },
-    { term: 'diagonal k', plain: 'Which diagonal of the grid you are on, k = x − y. The algorithm’s way of saying "which slanted lane".' },
-    { term: 'the V array', plain: 'A small note of the furthest point reached on each diagonal. It is the only data the algorithm really keeps.' },
-    { term: 'backtrack', plain: 'The second phase. Once the search reaches the corner, the route is read back out of the recorded V — that is what turns "the distance is 2" into the actual list of lines.' },
-    { term: 'tie-breaking', plain: 'What happens when two moves are equally good. The rule is arbitrary but fixed — and it is that rule, not any judgement, that decides which of several equally short diffs you are shown.' },
-    { term: 'hunk', plain: 'One block of nearby changes in a diff, with a few lines of context around it. The same diff can come out as one hunk or several; fewer is usually easier to read.' },
-    { term: 'tokenize', plain: 'Turning text into a list of numbers before comparing it — one number per line, word or character. What counts as an "element" is your choice, and the choice changes the answer.' },
-    { term: 'O(...)', plain: 'Shorthand for how the cost grows as the input grows, ignoring constants. O(N·M) means "proportional to the two lengths multiplied"; O((N+M)·D) means "proportional to their sum times the size of the change" — far smaller when the change is small.' },
+    { term: 'diff', icon: 'diff', plain: 'The list of changes between two texts — what was removed, what was added.' },
+    { term: 'edit script', icon: 'script', plain: 'The sequence of steps that turns A into B. It is the answer being searched for.' },
+    { term: 'edit graph', icon: 'graph', plain: 'The grid the search happens on. One axis is the old text, the other is the new one.' },
+    { term: 'D', icon: 'd', plain: 'How many paid steps the answer takes — lines deleted plus lines inserted. Smaller is tighter.' },
+    { term: 'snake', icon: 'snake', plain: 'A run of lines that are identical on both sides, travelled for free. It shows up as a diagonal.' },
+    { term: 'frontier', icon: 'frontier', plain: 'How far the search has reached so far. It expands one step at a time — it is the part that moves.' },
+    { term: 'diagonal k', icon: 'k', plain: 'Which diagonal of the grid you are on, k = x − y. The algorithm’s way of saying "which slanted lane".' },
+    { term: 'the V array', icon: 'v', plain: 'A small note of the furthest point reached on each diagonal. It is the only data the algorithm really keeps.' },
+    { term: 'backtrack', icon: 'backtrack', plain: 'The second phase. Once the search reaches the corner, the route is read back out of the recorded V — that is what turns "the distance is 2" into the actual list of lines.' },
+    { term: 'tie-breaking', icon: 'tie', plain: 'What happens when two moves are equally good. The rule is arbitrary but fixed — and it is that rule, not any judgement, that decides which of several equally short diffs you are shown.' },
+    { term: 'hunk', icon: 'hunk', plain: 'One block of nearby changes in a diff, with a few lines of context around it. The same diff can come out as one hunk or several; fewer is usually easier to read.' },
+    { term: 'tokenize', icon: 'tokenize', plain: 'Turning text into a list of numbers before comparing it — one number per line, word or character. What counts as an "element" is your choice, and the choice changes the answer.' },
+    { term: 'O(...)', icon: 'cost', plain: 'Shorthand for how the cost grows as the input grows, ignoring constants. O(N·M) means "proportional to the two lengths multiplied"; O((N+M)·D) means "proportional to their sum times the size of the change" — far smaller when the change is small.' },
   ],
   input: {
     title: 'Input',
