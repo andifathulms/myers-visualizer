@@ -3,8 +3,13 @@
 import { useMemo, useState } from 'react'
 import { InputPanes } from '@/components/input/InputPanes'
 import { Hunks } from '@/components/hunks/Hunks'
-import { Panel, StepHeading } from '@/components/ui/Panel'
-import { Note } from '@/components/ui/controls'
+import { Panel } from '@/components/ui/Panel'
+import { Note, Segmented } from '@/components/ui/controls'
+import { LatticeCanvas } from '@/components/lattice/LatticeCanvas'
+import { buildMatchGrid } from '@/components/lattice/frame'
+import { RouteOverlay } from '@/components/compare/RouteOverlay'
+import { pathOf } from '@/lib/diff/backtrack'
+import { VIEWABLE_CAP, type Point } from '@/layout/lattice'
 import { useDiffInputs } from '@/lib/client/useDiffInputs'
 import { diff } from '@/lib/diff'
 import { hunkCount, isMinimal, type AlgorithmId } from '@/lib/diff/types'
@@ -33,10 +38,38 @@ const LABELS: Record<AlgorithmId, string> = {
   histogram: 'Histogram',
 }
 
+/** The same names, short enough for a segmented control and the route key. */
+const SHORT: Record<AlgorithmId, string> = {
+  myers: 'Myers',
+  'myers-linear': 'Linear Myers',
+  patience: 'Patience',
+  histogram: 'Histogram',
+}
+
+/**
+ * Each route's dash on the shared lattice, so routes are told apart by shape
+ * as well as colour. Myers is solid: it is the baseline the others differ from.
+ */
+const DASH: Record<AlgorithmId, string> = {
+  myers: '',
+  'myers-linear': '7 5',
+  patience: '2 5',
+  histogram: '10 4 2 4',
+}
+
 export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const inputs = useDiffInputs()
   const { a, b } = inputs.tokenized
   const [selectedOp, setSelectedOp] = useState<number | null>(null)
+  /** Which algorithm's route the shared lattice draws as the answer. */
+  const [highlight, setHighlight] = useState<AlgorithmId>('myers')
+  const n = a.tokens.length
+  const m = b.tokens.length
+  const tooLarge = n > VIEWABLE_CAP || m > VIEWABLE_CAP
+  const matches = useMemo(
+    () => (tooLarge ? null : buildMatchGrid(a.tokens, b.tokens)),
+    [a.tokens, b.tokens, tooLarge],
+  )
 
   const results = useMemo(
     () =>
@@ -49,6 +82,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
             vCells: result.stats.vCells,
             hunks: hunkCount(result.script),
             rendered: buildHunks(result.script, a.texts, b.texts),
+            path: pathOf(result.script),
             error: null as string | null,
           }
         } catch (error) {
@@ -58,6 +92,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
             vCells: 0,
             hunks: 0,
             rendered: [],
+            path: [] as Point[],
             error: error instanceof Error ? error.message : String(error),
           }
         }
@@ -123,16 +158,16 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
   const memoryInverted = greedyCells > 0 && linearCells > greedyCells
 
   return (
-    <main className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
-      <header className="max-w-3xl">
-        <h1 className="font-serif text-h1 font-semibold">{t.title}</h1>
+    <main className="mx-auto max-w-[100rem] px-4 py-6 sm:px-gutter sm:py-8">
+      <header className="max-w-4xl">
+        <h1 className="font-serif text-h2 font-medium">{t.title}</h1>
         {/* The plain reading first; the precise one directly under it. */}
-        <p className="measure mt-3 font-sans text-lg text-indigo">{t.plain}</p>
-        <p className="measure mt-3 font-sans text-base text-muted">{t.lede}</p>
+        <p className="measure mt-2 font-sans text-base text-indigo">{t.plain}</p>
+        <p className="measure mt-1.5 font-sans text-sm text-muted">{t.lede}</p>
       </header>
 
-      <section className="mt-10">
-        <StepHeading step={1} title={dict.graph.stepInput} hint={dict.graph.stepInputHint} />
+      <section className="mt-5">
+        <h2 className="sr-only">{dict.graph.stepInput}</h2>
         <InputPanes
           locale={locale}
           dict={dict}
@@ -151,8 +186,76 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
         />
       </section>
 
-      <section className="mt-12">
-        <StepHeading step={2} title={t.tableTitle} />
+      {/*
+        The routes and the numbers side by side. The page argues that these
+        algorithms differ; a table of four numbers made the reader do the
+        comparing, so every route is drawn on the same edit graph — same data,
+        same axes (DESIGN.md §2.3) — and the table stays beside it as the
+        precise, copyable view.
+      */}
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start">
+        <section className="card graph-paper overflow-hidden">
+          <div className="border-b border-rule bg-surface px-4 py-3">
+            <h2 className="eyebrow">{t.routesTitle}</h2>
+            <p className="mt-1 font-sans text-fine text-muted">{t.routesHint}</p>
+          </div>
+          {tooLarge ? (
+            <p className="m-4 rounded-card border border-dashed border-indigo/40 bg-surface p-5 font-sans text-sm text-indigo">
+              {format(dict.input.tooLarge, { n, m, cap: VIEWABLE_CAP })}
+            </p>
+          ) : (
+            <div className="mx-auto w-full max-w-[max(18rem,min(40rem,calc(100svh-18rem)))] p-3">
+              <div className="relative aspect-square w-full">
+                <LatticeCanvas n={n} m={m} matches={matches} label={t.routesTitle} />
+                <RouteOverlay
+                  n={n}
+                  m={m}
+                  routes={results
+                    .filter((r) => r.error === null)
+                    .map((r) => ({
+                      key: r.algorithm,
+                      points: r.path,
+                      dash: DASH[r.algorithm],
+                      selected: r.algorithm === highlight,
+                    }))}
+                />
+              </div>
+            </div>
+          )}
+          <div className="flex flex-wrap items-end justify-between gap-4 border-t border-rule bg-surface px-4 py-3">
+            <Segmented
+              name="highlight"
+              label={t.highlight}
+              value={highlight}
+              onChange={setHighlight}
+              options={SHOWN.map((id) => ({ value: id, label: SHORT[id] }))}
+            />
+            {/* The key: each route's dash, drawn the way the lattice draws it. */}
+            <ul className="flex flex-wrap gap-x-4 gap-y-1 font-sans text-fine text-muted">
+              {SHOWN.map((id) => (
+                <li key={id} className="flex items-center gap-1.5">
+                  <svg aria-hidden width="22" height="6" className="block">
+                    <line
+                      x1="1"
+                      y1="3"
+                      x2="21"
+                      y2="3"
+                      strokeWidth={id === highlight ? 3 : 2}
+                      strokeLinecap="round"
+                      strokeDasharray={DASH[id] === '' ? undefined : DASH[id]}
+                      className={id === highlight ? 'stroke-madder' : 'stroke-ink/70'}
+                    />
+                  </svg>
+                  {SHORT[id]}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <div className="min-w-0">
+      <section>
+        <h2 className="eyebrow mb-3">{t.tableTitle}</h2>
 
         {/* Same reasoning as the diff pane: keyboard-scrollable, and named so
             that landing on it says something. WCAG 2.1.1. */}
@@ -160,7 +263,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
           tabIndex={0}
           role="region"
           aria-label={t.tableScroll}
-          className="card max-w-4xl overflow-x-auto"
+          className="card overflow-x-auto"
         >
           <table className="w-full border-collapse font-sans text-sm">
             {/*
@@ -170,7 +273,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
             */}
             <caption className="sr-only">{t.tableCaption}</caption>
             <thead>
-              <tr className="border-b border-rule bg-ground/50 text-left">
+              <tr className="border-b border-rule bg-sunken text-left">
                 <Th>{dict.input.algorithm}</Th>
                 <Th align="right">{t.scriptLength}</Th>
                 <Th align="right">{t.hunks}</Th>
@@ -234,7 +337,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
           The column names are terms of art. Reading them off in plain language
           costs three lines and saves the reader guessing what "hunk" means.
         */}
-        <dl className="mt-4 grid max-w-4xl gap-x-8 gap-y-2 font-sans text-fine sm:grid-cols-3">
+        <dl className="mt-4 grid gap-x-8 gap-y-2 font-sans text-fine sm:grid-cols-3">
           {[
             { label: t.scriptLength, hint: t.scriptLengthHint },
             { label: t.hunks, hint: t.hunksHint },
@@ -261,10 +364,15 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
           <Note tone="accent">{t.note}</Note>
         </div>
       </section>
+        </div>
+      </div>
 
-      <section className="mt-12">
-        <StepHeading step={3} title={t.outputTitle} hint={t.outputHint} />
-        <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
+      <section className="mt-10">
+        <h2 className="font-serif text-h3 font-semibold">{t.outputTitle}</h2>
+        <p className="mt-1 font-sans text-sm text-muted">{t.outputHint}</p>
+        {/* Two across, not four: a diff line squeezed into a quarter of the
+            page was mostly horizontal scrolling. */}
+        <div className="mt-4 grid gap-5 lg:grid-cols-2">
           {results.map((result) => (
             <Panel
               key={result.algorithm}
@@ -306,7 +414,7 @@ function Bar({ pct }: { pct: number }) {
   return (
     <span
       aria-hidden
-      className="ml-auto mt-1 block h-1 w-16 overflow-hidden rounded-full bg-ground"
+      className="ml-auto mt-1 block h-1 w-16 overflow-hidden rounded-full bg-sunken"
     >
       <span className="block h-full rounded-full bg-indigo/40" style={{ width: `${pct}%` }} />
     </span>

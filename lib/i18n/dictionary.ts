@@ -238,6 +238,11 @@ export type Dict = {
     title: string
     lede: string
     plain: string
+    /** The shared-lattice overlay: every algorithm's route on one edit graph. */
+    routesTitle: string
+    routesHint: string
+    /** Names the control that picks which route is drawn as the answer. */
+    highlight: string
     scriptLength: string
     scriptLengthHint: string
     hunks: string
@@ -260,7 +265,15 @@ export type Dict = {
     outputHint: string
     shortest: string
   }
-  presets: { title: string; lede: string; open: string; linkFragment: string }
+  presets: {
+    title: string
+    lede: string
+    open: string
+    linkFragment: string
+    /** Card facts. Placeholder {count}: exact, or the cap when it saturated. */
+    minimalCount: string
+    minimalAtLeast: string
+  }
   a11y: {
     skipToContent: string
     graphLabel: string
@@ -531,6 +544,9 @@ const id: Dict = {
     progress: 'Posisi',
   },
   compare: {
+    routesTitle: 'Semua rute di satu edit graph',
+    routesHint: 'Jawaban tiap algoritma digambar sebagai jalur di kisi yang sama. Di bagian yang berimpit mereka sepakat; di bagian yang berpisah, mereka mengaitkan perubahan secara berbeda.',
+    highlight: 'Sorot',
     title: 'Banding algoritma',
     lede: 'Myers, patience, dan histogram pada masukan yang sama. Patience biasanya menghasilkan script lebih panjang — itu memang tujuannya: minimal tidak sama dengan mudah dibaca.',
     plain: 'Git punya lebih dari satu cara membuat diff. Semuanya menghasilkan jawaban yang benar; yang berbeda adalah jawaban mana yang paling enak dibaca manusia. Halaman ini menjalankan semuanya sekaligus supaya bedanya terlihat.',
@@ -557,6 +573,8 @@ const id: Dict = {
     lede: 'Tiap contoh memuat fenomena yang ingin ditunjukkan. Buka salah satu, lalu tekan putar.',
     open: 'Buka di edit graph',
     linkFragment: 'Potongan tautan untuk contoh ini',
+    minimalCount: 'script minimal: {count}',
+    minimalAtLeast: 'script minimal: ≥ {count}',
   },
   a11y: {
     skipToContent: 'Lompat ke konten',
@@ -819,6 +837,9 @@ const en: Dict = {
     progress: 'Position',
   },
   compare: {
+    routesTitle: 'Every route on one edit graph',
+    routesHint: 'Each algorithm’s answer drawn as a path on the same grid. Where the routes coincide they agree; where they split, they attribute the change differently.',
+    highlight: 'Highlight',
     title: 'Algorithm comparison',
     lede: 'Myers, patience, and histogram on the same input. Patience usually produces a longer script — that is the point: minimal is not the same as readable.',
     plain: 'Git has more than one way of producing a diff. All of them are correct; what differs is which answer a human finds easiest to read. This page runs all of them at once so the difference is visible.',
@@ -844,7 +865,9 @@ const en: Dict = {
     title: 'Examples',
     lede: 'Each example carries the phenomenon it exists to show. Open one, then press play.',
     open: 'Open in the edit graph',
-    linkFragment: 'The link fragment for this preset',
+    linkFragment: 'The link fragment for this example',
+    minimalCount: 'minimal scripts: {count}',
+    minimalAtLeast: 'minimal scripts: ≥ {count}',
   },
   a11y: {
     skipToContent: 'Skip to content',

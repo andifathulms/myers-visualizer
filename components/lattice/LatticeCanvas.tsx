@@ -52,6 +52,13 @@ export function LatticeCanvas({
   const geometryRef = useRef<Geometry | null>(null)
   const stampedRef = useRef(0)
   const [size, setSize] = useState<{ w: number; h: number } | null>(null)
+  /**
+   * Bumped whenever the renderer is rebuilt, so the paint effect below runs
+   * for a new scene as well as for a new frame. Without it a rebuilt renderer
+   * — on mount, on resize, on new input — sat blank until the frame changed,
+   * which on a static lattice (the comparison page) or a paused one is never.
+   */
+  const [scene, setScene] = useState(0)
 
   useLayoutEffect(() => {
     const host = hostRef.current
@@ -76,6 +83,7 @@ export function LatticeCanvas({
     rendererRef.current = renderer
     geometryRef.current = geometry
     stampedRef.current = 0
+    setScene((version) => version + 1)
   }, [n, m, matches, size, padding])
 
   // Explored wash: stamp forward, rebuild only on a backward seek.
@@ -95,7 +103,7 @@ export function LatticeCanvas({
     }
     stampedRef.current = stampCount
     renderer.draw(frame)
-  }, [stampAt, stampCount, frame])
+  }, [stampAt, stampCount, frame, scene])
 
   const handleMove = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
