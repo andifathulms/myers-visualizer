@@ -8,7 +8,7 @@ import { Stepper } from '@/components/stepper/Stepper'
 import { Hunks } from '@/components/hunks/Hunks'
 import { InputPanes } from '@/components/input/InputPanes'
 import { Legend } from '@/components/chrome/Legend'
-import { Panel, StepHeading } from '@/components/ui/Panel'
+import { Panel } from '@/components/ui/Panel'
 import { StatBar } from '@/components/chrome/StatBar'
 import { useDiff } from '@/lib/client/useDiff'
 import { useDiffInputs } from '@/lib/client/useDiffInputs'
@@ -355,22 +355,43 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
     return buildHunks(shownScript, a.texts, b.texts)
   }, [shownScript, a.texts, b.texts])
 
+  /**
+   * Each selectable script's route, for the ambiguity picker's thumbnails.
+   * Index 0 is the script the search produced, matching `shownScript`.
+   */
+  const routes = useMemo(() => {
+    if (state.status !== 'done' || alternatives.length === 0) return undefined
+    return alternatives.map((script, index) => pathOf(index === 0 ? state.script : script))
+  }, [state, alternatives])
+
+  /** Where each d starts on the scrubber, and where the backtrack begins. */
+  const ticks = useMemo(() => {
+    if (timeline === null) return []
+    const levels = timeline.levelStarts.map((at, d) => ({ at, label: `d${d}` }))
+    return timeline.totalFrames > timeline.searchFrames
+      ? [...levels, { at: timeline.searchFrames, label: '↩' }]
+      : levels
+  }, [timeline])
+
   const t = dict.graph
 
   return (
-    <main className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
-      <header className="max-w-3xl">
-        <h1 className="font-serif text-h1 font-semibold">{t.title}</h1>
-        <p className="measure mt-3 font-sans text-lg text-indigo">{t.lede}</p>
+    <main className="mx-auto max-w-[100rem] px-4 py-6 sm:px-gutter sm:py-8">
+      <header className="flex flex-wrap items-end justify-between gap-x-10 gap-y-2">
+        <h1 className="font-serif text-h2 font-medium">{t.title}</h1>
+        <p className="max-w-[60ch] font-sans text-sm text-indigo">{t.lede}</p>
       </header>
 
       {/*
-        The page is a sequence — put something in, watch it run, read the
-        result — and the headings say so. A first visitor arriving straight
-        here from a shared link has no other clue what order to read it in.
+        One screen, not three stacked steps. The old Input → Watch → Result
+        sequence put the lattice below the fold and the diff a full scroll
+        under the player, so "move one and the others follow" could never be
+        seen happening — the hover link between a diff line and its cells had
+        both ends on different screens. The steps survive as headings for
+        assistive tech, where reading order is still the useful structure.
       */}
-      <section className="mt-10">
-        <StepHeading step={1} title={t.stepInput} hint={t.stepInputHint} />
+      <section className="mt-4">
+        <h2 className="sr-only">{t.stepInput}</h2>
         <InputPanes
           locale={locale}
           dict={dict}
@@ -394,133 +415,116 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
       {state.status === 'error' ? (
         <p
           role="alert"
-          className="mt-6 rounded-xl border border-madder/40 bg-madder/10 p-4 font-sans text-sm text-madder"
+          className="mt-5 rounded-card border border-madder/40 bg-madder/10 p-4 font-sans text-sm text-madder"
         >
           {state.message}
         </p>
       ) : null}
 
-      <section className="mt-12">
-        <StepHeading step={2} title={t.stepWatch} hint={t.stepWatchHint} />
-
-        {/*
-          Two columns from xl only; below that — including tablet widths,
-          where a 21rem sidebar beside a squeezed lattice was worse than
-          either full-width alone — the sidebar moves beneath the lattice
-          instead of beside it. DESIGN.md §5: the core object is the
-          largest element, and it was getting under half the page on
-          desktop while a fixed sidebar took a quarter. On a phone the
-          same content is one column and the order matters: the legend is
-          a full card of four rows, and left in source order it sat
-          between the player and the first number — so reading D on a
-          390px screen meant scrolling past the whole player and the
-          legend, and then scrolling again to reach the result. The aside
-          moves up and the legend goes last, where a reference belongs.
-        */}
-        <div className="flex flex-col gap-5 xl:grid xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start">
-          <div className="flex flex-col gap-4 xl:col-start-1 xl:row-start-1">
-            {tooLarge ? (
-              // An unreadable graph is not a visualisation. Say so, and show the
-              // result instead. §6.1
-              <p className="rounded-xl border border-dashed border-indigo/40 bg-surface p-5 font-sans text-sm text-indigo">
-                {format(dict.input.tooLarge, { n, m, cap: VIEWABLE_CAP })}
-              </p>
-            ) : (
-              <Panel title={t.canvas} hint={t.canvasHint} padded={false}>
-                {/*
-                  The lattice is not self-describing: which axis is the old
-                  text and which is the new is exactly the thing a newcomer
-                  cannot guess, and getting it backwards makes the whole
-                  picture read wrong.
-                */}
-                {/*
-                  Capped, and centred rather than stretched: the lattice is
-                  square, so an uncapped full-width column would turn a
-                  five-line input into a void sized by the input, not by
-                  the picture. The cap itself is raised well past its old
-                  38rem (608px) — DESIGN.md §5 measurements, the rendered
-                  canvas element's own box, read with getBoundingClientRect
-                  against the production build (`pnpm preview`):
-
-                    1280px viewport -> 872 x 872 px
-                    1440px viewport -> 872 x 872 px  (page caps at max-w-7xl)
-                    1920px viewport -> 872 x 872 px  (page caps at max-w-7xl)
-                     430px viewport -> 330 x 330 px
-                     390px viewport -> 300 x 300 px
-                     375px viewport -> 299 x 299 px
-
-                  Desktop is unchanged from 1280px up because the page's
-                  own max-w-7xl already saturates there — raising this cap
-                  further would do nothing until that outer width moves
-                  too. Below xl the sidebar moves beneath the lattice
-                  (below), so these three numbers are the same layout, not
-                  three points on a curve. Mobile numbers are close to the
-                  pre-change ones by construction: this cap never bound
-                  them, the viewport did.
-                */}
-                <div className="mx-auto w-full max-w-[60rem] px-4 pb-4">
-                  <p className="pb-1 font-mono text-micro text-muted">{t.axisA}</p>
-                  <div className="flex gap-2">
-                    <div className="flex items-center" aria-hidden>
-                      <p className="font-mono text-micro text-muted [writing-mode:vertical-rl]">
-                        {t.axisB}
-                      </p>
-                    </div>
-                    <div className="aspect-square w-full rounded-lg border border-rule bg-ground/40">
-                      <LatticeCanvas
-                        n={n}
-                        m={m}
-                        matches={matches}
-                        frame={latticeFrame}
-                        stampAt={stampAt}
-                        stampCount={Math.min(frame, timeline?.searchFrames ?? 0)}
-                        label={graphLabel}
-                        onHoverPoint={handleHoverPoint}
-                      />
-                    </div>
-                  </div>
-                  {/*
-                    At frame 0 the lattice is an empty grid with a couple of
-                    grey diagonals on it — less than the still figure in the
-                    hero promises. Say that it is waiting rather than leaving
-                    the reader to wonder whether it broke.
-                  */}
-                  {frame === 0 ? (
-                    <p className="mt-3 font-sans text-fine text-muted">{t.idleCanvas}</p>
-                  ) : null}
-                </div>
-              </Panel>
-            )}
-
-            {/*
-              The canvas cannot be read, so every step is also announced. Polite,
-              because stepping is user-driven and should not interrupt.
-            */}
-            <p aria-live="polite" className="sr-only">
-              {currentStep === null || timeline === null
-                ? ''
-                : format(dict.a11y.stepAnnouncement, {
-                    d: currentD,
-                    maxD: timeline.d,
-                    k: currentStep.k,
-                    x: currentStep.to.x,
-                    y: currentStep.to.y,
-                  })}
+      {/*
+        The stage and the inspector. From lg the lattice takes everything but
+        a 22–24rem column of instruments that read the same search; below lg
+        the instruments follow the player in one column. DESIGN.md §5: the
+        core object is the largest element on the page.
+      */}
+      <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start xl:grid-cols-[minmax(0,1fr)_24rem]">
+        <section className="flex min-w-0 flex-col gap-3">
+          <h2 className="sr-only">{t.stepWatch}</h2>
+          {tooLarge ? (
+            // An unreadable graph is not a visualisation. Say so, and show the
+            // result instead. §6.1
+            <p className="rounded-card border border-dashed border-indigo/40 bg-surface p-5 font-sans text-sm text-indigo">
+              {format(dict.input.tooLarge, { n, m, cap: VIEWABLE_CAP })}
             </p>
+          ) : (
+            <section className="card graph-paper overflow-hidden">
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-rule bg-surface px-4 py-2.5">
+                <h3 className="eyebrow">{t.canvas}</h3>
+                <p className="min-w-0 font-sans text-fine text-muted">{t.canvasHint}</p>
+              </div>
+              {/*
+                Square, and sized by the viewport's height as well as its
+                width: on a laptop the whole lattice fits on one screen
+                instead of running off the bottom. The floor keeps it legible
+                on short windows; on a phone the width binds first and the
+                lattice fills the column. The canvas itself keeps cells square
+                inside this box (DESIGN.md §2.10, tests/render).
+              */}
+              <div className="mx-auto w-full max-w-[max(18rem,min(58rem,calc(100svh-17rem)))] px-3 pb-3 pt-2 sm:px-4">
+                <p className="pb-1 font-mono text-micro text-muted">{t.axisA}</p>
+                <div className="flex gap-2">
+                  <div className="flex items-center" aria-hidden>
+                    <p className="font-mono text-micro text-muted [writing-mode:vertical-rl]">
+                      {t.axisB}
+                    </p>
+                  </div>
+                  {/* No box of its own: the lattice sits straight on the graph paper. */}
+                  <div className="aspect-square w-full">
+                    <LatticeCanvas
+                      n={n}
+                      m={m}
+                      matches={matches}
+                      frame={latticeFrame}
+                      stampAt={stampAt}
+                      stampCount={Math.min(frame, timeline?.searchFrames ?? 0)}
+                      label={graphLabel}
+                      onHoverPoint={handleHoverPoint}
+                    />
+                  </div>
+                </div>
+                {/*
+                  At frame 0 the lattice is an empty grid with a couple of
+                  grey diagonals on it — less than the still figure in the
+                  hero promises. Say that it is waiting rather than leaving
+                  the reader to wonder whether it broke.
+                */}
+                {frame === 0 ? (
+                  <p className="mt-3 font-sans text-fine text-muted">{t.idleCanvas}</p>
+                ) : null}
+              </div>
+              {/* The key lives with the picture it explains. */}
+              <div className="border-t border-rule bg-surface px-4 py-2.5">
+                <h3 className="sr-only">{dict.legend.title}</h3>
+                <Legend dict={dict} />
+              </div>
+            </section>
+          )}
 
-            {timeline !== null && currentStep !== null ? (
-              <StepReadout
-                dict={dict}
-                d={currentD}
-                k={currentStep.k}
-                move={currentStep.move}
-                tied={stepTied}
-                available={tieReadable}
-                backtrack={backtrack}
-              />
-            ) : null}
+          {/*
+            The canvas cannot be read, so every step is also announced. Polite,
+            because stepping is user-driven and should not interrupt.
+          */}
+          <p aria-live="polite" className="sr-only">
+            {currentStep === null || timeline === null
+              ? ''
+              : format(dict.a11y.stepAnnouncement, {
+                  d: currentD,
+                  maxD: timeline.d,
+                  k: currentStep.k,
+                  x: currentStep.to.x,
+                  y: currentStep.to.y,
+                })}
+          </p>
 
-            {timeline !== null ? (
+          {timeline !== null && currentStep !== null ? (
+            <StepReadout
+              dict={dict}
+              d={currentD}
+              k={currentStep.k}
+              move={currentStep.move}
+              tied={stepTied}
+              available={tieReadable}
+              backtrack={backtrack}
+            />
+          ) : null}
+
+          {/*
+            On a phone the transport sticks to the bottom edge while the stage
+            is on screen — the thumb is already there, and stepping no longer
+            means scrolling back up past the lattice to find the buttons.
+          */}
+          {timeline !== null ? (
+            <div className="sticky bottom-[env(safe-area-inset-bottom,0px)] z-20 lg:static">
               <Stepper
                 frame={frame}
                 total={timeline.totalFrames}
@@ -534,116 +538,124 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                 onNextSnake={() => seek(nextSnakeFrame(timeline, frame))}
                 onSpeed={setSpeed}
                 reducedMotion={reducedMotion}
+                ticks={ticks}
               />
-            ) : null}
-          </div>
-
-          <aside className="flex flex-col gap-5 xl:col-start-2 xl:row-span-2 xl:row-start-1">
-            <StatBar
-              dict={dict}
-              d={state.status === 'done' ? state.stats.d : 0}
-              currentD={currentD}
-              n={n}
-              m={m}
-              snakes={state.status === 'done' ? state.stats.snakes : 0}
-              steps={timeline?.searchFrames ?? 0}
-              vCells={state.status === 'done' ? state.stats.vCells : 0}
-              naiveVCells={
-                // Only meaningful for the variant that avoids the recording.
-                algorithm === 'myers-linear' && state.status === 'done'
-                  ? (state.stats.d + 2) ** 2
-                  : null
-              }
-              memoryWhy={
-                // Greedy Myers records one row per level and nothing else, so
-                // the identity holds exactly. The linear-space variant does
-                // not record that way and the same sentence would be false.
-                algorithm === 'myers' && state.status === 'done'
-                  ? format(t.memoryWhy, {
-                      side: state.stats.d + 2,
-                      cells: state.stats.vCells,
-                    })
-                  : null
-              }
-            />
-            {maintainsV ? (
-              <VStrip
-                cells={vPoints}
-                currentD={currentD}
-                highlightK={highlightK}
-                onHighlight={setHighlightK}
-                label={t.vstrip}
-                hint={t.vstripHint}
-                idle={t.idleVStrip}
-                groupLabel={t.vstripGroup}
-                maxX={n}
-              />
-            ) : (
-              // Showing a V strip for an algorithm that has no V would be a lie
-              // dressed as a visualisation.
-              <Panel title={t.vstrip}>
-                <p className="font-sans text-fine text-muted">{t.noVStrip}</p>
-              </Panel>
-            )}
-            <AmbiguityPanel
-              locale={locale}
-              dict={dict}
-              ambiguity={ambiguity}
-              alternatives={alternatives.length}
-              selected={altIndex}
-              onSelect={(index) => {
-                setAltIndex(index)
-                setSelectedOp(null)
-                seek(timeline?.totalFrames ?? 0)
-              }}
-              showAlternatives={showAlternatives}
-              onToggleShow={setShowAlternatives}
-              ghostPathsCapped={ghostPathsCapped}
-              ghostCap={GHOST_PATH_CAP}
-            />
-          </aside>
-
-          {/* A reference, so it comes after the numbers on a narrow screen. */}
-          <Panel title={dict.legend.title}>
-            <Legend dict={dict} />
-          </Panel>
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <StepHeading step={3} title={t.stepResult} hint={t.stepResultHint} />
-        <div className="max-w-4xl">
-          {/*
-            Said once, above the diff, and only when there is something to say.
-            A per-line number nobody has been told how to read is worse than
-            no number, and on an unambiguous input there is nothing to explain.
-          */}
-          {shares !== null && hunks.length > 0 ? (
-            <p className="mb-3 measure font-sans text-sm text-muted">
-              {contestedLines > 0 ? t.contested : t.contestedNone}
-            </p>
+            </div>
           ) : null}
-          <Hunks
-            hunks={hunks}
-            selectedOp={selectedOp}
-            onSelectOp={setSelectedOp}
-            hoveredOp={hoveredOp}
-            onHoverOp={handleLineHover}
-            emptyLabel={locale === 'id' ? 'Tidak ada perbedaan.' : 'No differences.'}
-            shares={shares}
-            totalScripts={ambiguity.count}
-            shareLabel={t.contestedShare}
-            labels={{
-              label: t.lineLabel,
-              kept: t.lineKept,
-              deleted: t.lineDeleted,
-              inserted: t.lineInserted,
-              share: t.lineShare,
-            }}
-            scrollLabel={t.outputScroll}
+
+          {maintainsV ? (
+            <VStrip
+              cells={vPoints}
+              currentD={currentD}
+              highlightK={highlightK}
+              onHighlight={setHighlightK}
+              label={t.vstrip}
+              hint={t.vstripHint}
+              idle={t.idleVStrip}
+              groupLabel={t.vstripGroup}
+              maxX={n}
+            />
+          ) : (
+            // Showing a V strip for an algorithm that has no V would be a lie
+            // dressed as a visualisation.
+            <Panel title={t.vstrip}>
+              <p className="font-sans text-fine text-muted">{t.noVStrip}</p>
+            </Panel>
+          )}
+        </section>
+
+        <aside className="flex min-w-0 flex-col gap-4">
+          <StatBar
+            dict={dict}
+            d={state.status === 'done' ? state.stats.d : 0}
+            currentD={currentD}
+            n={n}
+            m={m}
+            snakes={state.status === 'done' ? state.stats.snakes : 0}
+            steps={timeline?.searchFrames ?? 0}
+            vCells={state.status === 'done' ? state.stats.vCells : 0}
+            naiveVCells={
+              // Only meaningful for the variant that avoids the recording.
+              algorithm === 'myers-linear' && state.status === 'done'
+                ? (state.stats.d + 2) ** 2
+                : null
+            }
+            memoryWhy={
+              // Greedy Myers records one row per level and nothing else, so
+              // the identity holds exactly. The linear-space variant does
+              // not record that way and the same sentence would be false.
+              algorithm === 'myers' && state.status === 'done'
+                ? format(t.memoryWhy, {
+                    side: state.stats.d + 2,
+                    cells: state.stats.vCells,
+                  })
+                : null
+            }
           />
-        </div>
-      </section>
+          <AmbiguityPanel
+            locale={locale}
+            dict={dict}
+            ambiguity={ambiguity}
+            alternatives={alternatives.length}
+            selected={altIndex}
+            onSelect={(index) => {
+              setAltIndex(index)
+              setSelectedOp(null)
+              seek(timeline?.totalFrames ?? 0)
+            }}
+            showAlternatives={showAlternatives}
+            onToggleShow={setShowAlternatives}
+            ghostPathsCapped={ghostPathsCapped}
+            ghostCap={GHOST_PATH_CAP}
+            routes={routes}
+            n={n}
+            m={m}
+          />
+
+          {/*
+            The result sits beside the lattice, not a screen below it, so
+            hovering a contested line visibly lights its cells. Its own scroll
+            on wide screens keeps a long diff from pushing the instruments
+            above it out of reach.
+          */}
+          <section className="card p-4 sm:p-5">
+            <h2 className="eyebrow">{t.stepResult}</h2>
+            <p className="mt-1 font-sans text-sm text-muted">{t.stepResultHint}</p>
+            {/*
+              Said once, above the diff, and only when there is something to
+              say. A per-line number nobody has been told how to read is worse
+              than no number, and on an unambiguous input there is nothing to
+              explain.
+            */}
+            {shares !== null && hunks.length > 0 ? (
+              <p className="mt-3 font-sans text-fine text-muted">
+                {contestedLines > 0 ? t.contested : t.contestedNone}
+              </p>
+            ) : null}
+            <div className="mt-3 lg:max-h-[32rem] lg:overflow-y-auto">
+              <Hunks
+                hunks={hunks}
+                selectedOp={selectedOp}
+                onSelectOp={setSelectedOp}
+                hoveredOp={hoveredOp}
+                onHoverOp={handleLineHover}
+                emptyLabel={locale === 'id' ? 'Tidak ada perbedaan.' : 'No differences.'}
+                shares={shares}
+                totalScripts={ambiguity.count}
+                shareLabel={t.contestedShare}
+                labels={{
+                  label: t.lineLabel,
+                  kept: t.lineKept,
+                  deleted: t.lineDeleted,
+                  inserted: t.lineInserted,
+                  share: t.lineShare,
+                }}
+                scrollLabel={t.outputScroll}
+              />
+            </div>
+          </section>
+        </aside>
+      </div>
     </main>
   )
 }

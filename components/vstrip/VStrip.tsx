@@ -120,7 +120,9 @@ export function VStrip({
         role="toolbar"
         aria-label={groupLabel}
         aria-orientation="horizontal"
-        className="flex flex-wrap gap-1.5"
+        // One row that scrolls, rather than wrapping: the row's silhouette is
+        // the frontier's profile, and wrapping it into lines breaks that up.
+        className="flex gap-1.5 overflow-x-auto pb-1"
         onKeyDown={onKeyDown}
         onMouseLeave={() => onHighlight(null)}
       >
@@ -146,12 +148,14 @@ export function VStrip({
                 onBlur={() => onHighlight(null)}
                 aria-label={`k = ${cell.k}, x = ${cell.x}, y = ${cell.y}`}
                 className={[
-                  'flex w-[4rem] flex-col items-center rounded-lg border py-1 font-mono transition-colors',
+                  'flex w-[3.25rem] shrink-0 flex-col items-center rounded-ctl border px-1 pb-1 pt-1.5 font-mono transition-colors',
+                  // Ink, not madder: a hovered diagonal is a pointer, not the
+                  // answer, and madder means only the answer.
                   active
-                    ? 'border-madder bg-madder/10 text-madder'
+                    ? 'border-ink bg-sunken text-ink'
                     : live
-                      ? 'border-turmeric bg-turmeric/15 text-ink'
-                      : 'border-rule bg-ground/40 text-muted',
+                      ? 'border-turmeric/70 bg-turmeric/10 text-ink'
+                      : 'border-rule bg-surface text-muted',
                 ].join(' ')}
               >
                 {/*
@@ -165,24 +169,26 @@ export function VStrip({
                   cell: at the input cap it would read "y=300−(-40)" eighty-one
                   times over, and the rule belongs stated once, not repeated.
                 */}
-                <span className="text-micro tracking-wide">k{cell.k}</span>
                 {/*
                   Decorative: the bar restates x, which the text beneath
                   already gives a screen reader via the button's own label.
+                  Vertical, so the row of bars reads as a profile: the
+                  frontier's shape, one diagonal per column.
                 */}
                 <span
                   aria-hidden
-                  className="mt-1 h-1 w-full overflow-hidden rounded-full bg-ground"
+                  className="flex h-12 w-full items-end overflow-hidden rounded-[4px] bg-sunken"
                 >
                   <span
                     className={[
-                      'block h-full rounded-full',
-                      active ? 'bg-madder' : live ? 'bg-turmeric' : 'bg-indigo/40',
+                      'block w-full rounded-t-[3px]',
+                      active ? 'bg-ink' : live ? 'bg-turmeric' : 'bg-indigo/45',
                     ].join(' ')}
-                    style={{ width: `${pct}%` }}
+                    style={{ height: `${pct}%` }}
                   />
                 </span>
                 <span className="mt-1 text-fine tabular-nums">x {cell.x}</span>
+                <span className="text-micro tabular-nums text-muted">k{cell.k}</span>
                 <span className="text-micro tabular-nums text-muted">y {cell.y}</span>
               </button>
             </li>

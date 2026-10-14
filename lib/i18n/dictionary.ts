@@ -95,6 +95,12 @@ export type Dict = {
     swap: string
     presets: string
     options: string
+    /** The texts drawer: most visitors start from an example, so it opens on demand. */
+    editTexts: string
+    hideTexts: string
+    /** Placeholders {a} {b} {unit}: the size of each side, in the current granularity. */
+    textsSummary: string
+    unit: { line: string; word: string; char: string }
     /** Placeholders {n} {m} {cap} — the dictionary must stay serialisable. */
     tooLarge: string
   }
@@ -145,6 +151,8 @@ export type Dict = {
     ambiguityMany: string
     altScript: string
     altScriptHint: string
+    /** Under the first route thumbnail: which one the search itself produced. */
+    altChosen: string
     /** Label of the show/hide toggle for the lattice overlay. Default is on — the claim is the product. */
     ambiguityShowToggle: string
     /** Shown under the toggle when GHOST_PATH_CAP is hit. Placeholders {count} {cap}. */
@@ -388,6 +396,10 @@ const id: Dict = {
     swap: 'Tukar A/B',
     presets: 'Contoh',
     options: 'Opsi',
+    editTexts: 'Ubah teks',
+    hideTexts: 'Tutup teks',
+    textsSummary: 'A {a} → B {b} {unit}',
+    unit: { line: 'baris', word: 'kata', char: 'karakter' },
     tooLarge:
       'Masukan {n}×{m} melampaui batas tampilan {cap}×{cap}. Lattice sebesar itu tidak terbaca, jadi tidak digambar — hasil diff tetap ditampilkan di bawah.',
   },
@@ -430,7 +442,8 @@ const id: Dict = {
     ambiguityUnique: 'Edit script minimal tunggal — tidak ada ambiguitas pada masukan ini.',
     ambiguityMany: 'Beberapa script sama-sama minimal. Algoritma memilih satu lewat tie-breaking.',
     altScript: 'Script alternatif',
-    altScriptHint: 'Sama-sama sependek yang dipilih algoritma. Coba beralih dan lihat diff di bawah berubah.',
+    altScriptHint: 'Sama-sama sependek yang dipilih algoritma. Klik rute lain dan lihat diff-nya berubah.',
+    altChosen: 'pilihan Myers',
     ambiguityShowToggle: 'Tampilkan alternatif di kisi',
     ambiguityCapped:
       'Terlalu banyak untuk digambar satu per satu — ada {count}, lebih dari {cap} yang bisa ditampilkan sebagai garis. Kawasan yang diarsir di kisi tetap menandai perbedaannya.',
@@ -651,8 +664,12 @@ const en: Dict = {
     algorithm: 'Algorithm',
     run: 'Run',
     swap: 'Swap A/B',
-    presets: 'Presets',
+    presets: 'Example',
     options: 'Options',
+    editTexts: 'Edit texts',
+    hideTexts: 'Hide texts',
+    textsSummary: 'A {a} → B {b} {unit}',
+    unit: { line: 'lines', word: 'words', char: 'chars' },
     tooLarge:
       'Input {n}×{m} is above the viewable cap of {cap}×{cap}. A lattice that dense is not readable, so it is not drawn — the diff result is still shown below.',
   },
@@ -695,7 +712,8 @@ const en: Dict = {
     ambiguityUnique: 'The minimal edit script is unique — no ambiguity on this input.',
     ambiguityMany: 'Several scripts are equally minimal. The algorithm picks one by tie-breaking.',
     altScript: 'Alternative script',
-    altScriptHint: 'Every bit as short as the one the algorithm chose. Switch between them and watch the diff below change.',
+    altScriptHint: 'Every bit as short as the one the algorithm chose. Pick another route and watch the diff change.',
+    altChosen: 'Myers chose',
     ambiguityShowToggle: 'Show alternatives on the graph',
     ambiguityCapped:
       'Too many to draw individually — {count} exist, more than the {cap} the graph can show as lines. The shaded region on the graph still marks where they differ.',

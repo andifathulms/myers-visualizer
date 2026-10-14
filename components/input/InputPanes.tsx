@@ -4,8 +4,9 @@ import { GRANULARITIES, type Granularity } from '@/lib/tokenize'
 import { ALGORITHMS, type AlgorithmId } from '@/lib/diff/types'
 import { PRESETS } from '@/data/presets'
 import { ShareLink } from '@/components/chrome/ShareLink'
-import { Field, Select, Toggle } from '@/components/ui/controls'
-import type { Dict } from '@/lib/i18n/dictionary'
+import { useState } from 'react'
+import { Field, Segmented, Select, Toggle } from '@/components/ui/controls'
+import { format, type Dict } from '@/lib/i18n/dictionary'
 import type { Locale } from '@/lib/i18n/locales'
 
 type Props = {
@@ -31,19 +32,26 @@ type Props = {
 /** Algorithm names stay in English, as all algorithm terms do. */
 const ALGORITHM_LABELS: Record<AlgorithmId, string> = {
   myers: 'Myers',
-  'myers-linear': 'Myers — linear space',
+  'myers-linear': 'Linear Myers',
   patience: 'Patience',
   histogram: 'Histogram',
 }
 
 /**
- * Two panes and a settings bar. The presets sit first in the bar and in the
- * tab order: for a visitor with no text of their own to hand, picking one is
- * the shortest path to seeing anything happen at all.
+ * A toolbar first, the texts second. Most visitors arrive from a shared link
+ * or pick an example, so the two panes used to push the lattice below the
+ * fold for a control almost nobody touched first. The toolbar holds every
+ * setting in one row, with each option visible — four algorithms and three
+ * granularities were hidden behind selects — and the texts open as a drawer
+ * from the summary that says how big each side is.
  *
- * Every control is labelled above rather than beside it. The old single
- * wrapping row of `label: [select]` pairs re-flowed at narrow widths into
- * labels sitting next to the wrong control.
+ * The example picker stays first in the bar and in the tab order: for a
+ * visitor with no text of their own to hand, picking one is the shortest
+ * path to seeing anything happen at all.
+ *
+ * The panes are always in the DOM, hidden rather than unmounted, so the
+ * labels, the shared-link round trip and anything holding a reference to
+ * them keep working when the drawer is closed.
  */
 export function InputPanes({
   locale,
@@ -65,29 +73,13 @@ export function InputPanes({
 }: Props) {
   const t = dict.input
   const label: Record<Granularity, string> = { line: t.line, word: t.word, char: t.char }
+  const [open, setOpen] = useState(false)
+  /** Phone only: the settings row folds away so the lattice is on the first screen. */
+  const [settings, setSettings] = useState(false)
 
   return (
     <section className="font-sans">
-      <div className="relative grid gap-4 sm:grid-cols-2">
-        <Pane id="pane-a" label={t.sideA} value={aText} onChange={onA} />
-        <Pane id="pane-b" label={t.sideB} value={bText} onChange={onB} />
-
-        {/*
-          The swap sits on the seam between the two panes, where the gesture
-          it performs is: it is the one control whose meaning is spatial.
-        */}
-        <button
-          type="button"
-          onClick={onSwap}
-          title={t.swap}
-          aria-label={t.swap}
-          className="absolute left-1/2 top-1/2 hidden h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-rule bg-surface font-mono text-sm text-indigo shadow-sm transition-colors hover:border-indigo hover:text-ink sm:flex"
-        >
-          ⇄
-        </button>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-end gap-3 rounded-xl border border-rule bg-surface/70 p-3">
+      <div className="card flex flex-wrap items-end gap-x-4 gap-y-3 p-3">
         <Field label={t.presets} htmlFor="preset">
           <Select
             id="preset"
@@ -104,64 +96,119 @@ export function InputPanes({
           </Select>
         </Field>
 
-        {algorithm !== undefined && onAlgorithm !== undefined ? (
-          <Field label={t.algorithm} htmlFor="algorithm">
-            <Select
-              id="algorithm"
-              value={algorithm}
-              onChange={(event) => onAlgorithm(event.target.value as AlgorithmId)}
-            >
-              {ALGORITHMS.map((id) => (
-                <option key={id} value={id}>
-                  {ALGORITHM_LABELS[id]}
-                </option>
-              ))}
-            </Select>
-          </Field>
-        ) : null}
-
-        <Field label={t.granularity} htmlFor="granularity">
-          <Select
-            id="granularity"
-            value={granularity}
-            onChange={(event) => onGranularity(event.target.value as Granularity)}
-          >
-            {GRANULARITIES.map((g) => (
-              <option key={g} value={g}>
-                {label[g]}
-              </option>
-            ))}
-          </Select>
-        </Field>
-
-        <Toggle checked={ignoreWhitespace} onChange={onIgnoreWhitespace}>
-          {t.ignoreWhitespace}
-        </Toggle>
-
-        {/* Swap again, for the narrow layout where the seam button is hidden. */}
+        {/*
+          On a phone every setting stacked into a full screen of controls
+          before the lattice appeared. The example picker stays; the rest
+          folds behind one button there and is always open from `sm`.
+        */}
         <button
           type="button"
-          onClick={onSwap}
-          className="flex h-9 items-center gap-1.5 rounded-lg border border-rule bg-surface px-3 text-fine text-ink hover:border-indigo/60 sm:hidden"
+          onClick={() => setSettings((value) => !value)}
+          aria-expanded={settings}
+          aria-controls="toolbar-settings"
+          className="flex h-9 items-center gap-1.5 rounded-ctl border border-rule bg-surface px-3 text-fine text-ink sm:hidden"
         >
-          <span aria-hidden>⇄</span>
-          {t.swap}
+          {t.options}
+          <span aria-hidden>{settings ? '▴' : '▾'}</span>
         </button>
 
-        <div className="ml-auto">
-          <ShareLink url={shareUrl} dict={dict} />
+        <div
+          id="toolbar-settings"
+          className={`${settings ? 'flex' : 'hidden'} w-full flex-wrap items-end gap-x-4 gap-y-3 sm:flex sm:w-auto sm:flex-1`}
+        >
+          {algorithm !== undefined && onAlgorithm !== undefined ? (
+            <Segmented
+              name="algorithm"
+              label={t.algorithm}
+              value={algorithm}
+              onChange={onAlgorithm}
+              options={ALGORITHMS.map((id) => ({ value: id, label: ALGORITHM_LABELS[id] }))}
+            />
+          ) : null}
+
+          <Segmented
+            name="granularity"
+            label={t.granularity}
+            value={granularity}
+            onChange={onGranularity}
+            options={GRANULARITIES.map((g) => ({ value: g, label: label[g] }))}
+          />
+
+          <Toggle checked={ignoreWhitespace} onChange={onIgnoreWhitespace}>
+            {t.ignoreWhitespace}
+          </Toggle>
+
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-controls="texts-drawer"
+            className="flex h-9 items-center gap-2 rounded-ctl border border-dashed border-rule bg-surface px-3 text-fine text-ink transition-colors hover:border-indigo/60"
+          >
+            <span className="font-mono tabular-nums text-muted">
+              {format(t.textsSummary, {
+                a: count(aText, granularity),
+                b: count(bText, granularity),
+                unit: t.unit[granularity],
+              })}
+            </span>
+            <span className="font-medium underline decoration-rule underline-offset-4">
+              {open ? t.hideTexts : t.editTexts}
+            </span>
+          </button>
+
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onSwap}
+              className="flex h-9 items-center gap-1.5 rounded-ctl border border-rule bg-surface px-3 text-fine text-ink transition-colors hover:border-indigo/60"
+            >
+              <span aria-hidden>⇄</span>
+              {t.swap}
+            </button>
+            <ShareLink url={shareUrl} dict={dict} />
+          </div>
         </div>
       </div>
 
-      {/*
-        Granularity looks like a display preference and is not one: it decides
-        what the search compares at all, and so what "the same" means. Said
-        beside the control rather than left to one preset's description, which
-        was the only place on the site that mentioned it.
-      */}
-      <p className="measure mt-2 font-sans text-fine text-muted">{t.granularityWhy}</p>
+      <div id="texts-drawer" hidden={!open} className="card mt-3 p-3">
+        <div className="relative grid gap-4 sm:grid-cols-2">
+          <Pane id="pane-a" label={t.sideA} value={aText} onChange={onA} />
+          <Pane id="pane-b" label={t.sideB} value={bText} onChange={onB} />
+        </div>
+        {/*
+          Granularity looks like a display preference and is not one: it
+          decides what the search compares at all, and so what "the same"
+          means. Said here, beside the text it carves up, rather than left to
+          one preset's description, which was the only place on the site that
+          mentioned it — and kept out of the toolbar row, where three lines of
+          it pushed the lattice below the fold for everyone.
+        */}
+        <p className="measure mt-3 text-fine text-muted">{t.granularityWhy}</p>
+      </div>
     </section>
   )
+}
+
+/**
+ * How many elements a side has at this granularity, for the drawer's summary.
+ * A display count, not the tokenizer: it only has to agree with what a reader
+ * would count, and it never feeds the search.
+ */
+function count(text: string, granularity: Granularity): number {
+  if (text === '') return 0
+  switch (granularity) {
+    case 'line':
+      return text.split('\n').length
+    case 'word':
+      return text.split(/\s+/).filter((word) => word !== '').length
+    case 'char':
+      return [...text].length
+    default: {
+      const never: never = granularity
+      return never
+    }
+  }
 }
 
 function Pane({
@@ -195,7 +242,7 @@ function Pane({
         onChange={(event) => onChange(event.target.value)}
         spellCheck={false}
         rows={8}
-        className="w-full resize-y rounded-xl border border-rule bg-surface p-3 font-mono text-fine text-ink focus:border-indigo focus:outline-none"
+        className="w-full resize-y rounded-card border border-rule bg-sunken p-3 font-mono text-fine text-ink focus:border-indigo focus:outline-none"
       />
     </div>
   )

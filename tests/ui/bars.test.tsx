@@ -9,11 +9,10 @@ import { getDict } from '@/lib/i18n/dictionary'
  * instead of it, and its length has to actually track the value — a bar
  * that doesn't move with the number it sits beside is decoration, not data.
  */
-function barWidth(container: HTMLElement, index: number): number {
-  // The bar's fill is the inner span with the inline width style; the outer
-  // span is just the track.
-  const fills = container.querySelectorAll('span[style*="width"]')
-  const style = (fills[index] as HTMLElement).style.width
+/** The V strip's bars stand vertically, so the row reads as the frontier's profile. */
+function barHeight(container: HTMLElement, index: number): number {
+  const fills = container.querySelectorAll('span[style*="height"]')
+  const style = (fills[index] as HTMLElement).style.height
   return Number(style.replace('%', ''))
 }
 
@@ -38,9 +37,9 @@ describe('the V strip bar', () => {
       />,
     )
     // Against maxX = 4: x=1 -> 25%, x=2 -> 50%, x=4 -> 100%.
-    expect(barWidth(container, 0)).toBe(25)
-    expect(barWidth(container, 1)).toBe(50)
-    expect(barWidth(container, 2)).toBe(100)
+    expect(barHeight(container, 0)).toBe(25)
+    expect(barHeight(container, 1)).toBe(50)
+    expect(barHeight(container, 2)).toBe(100)
   })
 
   it('never divides by zero when the strip is empty', () => {
@@ -57,7 +56,7 @@ describe('the V strip bar', () => {
         maxX={0}
       />,
     )
-    expect(container.querySelectorAll('span[style*="width"]')).toHaveLength(0)
+    expect(container.querySelectorAll('span[style*="height"]')).toHaveLength(0)
   })
 })
 

@@ -145,9 +145,7 @@ describe('sharing', () => {
     await waitFor(() => expect(window.location.hash).toContain('g=line'))
     expect(window.location.hash).not.toContain('alg=')
 
-    fireEvent.change(screen.getByLabelText(dict.input.algorithm, { exact: false }), {
-      target: { value: 'patience' },
-    })
+    fireEvent.click(screen.getByRole('radio', { name: 'Patience' }))
     await waitFor(() => expect(window.location.hash).toContain('alg=patience'))
   })
 

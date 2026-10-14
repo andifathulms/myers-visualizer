@@ -55,10 +55,34 @@ export function StatBar({
       */}
       <div className="border-b border-rule pb-3">
         <div className="flex items-baseline gap-3">
-          <span className="font-mono text-h2 tabular-nums leading-none text-ink">{d}</span>
+          <span className="font-serif text-hero font-medium tabular-nums leading-none text-ink">{d}</span>
           <span className="font-sans text-fine text-muted">{t.d}</span>
         </div>
-        <p className="mt-1.5 font-sans text-fine tabular-nums text-muted">
+        {/*
+          One pip per level, filled as the search reaches it: progress toward
+          D drawn in the unit D is measured in. Past two dozen levels pips
+          stop being countable, so the same fact becomes a bar.
+        */}
+        {d > 0 ? (
+          d <= 24 ? (
+            <div aria-hidden className="mt-3 flex gap-1">
+              {Array.from({ length: d }, (_, level) => (
+                <span
+                  key={level}
+                  className={`h-1.5 flex-1 rounded-full ${level < currentD ? 'bg-ink' : 'bg-sunken'}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-sunken">
+              <div
+                className="h-full rounded-full bg-ink"
+                style={{ width: `${Math.min(100, (currentD / d) * 100)}%` }}
+              />
+            </div>
+          )
+        ) : null}
+        <p className="mt-2 font-sans text-fine tabular-nums text-muted">
           {format(t.dReached, { current: currentD })}
         </p>
       </div>

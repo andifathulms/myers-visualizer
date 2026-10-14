@@ -1,6 +1,6 @@
 'use client'
 
-import { Panel } from '@/components/ui/Panel'
+import type { ReactNode } from 'react'
 import { format, type Dict } from '@/lib/i18n/dictionary'
 
 /**
@@ -52,7 +52,7 @@ export function StepReadout({
   if (backtrack !== null) {
     const finished = backtrack.done >= backtrack.total
     return (
-      <Panel title={t.backtrackTitle} hint={t.backtrackHint}>
+      <Strip title={t.backtrackTitle} hint={t.backtrackHint}>
         <p className="font-sans text-sm text-muted">
           <span className="font-mono tabular-nums text-ink">
             {format(t.backtrackAt, {
@@ -69,15 +69,15 @@ export function StepReadout({
             </>
           ) : null}
         </p>
-      </Panel>
+      </Strip>
     )
   }
 
   if (!available) {
     return (
-      <Panel title={t.step}>
+      <Strip title={t.step}>
         <p className="font-sans text-sm text-muted">{t.stepNoSteps}</p>
-      </Panel>
+      </Strip>
     )
   }
 
@@ -90,7 +90,7 @@ export function StepReadout({
     is left is one short line that changes as you step.
   */
   return (
-    <Panel title={t.step} hint={t.stepHint}>
+    <Strip title={t.step} hint={t.stepHint}>
       <p className="font-sans text-sm text-muted">
         <span className="font-mono tabular-nums text-ink">{format(t.stepAt, { d, k })}</span>
         <span aria-hidden> · </span>
@@ -108,6 +108,24 @@ export function StepReadout({
           </>
         )}
       </p>
-    </Panel>
+    </Strip>
+  )
+}
+
+/**
+ * A one-line readout, not a full panel: it sits between the lattice and the
+ * transport, where a card with a heading and a paragraph cost the stage a
+ * hundred pixels of height for one changing sentence. The plain-language hint
+ * is still on screen, beside the readout rather than above it.
+ */
+function Strip({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+  return (
+    <section className="card flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-2.5">
+      <h3 className="eyebrow">{title}</h3>
+      <div className="min-w-0">{children}</div>
+      {hint === undefined ? null : (
+        <p className="w-full max-w-[90ch] font-sans text-fine text-muted">{hint}</p>
+      )}
+    </section>
   )
 }
