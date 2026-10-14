@@ -76,7 +76,7 @@ export function StepHeading({
     <div className="mb-3 flex items-start gap-3">
       <span
         aria-hidden
-        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-indigo/25 bg-paper font-mono text-fine tabular-nums text-indigo"
+        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-indigo/25 bg-surface font-mono text-fine tabular-nums text-indigo"
       >
         {step}
       </span>

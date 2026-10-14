@@ -12,11 +12,11 @@ const BASE =
   'inline-flex items-center justify-center gap-1.5 rounded-lg font-sans font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40'
 
 const TONE = {
-  primary: 'border border-indigo bg-indigo text-paper hover:bg-deepIndigo',
-  secondary: 'border border-rule bg-paper text-deepIndigo hover:border-indigo/60 hover:bg-cotton',
+  primary: 'border border-indigo bg-indigo text-surface hover:bg-ink',
+  secondary: 'border border-rule bg-surface text-ink hover:border-indigo/60 hover:bg-ground',
   ghost: 'border border-transparent text-indigo hover:bg-indigo/8',
   /** Pressed / selected. madder is not used here: it means "the answer". */
-  active: 'border border-indigo bg-indigo/10 text-deepIndigo',
+  active: 'border border-indigo bg-indigo/10 text-ink',
 } as const
 
 const SIZE = {
@@ -101,7 +101,7 @@ export function Select({
   return (
     <select
       {...rest}
-      className={`h-9 rounded-lg border border-rule bg-paper px-2.5 font-sans text-fine text-deepIndigo hover:border-indigo/60 ${className}`}
+      className={`h-9 rounded-lg border border-rule bg-surface px-2.5 font-sans text-fine text-ink hover:border-indigo/60 ${className}`}
     >
       {children}
     </select>
@@ -119,7 +119,7 @@ export function Toggle({
   children: ReactNode
 }) {
   return (
-    <label className="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-rule bg-paper px-3 font-sans text-fine text-deepIndigo hover:border-indigo/60">
+    <label className="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-rule bg-surface px-3 font-sans text-fine text-ink hover:border-indigo/60">
       <input
         type="checkbox"
         checked={checked}
@@ -145,7 +145,7 @@ export function Note({
   return (
     <p
       className={`measure border-l-2 pl-4 font-sans text-sm ${
-        tone === 'accent' ? 'border-madder text-deepIndigo' : 'border-rule text-muted'
+        tone === 'accent' ? 'border-madder text-ink' : 'border-rule text-muted'
       }`}
     >
       {children}

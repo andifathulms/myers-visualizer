@@ -13,7 +13,12 @@ import type { Locale } from './locales'
  * is preceded.
  */
 export type Dict = {
-  nav: { graph: string; compare: string; presets: string; home: string; brand: string }
+  /**
+   * The four destinations, named by what a visitor does there rather than by
+   * how the site is built — "Edit graph" and "Presets" meant nothing to a
+   * newcomer. Route slugs are unchanged: shared links depend on them.
+   */
+  nav: { learn: string; graph: string; compare: string; presets: string; home: string; brand: string }
   home: {
     kicker: string
     tagline: string
@@ -270,7 +275,8 @@ export type Dict = {
 
 const id: Dict = {
   nav: {
-    graph: 'Edit graph',
+    learn: 'Belajar',
+    graph: 'Playground',
     compare: 'Banding',
     presets: 'Contoh',
     home: 'Beranda',
@@ -534,9 +540,10 @@ const id: Dict = {
 
 const en: Dict = {
   nav: {
-    graph: 'Edit graph',
+    learn: 'Learn',
+    graph: 'Playground',
     compare: 'Compare',
-    presets: 'Presets',
+    presets: 'Examples',
     home: 'Home',
     brand: APP_NAME,
   },
@@ -755,8 +762,8 @@ const en: Dict = {
     shortest: 'shortest',
   },
   presets: {
-    title: 'Presets',
-    lede: 'Each preset carries the phenomenon it exists to show. Open one, then press play.',
+    title: 'Examples',
+    lede: 'Each example carries the phenomenon it exists to show. Open one, then press play.',
     open: 'Open in the edit graph',
     linkFragment: 'The link fragment for this preset',
   },

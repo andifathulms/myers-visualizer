@@ -81,13 +81,13 @@ export function InputPanes({
           onClick={onSwap}
           title={t.swap}
           aria-label={t.swap}
-          className="absolute left-1/2 top-1/2 hidden h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-rule bg-paper font-mono text-sm text-indigo shadow-sm transition-colors hover:border-indigo hover:text-deepIndigo sm:flex"
+          className="absolute left-1/2 top-1/2 hidden h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-rule bg-surface font-mono text-sm text-indigo shadow-sm transition-colors hover:border-indigo hover:text-ink sm:flex"
         >
           ⇄
         </button>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-end gap-3 rounded-xl border border-rule bg-paper/70 p-3">
+      <div className="mt-4 flex flex-wrap items-end gap-3 rounded-xl border border-rule bg-surface/70 p-3">
         <Field label={t.presets} htmlFor="preset">
           <Select
             id="preset"
@@ -142,7 +142,7 @@ export function InputPanes({
         <button
           type="button"
           onClick={onSwap}
-          className="flex h-9 items-center gap-1.5 rounded-lg border border-rule bg-paper px-3 text-fine text-deepIndigo hover:border-indigo/60 sm:hidden"
+          className="flex h-9 items-center gap-1.5 rounded-lg border border-rule bg-surface px-3 text-fine text-ink hover:border-indigo/60 sm:hidden"
         >
           <span aria-hidden>⇄</span>
           {t.swap}
@@ -195,7 +195,7 @@ function Pane({
         onChange={(event) => onChange(event.target.value)}
         spellCheck={false}
         rows={8}
-        className="w-full resize-y rounded-xl border border-rule bg-paper p-3 font-mono text-fine text-deepIndigo focus:border-indigo focus:outline-none"
+        className="w-full resize-y rounded-xl border border-rule bg-surface p-3 font-mono text-fine text-ink focus:border-indigo focus:outline-none"
       />
     </div>
   )

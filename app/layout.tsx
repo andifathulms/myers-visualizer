@@ -1,19 +1,33 @@
 import type { Metadata, Viewport } from 'next'
-import { DM_Mono, Inter, Newsreader } from 'next/font/google'
+import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from 'next/font/google'
 import './globals.css'
 import { APP_DESCRIPTION, APP_NAME, APP_TITLE } from '@/lib/brand'
 import { PALETTE } from '@/lib/palette'
 
 // Self-hosted at build time: no runtime font fetch, so the site is fully
 // offline after first load. PRD §11.
-const mono = DM_Mono({
+// Plex Sans and Plex Mono share a skeleton, so prose and figures read as one
+// voice. Newsreader carries the optical-size axis so headings get its display
+// cut at large sizes rather than the text cut scaled up.
+const mono = IBM_Plex_Mono({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-mono',
   display: 'swap',
 })
-const serif = Newsreader({ subsets: ['latin'], variable: '--font-serif', display: 'swap' })
-const sans = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
+const serif = Newsreader({
+  subsets: ['latin'],
+  axes: ['opsz'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+})
+const sans = IBM_Plex_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-sans',
+  display: 'swap',
+})
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 const SITE = 'https://andifathulms.github.io/myers-visualizer'
@@ -52,7 +66,7 @@ export const metadata: Metadata = {
  * is what makes the site look like one surface rather than two.
  */
 export const viewport: Viewport = {
-  themeColor: PALETTE.cotton,
+  themeColor: PALETTE.ground,
 }
 
 /**
@@ -65,7 +79,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${mono.variable} ${serif.variable} ${sans.variable}`}>
-      <body className="bg-cotton text-deepIndigo antialiased">{children}</body>
+      <body className="bg-ground text-ink antialiased">{children}</body>
     </html>
   )
 }

@@ -32,7 +32,7 @@ export function MakerSignature() {
           href={MAKER.portfolio}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-deepIndigo underline decoration-rule underline-offset-4 transition-colors hover:text-madder hover:decoration-madder"
+          className="text-ink underline decoration-rule underline-offset-4 transition-colors hover:text-madder hover:decoration-madder"
         >
           {MAKER.name}
         </a>{' '}
@@ -49,7 +49,7 @@ export function MakerSignature() {
               rel="noopener noreferrer"
               aria-label={label}
               title={label}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-indigo/10 hover:text-deepIndigo"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-indigo/10 hover:text-ink"
             >
               <Icon />
             </a>

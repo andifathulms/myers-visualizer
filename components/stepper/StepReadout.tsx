@@ -54,7 +54,7 @@ export function StepReadout({
     return (
       <Panel title={t.backtrackTitle} hint={t.backtrackHint}>
         <p className="font-sans text-sm text-muted">
-          <span className="font-mono tabular-nums text-deepIndigo">
+          <span className="font-mono tabular-nums text-ink">
             {format(t.backtrackAt, {
               done: backtrack.done,
               total: backtrack.total,
@@ -92,7 +92,7 @@ export function StepReadout({
   return (
     <Panel title={t.step} hint={t.stepHint}>
       <p className="font-sans text-sm text-muted">
-        <span className="font-mono tabular-nums text-deepIndigo">{format(t.stepAt, { d, k })}</span>
+        <span className="font-mono tabular-nums text-ink">{format(t.stepAt, { d, k })}</span>
         <span aria-hidden> · </span>
         {direction}
         {move === 'start' ? null : (
@@ -102,7 +102,7 @@ export function StepReadout({
               Weight, not colour. A tie is neither the frontier nor the answer,
               and madder is reserved for the answer.
             */}
-            <span className={tied ? 'font-medium text-deepIndigo' : undefined}>
+            <span className={tied ? 'font-medium text-ink' : undefined}>
               {tied ? t.stepTied : t.stepNoTie}
             </span>
           </>

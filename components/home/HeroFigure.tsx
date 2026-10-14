@@ -116,7 +116,7 @@ export function HeroFigure({ dict }: { dict: Dict }) {
             width={N * CELL}
             height={N * CELL}
             rx={4}
-            className="fill-cotton/60"
+            className="fill-ground/60"
           />
 
           {/* The grid itself. */}

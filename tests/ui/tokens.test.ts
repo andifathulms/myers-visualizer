@@ -10,8 +10,10 @@ import { PALETTE } from '@/lib/palette'
  *
  * It also holds the contrast floor. The tokens are a claim about legibility
  * ("secondary text, on the ground"), and a claim written down is a claim
- * asserted: WCAG AA for body text is 4.5:1, and `muted` on `cotton` sat at
- * 4.34:1 until it was measured.
+ * asserted: WCAG AA for body text is 4.5:1, and `muted` on the old cotton
+ * ground sat at 4.34:1 until it was measured. Graphics are held to 3:1
+ * (WCAG 1.4.11): the old frontier was 2.03:1 on the ground, and nothing
+ * here checked it.
  */
 const CSS = readFileSync(join(process.cwd(), 'app', 'globals.css'), 'utf8')
 
@@ -64,19 +66,31 @@ describe('design tokens', () => {
   })
 
   /*
-   * Both surfaces, because text lands on either: cards are paper, and the page
-   * itself is cotton. A tone that only passes on the lighter of the two is a
-   * tone that fails wherever the card ends.
+   * Every surface, because text lands on each: cards are `surface`, the page
+   * is `ground`, inputs and table heads are `sunken`. A tone that only passes
+   * on the lightest of them fails wherever the card ends.
    */
-  it.each(['cotton', 'paper'] as const)('keeps every text tone at 4.5:1 on %s', (surface) => {
-    for (const tone of ['deepIndigo', 'indigo', 'muted', 'added', 'removed'] as const) {
+  const SURFACES = ['ground', 'surface', 'sunken'] as const
+
+  it.each(SURFACES)('keeps every text tone at 4.5:1 on %s', (surface) => {
+    for (const tone of ['ink', 'indigo', 'muted', 'added', 'removed'] as const) {
       expect(contrast(PALETTE[tone], PALETTE[surface]), `${tone} on ${surface}`).toBeGreaterThanOrEqual(4.5)
     }
   })
 
-  it('keeps madder legible as an accent on both surfaces', () => {
-    expect(contrast(PALETTE.madder, PALETTE.cotton)).toBeGreaterThanOrEqual(4.5)
-    expect(contrast(PALETTE.madder, PALETTE.paper)).toBeGreaterThanOrEqual(4.5)
+  it.each(SURFACES)('keeps madder legible as an accent on %s', (surface) => {
+    expect(contrast(PALETTE.madder, PALETTE[surface])).toBeGreaterThanOrEqual(4.5)
+  })
+
+  /*
+   * The lattice's marks — structure, frontier, path — are graphics, and the
+   * frontier is the one thing that moves. 3:1 against every surface it can
+   * be drawn on.
+   */
+  it.each(SURFACES)('keeps every lattice mark at 3:1 on %s', (surface) => {
+    for (const mark of ['indigo', 'turmeric', 'madder'] as const) {
+      expect(contrast(PALETTE[mark], PALETTE[surface]), `${mark} on ${surface}`).toBeGreaterThanOrEqual(3)
+    }
   })
 
   /*

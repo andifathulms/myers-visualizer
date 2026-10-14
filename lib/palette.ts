@@ -1,5 +1,5 @@
 /**
- * The single source of the palette. PRD §9.
+ * The single source of the palette. PRD §9, DESIGN.md §3.
  *
  * Tailwind imports these tokens, and canvas — which cannot use utility
  * classes — reads them by name here. A hex literal belongs in this file
@@ -8,45 +8,44 @@
  *   madder is reserved for the chosen path and the middle snake: the two
  *   things that are *the answer*. Never use it for anything else.
  *
- * The lattice tokens below are normative and unchanged. The rest are surface
- * and text tones, added so the interface can group things — a card that lifts
- * off the ground, a hairline that is not a translucent hack, a secondary text
- * tone that is actually legible. They carry no algorithmic meaning.
+ * The values were re-tuned in the 2026 redesign (DESIGN.md §3, recorded
+ * there). The old warm cotton/paper ground sat 1.1:1 from its own cards and
+ * put the frontier at 2.03:1 on the ground, under the 3:1 WCAG asks of a
+ * graphic. `tests/ui/tokens.test.ts` now holds lattice marks to 3:1 as well
+ * as text to 4.5:1, on every surface.
  */
 export const PALETTE = {
-  /** Undyed cotton — the ground. */
-  cotton: '#E8E2D4',
-  /** Bleached cotton — a raised surface. Cards sit on this, above the ground. */
-  paper: '#F4F1E8',
-  /** A hairline between surfaces. Warm, so it reads as a fold rather than a border. */
-  rule: '#D3CAB6',
-  /** The lattice and structure. */
-  indigo: '#2A3D5C',
-  /** Text. */
-  deepIndigo: '#1A2438',
-  /**
-   * Secondary text. 5.1:1 on cotton and 5.8:1 on paper — measured, not
-   * estimated. It was a shade lighter and claimed 5.5:1; it was actually
-   * 4.3:1 on the ground, which is where the glossary and the axis labels
-   * live. `tests/ui/tokens.test.ts` holds the floor now.
-   */
-  muted: '#525E75',
+  /** The sheet — the page ground. Cool, so the lattice colours carry. */
+  ground: '#F3F5F8',
+  /** A raised surface. Instruments and cards sit on this, above the ground. */
+  surface: '#FFFFFF',
+  /** Recessed: inputs, code, table heads, empty tracks. */
+  sunken: '#EAEEF4',
+  /** A hairline between surfaces. */
+  rule: '#D8DEE8',
+  /** The lattice and structure; lede paragraphs. */
+  indigo: '#2C3D6E',
+  /** Primary text. */
+  ink: '#111A2E',
+  /** Secondary text. Measured on all three surfaces by the token test. */
+  muted: '#55607A',
   /** The advancing frontier — the live edge of the search. */
-  turmeric: '#C9982E',
+  turmeric: '#B97A06',
   /** The chosen path and the middle snake. Nothing else. */
-  madder: '#A63D2F',
+  madder: '#C0392B',
   /** Pale indigo wash for the explored region. */
-  explored: '#C7CEDC',
+  explored: '#D6DDEF',
   /**
    * The diff output's two directions. Deletion is deliberately *not* madder:
    * madder means "this is the answer" in the lattice, and a removed line is
-   * not an answer. Both clear 4.5:1 on paper.
+   * not an answer. A wine rather than a red, so the two never read as one.
    */
-  added: '#3E6B54',
-  removed: '#8A4B3A',
+  added: '#1F7A4E',
+  removed: '#A3364F',
 } as const
 
 export type PaletteToken = keyof typeof PALETTE
+export type Palette = { readonly [K in PaletteToken]: string }
 
 /**
  * The brand mark's own colours — the "snake" staircase from the brand kit,

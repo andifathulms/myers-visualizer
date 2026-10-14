@@ -13,25 +13,38 @@
  * a hex changed in the palette and not here is a test failure, not a drift.
  */
 :root {
-  --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', monospace;
+  /*
+   * IBM Plex Sans and Plex Mono share a skeleton, so `k = −2` in a sentence
+   * and `k−2` in a V cell read as one voice. Newsreader is for headings only.
+   */
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
   --font-serif: 'Newsreader', Georgia, serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
 
   /* Surfaces. */
-  --color-cotton: 232 226 212;
-  --color-paper: 244 241 232;
-  --color-rule: 211 202 182;
+  --color-ground: 243 245 248;
+  --color-surface: 255 255 255;
+  --color-sunken: 234 238 244;
+  --color-rule: 216 222 232;
   /* Text. */
-  --color-indigo: 42 61 92;
-  --color-deep-indigo: 26 36 56;
-  --color-muted: 82 94 117;
+  --color-indigo: 44 61 110;
+  --color-ink: 17 26 46;
+  --color-muted: 85 96 122;
   /* Lattice — normative. PRD §9. */
-  --color-turmeric: 201 152 46;
-  --color-madder: 166 61 47;
-  --color-explored: 199 206 220;
+  --color-turmeric: 185 122 6;
+  --color-madder: 192 57 43;
+  --color-explored: 214 221 239;
   /* Diff output. */
-  --color-added: 62 107 84;
-  --color-removed: 138 75 58;
+  --color-added: 31 122 78;
+  --color-removed: 163 54 79;
+
+  /*
+   * Elevation, as one value: a hairline plus a soft drop, only for things that
+   * float or frame the core object. Channels come from --color-ink so the
+   * shadow follows the theme.
+   */
+  --shadow-lift: 0 1px 2px rgb(var(--color-ink) / 0.06), 0 12px 32px -16px rgb(var(--color-ink) / 0.22);
+  --paper-grid: rgb(var(--color-indigo) / 0.07);
 
   /*
    * One type scale, in role order. Prose sits at --text-base and never below:
@@ -47,9 +60,9 @@
   --text-base: 1rem; /* 16px — body. */
   --text-lg: 1.125rem; /* 18px — lede. */
   --text-h3: 1.25rem; /* 20px */
-  --text-h2: clamp(1.5rem, 1.15rem + 1.6vw, 1.875rem);
-  --text-h1: clamp(1.75rem, 1.3rem + 2.1vw, 2.25rem);
-  --text-hero: clamp(2rem, 1.15rem + 4vw, 3.25rem);
+  --text-h2: clamp(1.5rem, 1.1rem + 1.5vw, 2rem); /* to 32px */
+  --text-h1: clamp(1.75rem, 1.1rem + 2.4vw, 2.75rem); /* to 44px */
+  --text-hero: clamp(2.25rem, 1rem + 4.6vw, 4rem); /* to 64px */
 
   /*
    * Vertical rhythm. Tailwind's 4px spacing scale already covers the inside of
@@ -64,8 +77,8 @@
 
 html,
 body {
-  background-color: rgb(var(--color-cotton));
-  color: rgb(var(--color-deep-indigo));
+  background-color: rgb(var(--color-ground));
+  color: rgb(var(--color-ink));
 }
 
 @layer base {
@@ -79,7 +92,7 @@ body {
   h3 {
     @apply font-serif;
     /* Serif display sizes need negative tracking, or they read as loose. */
-    letter-spacing: -0.011em;
+    letter-spacing: -0.015em;
     text-wrap: balance;
   }
 
@@ -116,10 +129,35 @@ body {
     max-width: 64ch;
   }
 
-  /* A card's lift: one hairline plus a whisper of shadow, never a slab. */
+  /*
+   * A card: one hairline on the raised surface, no shadow. Shadow is kept for
+   * what floats or frames the core object (`.lift`), so it still means
+   * something when it appears.
+   */
   .card {
-    @apply rounded-xl border border-rule bg-paper;
-    box-shadow: 0 1px 2px rgb(var(--color-deep-indigo) / 0.04);
+    @apply rounded-card border border-rule bg-surface;
+  }
+
+  .lift {
+    box-shadow: var(--shadow-lift);
+  }
+
+  /*
+   * Graph paper: a faint 24px grid on the ground, only behind drawn figures —
+   * the hero, the lattice stage, preset thumbnails. The subject's own
+   * material, used where the subject is drawn and nowhere else.
+   */
+  .graph-paper {
+    background-image:
+      linear-gradient(var(--paper-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--paper-grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+  }
+
+  /* An uppercase label — panel titles, eyebrows. */
+  .eyebrow {
+    @apply font-sans text-micro font-semibold uppercase tracking-[0.08em] text-muted;
   }
 
   /* Section rhythm, so the distance between two sections is a token. */

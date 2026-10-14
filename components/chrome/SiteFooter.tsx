@@ -20,7 +20,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
   const dict = getDict(locale)
 
   return (
-    <footer className="mt-20 border-t border-rule bg-paper/60">
+    <footer className="mt-20 border-t border-rule bg-surface/60">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 font-sans text-sm sm:grid-cols-[1fr_auto]">
         <p className="flex items-center gap-2.5 font-serif text-lg font-semibold">
           <BrandMark size={22} />

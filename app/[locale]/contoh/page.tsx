@@ -45,7 +45,7 @@ export default function ContohPage({ params }: { params: { locale: string } }) {
               {/* The preset id is the shared URL — stable and readable. */}
               <Link
                 href={`/${locale}/graf#p=${preset.id}`}
-                className="inline-flex h-9 items-center rounded-lg border border-rule bg-cotton px-3.5 font-sans text-fine font-medium text-deepIndigo transition-colors hover:border-madder hover:text-madder"
+                className="inline-flex h-9 items-center rounded-lg border border-rule bg-ground px-3.5 font-sans text-fine font-medium text-ink transition-colors hover:border-madder hover:text-madder"
               >
                 {dict.presets.open} →
               </Link>

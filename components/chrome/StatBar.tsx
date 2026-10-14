@@ -55,7 +55,7 @@ export function StatBar({
       */}
       <div className="border-b border-rule pb-3">
         <div className="flex items-baseline gap-3">
-          <span className="font-mono text-h2 tabular-nums leading-none text-deepIndigo">{d}</span>
+          <span className="font-mono text-h2 tabular-nums leading-none text-ink">{d}</span>
           <span className="font-sans text-fine text-muted">{t.d}</span>
         </div>
         <p className="mt-1.5 font-sans text-fine tabular-nums text-muted">
@@ -67,7 +67,7 @@ export function StatBar({
         {rows.map((row) => (
           <div key={row.label} className="contents">
             <dt className="text-muted">{row.label}</dt>
-            <dd className="text-right font-mono tabular-nums text-deepIndigo">{row.value}</dd>
+            <dd className="text-right font-mono tabular-nums text-ink">{row.value}</dd>
           </div>
         ))}
       </dl>

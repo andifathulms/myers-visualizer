@@ -26,7 +26,7 @@ export default function LocaleLayout({
       <ServiceWorker />
       <a
         href="#konten"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded focus:bg-indigo focus:px-3 focus:py-2 focus:font-sans focus:text-sm focus:text-cotton"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded focus:bg-indigo focus:px-3 focus:py-2 focus:font-sans focus:text-sm focus:text-ground"
       >
         {dict.a11y.skipToContent}
       </a>

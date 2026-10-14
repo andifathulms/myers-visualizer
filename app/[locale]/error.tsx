@@ -31,13 +31,13 @@ export default function LocaleError({ reset }: { error: Error & { digest?: strin
           <button
             type="button"
             onClick={reset}
-            className="inline-flex h-10 items-center rounded-lg border border-indigo bg-indigo px-4 font-sans text-sm font-medium text-paper transition-colors hover:bg-deepIndigo"
+            className="inline-flex h-10 items-center rounded-lg border border-indigo bg-indigo px-4 font-sans text-sm font-medium text-surface transition-colors hover:bg-ink"
           >
             {t.retry}
           </button>
           <Link
             href={`/${locale}/`}
-            className="inline-flex h-10 items-center rounded-lg border border-rule bg-paper px-4 font-sans text-sm font-medium text-deepIndigo transition-colors hover:border-indigo/60"
+            className="inline-flex h-10 items-center rounded-lg border border-rule bg-surface px-4 font-sans text-sm font-medium text-ink transition-colors hover:border-indigo/60"
           >
             {dict.nav.home}
           </Link>

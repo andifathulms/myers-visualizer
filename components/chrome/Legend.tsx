@@ -25,7 +25,7 @@ export function Legend({ dict }: { dict: Dict }) {
             aria-hidden
             className={`inline-block h-2.5 w-4 shrink-0 translate-y-px rounded-sm ${item.className}`}
           />
-          <span className="text-deepIndigo">{item.label}</span>
+          <span className="text-ink">{item.label}</span>
           <span className="text-muted">— {item.hint}</span>
         </li>
       ))}

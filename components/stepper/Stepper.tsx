@@ -88,7 +88,7 @@ export function Stepper({
   }, [frame, onSeek, onPlayToggle, onNextLevel, onPreviousLevel])
 
   return (
-    <div className="rounded-xl border border-rule bg-paper p-3">
+    <div className="rounded-xl border border-rule bg-surface p-3">
       <div className="flex flex-wrap items-center gap-1.5">
         <Button onClick={() => onSeek(0)} label={t.reset}>
           <Glyph>⏮</Glyph>

@@ -62,8 +62,8 @@ export function AmbiguityPanel({
         <p className="font-sans text-fine text-muted">{t.ambiguityUnique}</p>
       ) : (
         <>
-          <p className="font-mono text-h2 leading-none tabular-nums text-deepIndigo">{countLabel}</p>
-          <p className="mt-1.5 font-sans text-fine text-deepIndigo">
+          <p className="font-mono text-h2 leading-none tabular-nums text-ink">{countLabel}</p>
+          <p className="mt-1.5 font-sans text-fine text-ink">
             {t.ambiguityCount}
           </p>
           <p className="mt-2 font-sans text-fine text-muted">{t.ambiguityMany}</p>
@@ -110,7 +110,7 @@ export function AmbiguityPanel({
                     'h-8 w-8 rounded-lg border font-mono text-fine tabular-nums transition-colors',
                     selected === index
                       ? 'border-madder bg-madder/10 text-madder'
-                      : 'border-rule bg-cotton/40 text-muted hover:border-indigo/60 hover:text-deepIndigo',
+                      : 'border-rule bg-ground/40 text-muted hover:border-indigo/60 hover:text-ink',
                   ].join(' ')}
                 >
                   {index + 1}

@@ -75,13 +75,13 @@ export default function Home({ params }: { params: { locale: string } }) {
           <div className="flex flex-wrap gap-3 lg:col-start-1 lg:row-start-2">
             <Link
               href={`/${locale}/graf`}
-              className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-base font-medium text-paper transition-colors hover:bg-deepIndigo"
+              className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-base font-medium text-surface transition-colors hover:bg-ink"
             >
               {t.ctaGraph}
             </Link>
             <Link
               href={`/${locale}/banding`}
-              className="inline-flex h-11 items-center rounded-lg border border-rule bg-paper px-5 font-sans text-base font-medium text-deepIndigo transition-colors hover:border-indigo/60"
+              className="inline-flex h-11 items-center rounded-lg border border-rule bg-surface px-5 font-sans text-base font-medium text-ink transition-colors hover:border-indigo/60"
             >
               {t.ctaCompare}
             </Link>
@@ -125,7 +125,7 @@ export default function Home({ params }: { params: { locale: string } }) {
             <li key={step.title} className="card p-5">
               <span
                 aria-hidden
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo font-mono text-sm text-paper"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo font-mono text-sm text-surface"
               >
                 {index + 1}
               </span>
@@ -138,7 +138,7 @@ export default function Home({ params }: { params: { locale: string } }) {
         <div className="mt-8">
           <Link
             href={`/${locale}/graf`}
-            className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-base font-medium text-paper transition-colors hover:bg-deepIndigo"
+            className="inline-flex h-11 items-center rounded-lg border border-indigo bg-indigo px-5 font-sans text-base font-medium text-surface transition-colors hover:bg-ink"
           >
             {t.ctaGraph}
           </Link>
@@ -152,7 +152,7 @@ export default function Home({ params }: { params: { locale: string } }) {
           <p className="measure mt-4 font-sans text-lg text-indigo">{t.ambiguity}</p>
           <Link
             href={`/${locale}/contoh`}
-            className="mt-5 inline-flex h-10 items-center rounded-lg border border-rule bg-cotton px-4 font-sans text-sm font-medium text-deepIndigo transition-colors hover:border-madder hover:text-madder"
+            className="mt-5 inline-flex h-10 items-center rounded-lg border border-rule bg-ground px-4 font-sans text-sm font-medium text-ink transition-colors hover:border-madder hover:text-madder"
           >
             {dict.presets.title} →
           </Link>
@@ -167,7 +167,7 @@ export default function Home({ params }: { params: { locale: string } }) {
         <div className="card mt-6 max-w-3xl overflow-hidden">
           <table className="w-full border-collapse font-sans text-base">
             <thead>
-              <tr className="border-b border-rule bg-cotton/50 text-left">
+              <tr className="border-b border-rule bg-ground/50 text-left">
                 <th className="px-4 py-2.5 text-micro font-semibold uppercase tracking-[0.07em] text-muted">
                   {t.moves.move}
                 </th>
@@ -210,7 +210,7 @@ export default function Home({ params }: { params: { locale: string } }) {
           {WALKTHROUGH.map((level, index) => (
             <li key={level.d} className="card p-5">
               <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-                <h3 className="font-mono text-h3 font-semibold tabular-nums text-deepIndigo">
+                <h3 className="font-mono text-h3 font-semibold tabular-nums text-ink">
                   {format(t.walkLevel, { d: level.d })}
                 </h3>
                 {level.reached === null ? null : (
@@ -230,7 +230,7 @@ export default function Home({ params }: { params: { locale: string } }) {
                 {level.v.map(([k, x]) => (
                   <span
                     key={k}
-                    className="rounded-lg border border-rule bg-cotton/40 px-2 py-1 font-mono text-fine tabular-nums text-deepIndigo"
+                    className="rounded-lg border border-rule bg-ground/40 px-2 py-1 font-mono text-fine tabular-nums text-ink"
                   >
                     k{k} x {x}
                   </span>
@@ -240,7 +240,7 @@ export default function Home({ params }: { params: { locale: string } }) {
           ))}
         </ol>
 
-        <p className="measure mt-5 font-sans text-base text-deepIndigo">
+        <p className="measure mt-5 font-sans text-base text-ink">
           {format(t.walkResult, { d: WALKTHROUGH_D })}
         </p>
 
@@ -254,7 +254,7 @@ export default function Home({ params }: { params: { locale: string } }) {
           <p className="measure font-sans text-base text-muted">{t.walkTie}</p>
           <Link
             href={`/${locale}/graf#p=minimal-edit`}
-            className="mt-4 inline-flex h-10 items-center rounded-lg border border-rule bg-cotton px-4 font-sans text-sm font-medium text-deepIndigo transition-colors hover:border-madder hover:text-madder"
+            className="mt-4 inline-flex h-10 items-center rounded-lg border border-rule bg-ground px-4 font-sans text-sm font-medium text-ink transition-colors hover:border-madder hover:text-madder"
           >
             {t.walkCta} →
           </Link>
@@ -269,7 +269,7 @@ export default function Home({ params }: { params: { locale: string } }) {
         <dl className="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2">
           {dict.glossary.map((entry) => (
             <div key={entry.term}>
-              <dt className="font-mono text-base font-medium text-deepIndigo">{entry.term}</dt>
+              <dt className="font-mono text-base font-medium text-ink">{entry.term}</dt>
               <dd className="mt-1 font-sans text-base text-muted">{entry.plain}</dd>
             </div>
           ))}
@@ -308,7 +308,7 @@ export default function Home({ params }: { params: { locale: string } }) {
 
 function List({ items }: { items: readonly string[] }) {
   return (
-    <ol className="font-mono text-fine leading-6 text-deepIndigo">
+    <ol className="font-mono text-fine leading-6 text-ink">
       {items.map((item, index) => (
         <li key={index} className="flex gap-2">
           {/* A hairline mark, so it uses the hairline token rather than
@@ -358,7 +358,7 @@ function MoveRow({
 }) {
   return (
     <tr className="border-b border-rule/60 last:border-0">
-      <td className="px-4 py-2.5 font-mono text-fine text-deepIndigo">{move}</td>
+      <td className="px-4 py-2.5 font-mono text-fine text-ink">{move}</td>
       <td className="px-4 py-2.5 text-muted">{meaning}</td>
       <td
         className={`px-4 py-2.5 text-right font-mono tabular-nums ${
@@ -369,7 +369,7 @@ function MoveRow({
       </td>
       <td
         className={`px-4 py-2.5 text-right font-mono ${
-          free ? 'font-semibold text-deepIndigo' : 'text-muted'
+          free ? 'font-semibold text-ink' : 'text-muted'
         }`}
       >
         {k}

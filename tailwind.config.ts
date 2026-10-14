@@ -50,6 +50,19 @@ const config: Config = {
         section: 'var(--space-section)',
         hero: 'var(--space-hero)',
       },
+      /*
+       * Three radii, by role: a control, a card, a frame around the core
+       * object. Tailwind's own keys still exist, but these are the ones the
+       * design names.
+       */
+      borderRadius: {
+        ctl: '6px',
+        card: '10px',
+        frame: '14px',
+      },
+      boxShadow: {
+        lift: 'var(--shadow-lift)',
+      },
       fontFamily: {
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
         serif: ['var(--font-serif)', 'Georgia', 'serif'],

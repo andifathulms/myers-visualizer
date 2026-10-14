@@ -150,8 +150,8 @@ export function VStrip({
                   active
                     ? 'border-madder bg-madder/10 text-madder'
                     : live
-                      ? 'border-turmeric bg-turmeric/15 text-deepIndigo'
-                      : 'border-rule bg-cotton/40 text-muted',
+                      ? 'border-turmeric bg-turmeric/15 text-ink'
+                      : 'border-rule bg-ground/40 text-muted',
                 ].join(' ')}
               >
                 {/*
@@ -172,7 +172,7 @@ export function VStrip({
                 */}
                 <span
                   aria-hidden
-                  className="mt-1 h-1 w-full overflow-hidden rounded-full bg-cotton"
+                  className="mt-1 h-1 w-full overflow-hidden rounded-full bg-ground"
                 >
                   <span
                     className={[

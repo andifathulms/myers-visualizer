@@ -170,7 +170,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
             */}
             <caption className="sr-only">{t.tableCaption}</caption>
             <thead>
-              <tr className="border-b border-rule bg-cotton/50 text-left">
+              <tr className="border-b border-rule bg-ground/50 text-left">
                 <Th>{dict.input.algorithm}</Th>
                 <Th align="right">{t.scriptLength}</Th>
                 <Th align="right">{t.hunks}</Th>
@@ -189,11 +189,11 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                       number with nothing to attach it to. WCAG 1.3.1.
                     */}
                     <th scope="row" className="px-4 py-3 text-left font-normal">
-                      <span className="font-medium text-deepIndigo">
+                      <span className="font-medium text-ink">
                         {LABELS[result.algorithm]}
                       </span>
                       {shortest && contested ? (
-                        <span className="ml-2 rounded border border-rule bg-cotton px-1.5 py-0.5 font-sans text-micro uppercase tracking-wide text-muted">
+                        <span className="ml-2 rounded border border-rule bg-ground px-1.5 py-0.5 font-sans text-micro uppercase tracking-wide text-muted">
                           {t.shortest}
                         </span>
                       ) : null}
@@ -201,7 +201,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
                     <td className="px-4 py-3 text-right">
                       <span
                         className={`font-mono tabular-nums ${
-                          shortest ? 'font-medium text-deepIndigo' : 'text-muted'
+                          shortest ? 'font-medium text-ink' : 'text-muted'
                         }`}
                       >
                         {result.error === null ? result.d : '—'}
@@ -241,7 +241,7 @@ export function CompareView({ locale, dict }: { locale: Locale; dict: Dict }) {
             { label: t.minimal, hint: t.minimalHint },
           ].map((entry) => (
             <div key={entry.label}>
-              <dt className="font-medium text-deepIndigo">{entry.label}</dt>
+              <dt className="font-medium text-ink">{entry.label}</dt>
               <dd className="text-muted">{entry.hint}</dd>
             </div>
           ))}
@@ -306,7 +306,7 @@ function Bar({ pct }: { pct: number }) {
   return (
     <span
       aria-hidden
-      className="ml-auto mt-1 block h-1 w-16 overflow-hidden rounded-full bg-cotton"
+      className="ml-auto mt-1 block h-1 w-16 overflow-hidden rounded-full bg-ground"
     >
       <span className="block h-full rounded-full bg-indigo/40" style={{ width: `${pct}%` }} />
     </span>

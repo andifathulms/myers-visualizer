@@ -422,7 +422,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
             {tooLarge ? (
               // An unreadable graph is not a visualisation. Say so, and show the
               // result instead. §6.1
-              <p className="rounded-xl border border-dashed border-indigo/40 bg-paper p-5 font-sans text-sm text-indigo">
+              <p className="rounded-xl border border-dashed border-indigo/40 bg-surface p-5 font-sans text-sm text-indigo">
                 {format(dict.input.tooLarge, { n, m, cap: VIEWABLE_CAP })}
               </p>
             ) : (
@@ -466,7 +466,7 @@ export function GraphView({ locale, dict }: { locale: Locale; dict: Dict }) {
                         {t.axisB}
                       </p>
                     </div>
-                    <div className="aspect-square w-full rounded-lg border border-rule bg-cotton/40">
+                    <div className="aspect-square w-full rounded-lg border border-rule bg-ground/40">
                       <LatticeCanvas
                         n={n}
                         m={m}

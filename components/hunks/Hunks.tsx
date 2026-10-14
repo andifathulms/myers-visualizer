@@ -100,10 +100,10 @@ export function Hunks({
       tabIndex={0}
       role={scrollLabel === undefined ? undefined : 'region'}
       aria-label={scrollLabel}
-      className="overflow-x-auto rounded-xl border border-rule bg-paper">
+      className="overflow-x-auto rounded-xl border border-rule bg-surface">
       {hunks.map((hunk, index) => (
         <div key={index} className="border-b border-rule last:border-0">
-          <div className="border-b border-rule bg-cotton/50 px-3 py-1.5 font-mono text-micro text-muted">
+          <div className="border-b border-rule bg-ground/50 px-3 py-1.5 font-mono text-micro text-muted">
             {formatHunkHeader(hunk)}
           </div>
           <ol className="py-1">
@@ -182,7 +182,7 @@ function Line({
         onBlur={() => onHover?.(null)}
         className={[
           'flex w-full gap-2 whitespace-pre px-3 text-left font-mono text-fine leading-6',
-          selected ? 'bg-turmeric/30 text-deepIndigo' : `${tone} hover:brightness-[0.97]`,
+          selected ? 'bg-turmeric/30 text-ink' : `${tone} hover:brightness-[0.97]`,
           // The lattice-linking counterpart to the badge: a ring, not a fill,
           // so it never competes with `selected`'s turmeric wash. §4.2
           !selected && hovered ? 'ring-1 ring-inset ring-indigo/50' : '',

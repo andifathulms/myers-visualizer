@@ -9,25 +9,28 @@ import { BrandMark } from '@/components/chrome/BrandMark'
 /**
  * Sticky, because the tool pages are long and the way back to the
  * explanation should never be a scroll away. The current section is marked:
- * three unstyled links gave no sense of where you were.
+ * unstyled links gave no sense of where you were.
  *
  * Two rows on a phone, one from `sm`. The links used to sit in a horizontal
  * scroller so the header could never wrap — but at 390px that rendered
  * "Compare" as "Cc", and a word cut in half in the first thing a visitor
  * sees reads as broken rather than as scrollable. A deliberate second row
- * costs about 36px and shows all three destinations.
+ * costs about 36px and shows all four destinations.
  */
 export function SiteNav({ locale, dict }: { locale: Locale; dict: Dict }) {
   const pathname = usePathname() ?? ''
 
+  // Learn is the home page, named: it is the explainer, and it had no menu
+  // entry at all — the brand mark was the only way back to it.
   const links = [
+    { href: `/${locale}`, label: dict.nav.learn },
     { href: `/${locale}/graf`, label: dict.nav.graph },
     { href: `/${locale}/banding`, label: dict.nav.compare },
     { href: `/${locale}/contoh`, label: dict.nav.presets },
   ]
 
   return (
-    <header className="sticky top-0 z-40 border-b border-rule bg-cotton/85 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-rule bg-surface/90 backdrop-blur-md">
       <nav
         aria-label={dict.nav.brand}
         className="mx-auto max-w-7xl px-4 py-2 font-sans text-sm sm:flex sm:items-center sm:gap-4 sm:px-gutter sm:py-2.5"
@@ -53,12 +56,12 @@ export function SiteNav({ locale, dict }: { locale: Locale; dict: Dict }) {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? 'page' : undefined}
-                className={`shrink-0 whitespace-nowrap rounded-lg px-2.5 py-1.5 transition-colors sm:px-3 ${
+                className={`relative shrink-0 whitespace-nowrap rounded-ctl px-2.5 py-1.5 transition-colors sm:px-3 ${
                   active
-                    ? 'bg-indigo/10 font-medium text-deepIndigo'
-                    : // Not muted: these are the three places you can go, and
-                      // secondary-text weight made them read as fine print.
-                      'text-deepIndigo hover:bg-indigo/5'
+                    ? // A tab underline in ink, not a tint and never madder:
+                      // madder means "the answer", and a current page is not.
+                      'font-medium text-ink after:absolute after:inset-x-2.5 after:-bottom-[9px] after:h-0.5 after:rounded-full after:bg-ink sm:after:-bottom-[11px]'
+                    : 'text-muted hover:bg-sunken hover:text-ink'
                 }`}
               >
                 {link.label}
@@ -90,7 +93,7 @@ function LocaleToggle({
 }) {
   return (
     <div
-      className={`shrink-0 items-center gap-0.5 rounded-lg border border-rule bg-paper p-0.5 ${className}`}
+      className={`shrink-0 items-center gap-0.5 rounded-ctl border border-rule bg-surface p-0.5 ${className}`}
     >
       {LOCALES.map((code) =>
         code === locale ? (
@@ -104,7 +107,7 @@ function LocaleToggle({
           */
           <span
             key={code}
-            className="rounded-md bg-indigo/10 px-2 py-1 text-micro font-semibold text-deepIndigo"
+            className="rounded-[4px] bg-ink px-2 py-1 text-micro font-semibold text-surface"
           >
             {/* `uppercase` sits on the visual half only: applied to the
                 wrapper it also uppercased the sentence below, and some
@@ -122,7 +125,7 @@ function LocaleToggle({
             href={`/${code}`}
             title={dict.a11y.switchLocale}
             aria-label={`${dict.a11y.switchLocale}: ${LOCALE_NAMES[code]}`}
-            className="rounded-md px-2 py-1 text-micro font-semibold uppercase tracking-wider text-muted transition-colors hover:text-deepIndigo"
+            className="rounded-md px-2 py-1 text-micro font-semibold uppercase tracking-wider text-muted transition-colors hover:text-ink"
           >
             {code}
           </Link>
