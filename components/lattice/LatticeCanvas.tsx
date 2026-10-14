@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { computeGeometry, pointAt, type Geometry, type Point } from '@/layout/lattice'
 import { LatticeRenderer } from './render'
+import { paletteFor } from '@/lib/palette'
+import { useTheme } from '@/lib/client/useTheme'
 import { EMPTY_FRAME, type FrontierPoint, type LatticeFrame, type MatchGrid, type Snake } from './frame'
 
 /** One d's worth of search, stamped onto the explored wash as the step passes. */
@@ -59,6 +61,8 @@ export function LatticeCanvas({
    * which on a static lattice (the comparison page) or a paused one is never.
    */
   const [scene, setScene] = useState(0)
+  // Canvas is handed its colours; a theme change rebuilds the renderer.
+  const { theme } = useTheme()
 
   useLayoutEffect(() => {
     const host = hostRef.current
@@ -78,13 +82,15 @@ export function LatticeCanvas({
     const canvas = canvasRef.current
     if (canvas === null || size === null) return
     const geometry = computeGeometry(n, m, size.w, size.h, padding)
-    const renderer = new LatticeRenderer(canvas, geometry, size.w, size.h)
+    const renderer = new LatticeRenderer(canvas, geometry, size.w, size.h, {
+      palette: paletteFor(theme),
+    })
     renderer.setScene(geometry, matches)
     rendererRef.current = renderer
     geometryRef.current = geometry
     stampedRef.current = 0
     setScene((version) => version + 1)
-  }, [n, m, matches, size, padding])
+  }, [n, m, matches, size, padding, theme])
 
   // Explored wash: stamp forward, rebuild only on a backward seek.
   useEffect(() => {

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { LOCALES, LOCALE_NAMES, type Locale } from '@/lib/i18n/locales'
 import { format, type Dict } from '@/lib/i18n/dictionary'
 import { BrandMark } from '@/components/chrome/BrandMark'
+import { ThemeToggle } from '@/components/chrome/ThemeToggle'
 
 /**
  * Sticky, because the tool pages are long and the way back to the
@@ -44,7 +45,10 @@ export function SiteNav({ locale, dict }: { locale: Locale; dict: Dict }) {
             {dict.nav.brand}
           </Link>
 
-          <LocaleToggle locale={locale} dict={dict} className="flex sm:hidden" />
+          <div className="flex items-center gap-2 sm:hidden">
+            <ThemeToggle dict={dict} />
+            <LocaleToggle locale={locale} dict={dict} className="flex" />
+          </div>
         </div>
 
         <div className="mt-1 flex min-w-0 flex-1 items-center gap-1 sm:mt-0">
@@ -70,7 +74,10 @@ export function SiteNav({ locale, dict }: { locale: Locale; dict: Dict }) {
           })}
         </div>
 
-        <LocaleToggle locale={locale} dict={dict} className="hidden sm:flex" />
+        <div className="hidden items-center gap-2 sm:flex">
+          <ThemeToggle dict={dict} />
+          <LocaleToggle locale={locale} dict={dict} className="flex" />
+        </div>
       </nav>
     </header>
   )

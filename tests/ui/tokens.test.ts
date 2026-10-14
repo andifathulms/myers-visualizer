@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { PALETTE } from '@/lib/palette'
+import { NIGHT, PALETTE } from '@/lib/palette'
 
 /**
  * The palette is authored once, in lib/palette.ts, because canvas reads it as
@@ -101,6 +101,43 @@ describe('design tokens', () => {
   it('keeps the inverted band legible', () => {
     for (const tone of ['surface', 'explored'] as const) {
       expect(contrast(PALETTE[tone], PALETTE.ink), `${tone} on ink`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  /*
+   * The night theme restates NIGHT twice in the CSS — once for the system
+   * preference, once for an explicit choice — because a colour defined only
+   * under one of them is the classic unreadable-dark-mode bug. Both blocks
+   * must carry every token, with NIGHT's values.
+   */
+  it('declares the night palette in both dark blocks', () => {
+    const blocks = [
+      /prefers-color-scheme:\s*dark\)\s*\{\s*:root:not\(\[data-theme='light'\]\)\s*\{([^}]*)\}/.exec(CSS),
+      /:root\[data-theme='dark'\]\s*\{([^}]*)\}/.exec(CSS),
+    ]
+    for (const block of blocks) {
+      expect(block, 'a dark block is missing').not.toBeNull()
+      for (const [token, hex] of Object.entries(NIGHT)) {
+        const declared = new RegExp(`--color-${kebab(token)}:\\s*([0-9]+ [0-9]+ [0-9]+);`).exec(block?.[1] ?? '')
+        expect(declared, `--color-${kebab(token)} missing from a dark block`).not.toBeNull()
+        expect(declared?.[1]).toBe(channelsOf(hex).join(' '))
+      }
+    }
+  })
+
+  /* Every floor above, held again on the night surfaces. */
+  it.each(SURFACES)('holds every contrast floor at night on %s', (surface) => {
+    for (const tone of ['ink', 'indigo', 'muted', 'added', 'removed', 'madder'] as const) {
+      expect(contrast(NIGHT[tone], NIGHT[surface]), `night ${tone} on ${surface}`).toBeGreaterThanOrEqual(4.5)
+    }
+    for (const mark of ['indigo', 'turmeric', 'madder'] as const) {
+      expect(contrast(NIGHT[mark], NIGHT[surface]), `night ${mark} on ${surface}`).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it('keeps the inverted band legible at night', () => {
+    for (const tone of ['surface', 'explored'] as const) {
+      expect(contrast(NIGHT[tone], NIGHT.ink), `night ${tone} on ink`).toBeGreaterThanOrEqual(4.5)
     }
   })
 

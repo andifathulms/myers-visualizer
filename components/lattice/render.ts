@@ -11,7 +11,7 @@
  *              backward seek forces a rebuild.
  *   dynamic  — frontier, current snakes, path. Cleared and drawn every frame.
  */
-import { PALETTE } from '@/lib/palette'
+import { PALETTE, type Palette } from '@/lib/palette'
 import {
   DETAIL_THRESHOLD,
   px,
@@ -28,7 +28,13 @@ export type Layer = { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }
 /** Injectable so the frame-cost test can drive the renderer without a DOM. */
 export type LayerFactory = (width: number, height: number, dpr: number) => Layer
 
-export type RendererDeps = { createLayer?: LayerFactory; dpr?: number }
+/**
+ * `palette` is the theme's colour set — `PALETTE` by day, `NIGHT` by night.
+ * Canvas cannot read CSS custom properties per stroke cheaply, so the
+ * renderer is handed the right palette and the canvas is rebuilt when the
+ * theme changes. Same roles in both: madder is still only the answer.
+ */
+export type RendererDeps = { createLayer?: LayerFactory; dpr?: number; palette?: Palette }
 
 function makeLayer(width: number, height: number, dpr: number): Layer {
   const canvas = document.createElement('canvas')
@@ -48,6 +54,7 @@ export class LatticeRenderer {
   private dpr: number
   private staticLayer: Layer
   private exploredLayer: Layer
+  private readonly palette: Palette
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -59,6 +66,7 @@ export class LatticeRenderer {
     const ctx = canvas.getContext('2d')
     if (ctx === null) throw new Error('2d context unavailable')
     const create = deps.createLayer ?? makeLayer
+    this.palette = deps.palette ?? PALETTE
     this.dpr =
       deps.dpr ?? (typeof window === 'undefined' ? 1 : Math.min(window.devicePixelRatio || 1, 2))
     canvas.width = Math.ceil(cssWidth * this.dpr)
@@ -78,8 +86,8 @@ export class LatticeRenderer {
   setScene(geometry: Geometry, matches: MatchGrid | null): void {
     this.geometry = geometry
     this.staticLayer.ctx.clearRect(0, 0, this.cssWidth, this.cssHeight)
-    drawGrid(this.staticLayer.ctx, geometry)
-    if (matches !== null) drawKnots(this.staticLayer.ctx, geometry, matches)
+    drawGrid(this.staticLayer.ctx, geometry, this.palette)
+    if (matches !== null) drawKnots(this.staticLayer.ctx, geometry, matches, this.palette)
     this.clearExplored()
   }
 
@@ -91,7 +99,7 @@ export class LatticeRenderer {
   stampExplored(snakes: readonly Snake[], frontier: readonly FrontierPoint[]): void {
     const ctx = this.exploredLayer.ctx
     const g = this.geometry
-    ctx.strokeStyle = PALETTE.explored
+    ctx.strokeStyle = this.palette.explored
     ctx.lineWidth = Math.max(1, Math.min(3, g.cell * 0.35))
     ctx.lineCap = 'round'
     ctx.beginPath()
@@ -102,7 +110,7 @@ export class LatticeRenderer {
     ctx.stroke()
 
     const r = Math.max(0.6, Math.min(2.5, g.cell * 0.16))
-    ctx.fillStyle = PALETTE.explored
+    ctx.fillStyle = this.palette.explored
     ctx.beginPath()
     for (const p of frontier) {
       ctx.moveTo(px(g, p.x) + r, py(g, p.y))
@@ -119,30 +127,30 @@ export class LatticeRenderer {
     ctx.drawImage(this.staticLayer.canvas, 0, 0, this.cssWidth, this.cssHeight)
     ctx.drawImage(this.exploredLayer.canvas, 0, 0, this.cssWidth, this.cssHeight)
 
-    if (frame.region !== null) drawRegion(ctx, g, frame.region)
+    if (frame.region !== null) drawRegion(ctx, g, frame.region, this.palette)
     // Beneath both path layers, per DESIGN.md §4.1: it is structure the
     // answer sits inside, not the answer itself.
-    if (frame.contestedEdges !== null) drawContestedRegion(ctx, g, frame.contestedEdges)
-    if (frame.highlightK !== null) drawDiagonalHighlight(ctx, g, frame.highlightK)
-    drawFrontier(ctx, g, frame.frontier, frame.snakes, PALETTE.turmeric)
+    if (frame.contestedEdges !== null) drawContestedRegion(ctx, g, frame.contestedEdges, this.palette)
+    if (frame.highlightK !== null) drawDiagonalHighlight(ctx, g, frame.highlightK, this.palette)
+    drawFrontier(ctx, g, frame.frontier, frame.snakes, this.palette.turmeric)
     if (frame.backwardFrontier !== null) {
-      drawFrontier(ctx, g, frame.backwardFrontier, [], PALETTE.turmeric, true)
+      drawFrontier(ctx, g, frame.backwardFrontier, [], this.palette.turmeric, true)
     }
-    drawGhostPaths(ctx, g, frame.ghostPaths)
+    drawGhostPaths(ctx, g, frame.ghostPaths, this.palette)
     // madder last: it must sit above everything, because it is the answer.
     for (const settled of frame.settledSnakes) {
-      drawSnakeThread(ctx, g, settled, PALETTE.madder, 1.6)
+      drawSnakeThread(ctx, g, settled, this.palette.madder, 1.6)
     }
-    if (frame.middleSnake !== null) drawSnakeThread(ctx, g, frame.middleSnake, PALETTE.madder, 3.2)
-    if (frame.path !== null) drawPath(ctx, g, frame.path)
+    if (frame.middleSnake !== null) drawSnakeThread(ctx, g, frame.middleSnake, this.palette.madder, 3.2)
+    if (frame.path !== null) drawPath(ctx, g, frame.path, this.palette)
     // Topmost: a hover highlight has to read over the answer it may sit on
     // top of, since a contested line's own edge is often part of it.
-    if (frame.hoverEdge !== null) drawHoverEdge(ctx, g, frame.hoverEdge)
+    if (frame.hoverEdge !== null) drawHoverEdge(ctx, g, frame.hoverEdge, this.palette)
   }
 }
 
-function drawGrid(ctx: CanvasRenderingContext2D, g: Geometry): void {
-  ctx.strokeStyle = PALETTE.indigo
+function drawGrid(ctx: CanvasRenderingContext2D, g: Geometry, pal: Palette): void {
+  ctx.strokeStyle = pal.indigo
   ctx.globalAlpha = g.cell < 6 ? 0.14 : 0.24
   ctx.lineWidth = 1
   ctx.beginPath()
@@ -164,10 +172,10 @@ function drawGrid(ctx: CanvasRenderingContext2D, g: Geometry): void {
  * Match positions as knots. A match at (x, y) makes the diagonal from (x, y)
  * to (x+1, y+1) free, so the knot is drawn on that segment's midpoint.
  */
-function drawKnots(ctx: CanvasRenderingContext2D, g: Geometry, matches: MatchGrid): void {
+function drawKnots(ctx: CanvasRenderingContext2D, g: Geometry, matches: MatchGrid, pal: Palette): void {
   const detailed = g.n <= DETAIL_THRESHOLD && g.m <= DETAIL_THRESHOLD
-  ctx.strokeStyle = PALETTE.indigo
-  ctx.fillStyle = PALETTE.indigo
+  ctx.strokeStyle = pal.indigo
+  ctx.fillStyle = pal.indigo
   ctx.globalAlpha = 0.5
   ctx.lineWidth = Math.max(1, Math.min(2.5, g.cell * 0.2))
   ctx.lineCap = 'round'
@@ -197,9 +205,9 @@ function drawKnots(ctx: CanvasRenderingContext2D, g: Geometry, matches: MatchGri
  * The sub-rectangle the search has recursed into. Indigo, not madder — it is
  * structure, not the answer.
  */
-function drawRegion(ctx: CanvasRenderingContext2D, g: Geometry, region: Region): void {
+function drawRegion(ctx: CanvasRenderingContext2D, g: Geometry, region: Region, pal: Palette): void {
   ctx.save()
-  ctx.strokeStyle = PALETTE.indigo
+  ctx.strokeStyle = pal.indigo
   ctx.globalAlpha = 0.55
   ctx.lineWidth = 1
   ctx.setLineDash([4, 3])
@@ -218,10 +226,10 @@ function drawRegion(ctx: CanvasRenderingContext2D, g: Geometry, region: Region):
  * same batching `drawGrid` uses for the same reason: this can be a few
  * thousand edges on a large ambiguous input.
  */
-function drawContestedRegion(ctx: CanvasRenderingContext2D, g: Geometry, edges: readonly Edge[]): void {
+function drawContestedRegion(ctx: CanvasRenderingContext2D, g: Geometry, edges: readonly Edge[], pal: Palette): void {
   if (edges.length === 0) return
   ctx.save()
-  ctx.strokeStyle = PALETTE.madder
+  ctx.strokeStyle = pal.madder
   ctx.globalAlpha = 0.14
   ctx.lineWidth = Math.max(3, g.cell * 0.8)
   ctx.lineCap = 'round'
@@ -245,10 +253,11 @@ function drawGhostPaths(
   ctx: CanvasRenderingContext2D,
   g: Geometry,
   paths: readonly (readonly Point[])[],
+  pal: Palette,
 ): void {
   if (paths.length === 0) return
   ctx.save()
-  ctx.strokeStyle = PALETTE.indigo
+  ctx.strokeStyle = pal.indigo
   ctx.globalAlpha = 0.3
   ctx.lineWidth = Math.max(1, Math.min(2.5, g.cell * 0.22))
   ctx.lineCap = 'round'
@@ -273,9 +282,9 @@ function drawGhostPaths(
  * it borrows its weight from — a spotlight on structure, not a second
  * answer. DESIGN.md §4.2.
  */
-function drawHoverEdge(ctx: CanvasRenderingContext2D, g: Geometry, edge: Edge): void {
+function drawHoverEdge(ctx: CanvasRenderingContext2D, g: Geometry, edge: Edge, pal: Palette): void {
   ctx.save()
-  ctx.strokeStyle = PALETTE.indigo
+  ctx.strokeStyle = pal.indigo
   ctx.globalAlpha = 0.55
   ctx.lineWidth = Math.max(3, g.cell * 0.55)
   ctx.lineCap = 'round'
@@ -286,11 +295,11 @@ function drawHoverEdge(ctx: CanvasRenderingContext2D, g: Geometry, edge: Edge): 
   ctx.restore()
 }
 
-function drawDiagonalHighlight(ctx: CanvasRenderingContext2D, g: Geometry, k: number): void {
+function drawDiagonalHighlight(ctx: CanvasRenderingContext2D, g: Geometry, k: number, pal: Palette): void {
   const ends = diagonalEndpoints(g, k)
   if (ends === null) return
   ctx.save()
-  ctx.strokeStyle = PALETTE.indigo
+  ctx.strokeStyle = pal.indigo
   ctx.globalAlpha = 0.35
   ctx.lineWidth = Math.max(2, g.cell * 0.5)
   ctx.lineCap = 'round'
@@ -370,10 +379,10 @@ function drawSnakeThread(
   ctx.restore()
 }
 
-function drawPath(ctx: CanvasRenderingContext2D, g: Geometry, path: readonly Point[]): void {
+function drawPath(ctx: CanvasRenderingContext2D, g: Geometry, path: readonly Point[], pal: Palette): void {
   if (path.length === 0) return
   ctx.save()
-  ctx.strokeStyle = PALETTE.madder
+  ctx.strokeStyle = pal.madder
   ctx.lineWidth = Math.max(1.6, Math.min(4, g.cell * 0.34))
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'

@@ -135,6 +135,7 @@ Colour is authored in `lib/palette.ts` and restated as RGB channels in `app/glob
 
 `tests/ui/tokens.test.ts` holds all of it: the CSS matches the palette, no stray hex, every text tone clears 4.5:1 on **both** surfaces, and nothing uses a font size off the scale.
 
+- **Two themes, same roles.** Day (`PALETTE`) is the default; Night (`NIGHT`) applies under `prefers-color-scheme: dark` unless the reader chose Day, or when they chose Night (`data-theme` on `<html>`, set by `ThemeToggle`, restored before first paint by `THEME_BOOT_SCRIPT`). CSS restates `NIGHT` in two identical blocks; the token test checks both, and holds every contrast floor on every surface in both themes. Canvas cannot read CSS, so `LatticeCanvas` hands the renderer `paletteFor(theme)` and rebuilds it when the theme changes — `render.ts` never imports a palette value directly.
 - **Lattice tokens are normative and fixed** — `indigo`, `explored`, `turmeric`, `madder`. `madder` still means *this is the answer*: the chosen path and the middle snake, plus focus rings, and nothing else. A pressed button, a selected tab or a deleted line must not use it.
 - **Surface tokens** — `ground` is the page, `surface` is a raised instrument or card, `sunken` is recessed (inputs, code, table heads, empty tracks), `rule` is the hairline between them. Cards are `.card` (globals.css): surface plus one hairline, no shadow. Shadow (`.lift` / `shadow-lift`) is only for what floats or frames the core object. `.graph-paper` is a faint 24px grid used only behind drawn figures. Radii by role: `rounded-ctl` (6px), `rounded-card` (10px), `rounded-frame` (14px). The old warm `cotton`/`paper` names are gone (2026 redesign, DESIGN.md §3).
 - **Text tones** — `ink` primary, `muted` secondary, `indigo` for lede paragraphs — all held to 4.5:1 on ground, surface and sunken, and lattice marks (`indigo`, `turmeric`, `madder`) to 3:1, by the token test. Do not use opacity to fake a text tone: `muted/60` was 2.7:1. Contrast claims here are measured by the test, not estimated — the previous `muted` advertised 5.5:1 and was 4.34:1 on the ground.
@@ -168,18 +169,20 @@ The site links the Myers paper and James Coglan's explainer series prominently �
 
 ## Current state
 
+**2026 redesign (DESIGN.md §3, recorded there).** Cool drafting-sheet palette with role-named tokens, IBM Plex Sans/Mono with Newsreader headings, a four-tab nav (Learn · Playground · Compare · Examples — slugs unchanged), the Playground as one workbench screen, a chapter rail and illustrated steps on Learn, every algorithm's route on one lattice on Compare, build-time route thumbnails on Examples, and the Night theme. Not done from the proposal: the phone Playground has a docked transport but not the tabbed result/V/numbers dock, and the toolbar's example picker has no thumbnail yet.
+
 M0–M7 built — every milestone in PRD §10. Static export, canvas lattice, greedy Myers with `V` recording and backtrack, edit graph + `V` strip + stepping, unified diff output, presets, ambiguity enumeration, patience, histogram, linear-space Myers with the middle snake and recursion view, sharing, granularity and whitespace options, and the a11y pass.
 
-Green: apply property and oracle agreement across the corpus for every algorithm, minimality ordering, cross-variant `D` equality, trace well-formedness, determinism, step budget at the input cap. First-load JS is 87.4 KB gzipped shared, 107 KB on the graph page, against the 250 KB budget.
+Green: apply property and oracle agreement across the corpus for every algorithm, minimality ordering, cross-variant `D` equality, trace well-formedness, determinism, step budget at the input cap. First-load JS is 87.4 KB gzipped shared, 133 KB on the graph page, against the 250 KB budget.
 
-**The M0 gate is measured.** `pnpm bench:render` builds, serves under the production basePath, drives the spike in headless Chrome and reads the numbers back, exiting non-zero if the budget is blown. On a 300×300 lattice over 220 measured frames (20 discarded as warm-up):
+**The M0 gate is measured.** `pnpm bench:render` builds, serves under the production basePath, drives the spike in headless Chrome and reads the numbers back, exiting non-zero if the budget is blown. On a 300×300 lattice over 220 measured frames (20 discarded as warm-up), re-measured after the 2026 redesign threaded the palette through the renderer:
 
 | | |
 |---|---|
-| draw mean | 0.13 ms |
-| draw p95 | 0.30 ms |
+| draw mean | 0.32 ms |
+| draw p95 | 0.60 ms |
 | frame median | 16.70 ms — **59.9 fps** |
-| frame p95 | 17.20 ms |
+| frame p95 | 18.40 ms |
 | budget | 16.7 ms |
 
 Read it correctly. `draw` is CPU time submitting canvas commands, so on its own it would not prove rasterisation keeps up — the frame interval is what does: rAF held 60fps for 220 consecutive frames *while* doing this work every frame. Headless Chrome rasterises in software, so this is a conservative floor rather than a best case.

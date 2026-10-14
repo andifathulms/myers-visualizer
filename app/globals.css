@@ -40,10 +40,12 @@
 
   /*
    * Elevation, as one value: a hairline plus a soft drop, only for things that
-   * float or frame the core object. Channels come from --color-ink so the
-   * shadow follows the theme.
+   * float or frame the core object. Its tone is its own channel triple rather
+   * than --color-ink, because ink turns light at night and a light shadow is
+   * a glow.
    */
-  --shadow-lift: 0 1px 2px rgb(var(--color-ink) / 0.06), 0 12px 32px -16px rgb(var(--color-ink) / 0.22);
+  --shadow-tone: 17 26 46;
+  --shadow-lift: 0 1px 2px rgb(var(--shadow-tone) / 0.06), 0 12px 32px -16px rgb(var(--shadow-tone) / 0.22);
   --paper-grid: rgb(var(--color-indigo) / 0.07);
 
   /*
@@ -73,6 +75,51 @@
   --space-stack: 1.5rem; /* between blocks inside a section */
   --space-section: 3rem; /* between sections */
   --space-hero: 3.5rem; /* above the fold, top of page */
+}
+
+/*
+ * The night sheet — `NIGHT` in lib/palette.ts, as channels. Applied when the
+ * system asks for dark and the reader has not chosen light, or when the
+ * reader has chosen dark. The two blocks must stay identical; the token test
+ * checks both against the palette. Canvas does not read these: it is handed
+ * `paletteFor(theme)` and rebuilt when the theme changes.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-ground: 12 17 29;
+    --color-surface: 20 27 43;
+    --color-sunken: 15 21 36;
+    --color-rule: 37 48 73;
+    --color-indigo: 169 184 232;
+    --color-ink: 232 235 244;
+    --color-muted: 154 164 190;
+    --color-turmeric: 242 181 65;
+    --color-madder: 255 107 77;
+    --color-explored: 36 50 90;
+    --color-added: 92 203 148;
+    --color-removed: 242 141 166;
+    --shadow-tone: 0 0 0;
+    --paper-grid: rgb(var(--color-indigo) / 0.05);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-ground: 12 17 29;
+  --color-surface: 20 27 43;
+  --color-sunken: 15 21 36;
+  --color-rule: 37 48 73;
+  --color-indigo: 169 184 232;
+  --color-ink: 232 235 244;
+  --color-muted: 154 164 190;
+  --color-turmeric: 242 181 65;
+  --color-madder: 255 107 77;
+  --color-explored: 36 50 90;
+  --color-added: 92 203 148;
+  --color-removed: 242 141 166;
+  --shadow-tone: 0 0 0;
+  --paper-grid: rgb(var(--color-indigo) / 0.05);
+  color-scheme: dark;
 }
 
 html,

@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from 'next/font/google'
 import './globals.css'
 import { APP_DESCRIPTION, APP_NAME, APP_TITLE } from '@/lib/brand'
-import { PALETTE } from '@/lib/palette'
+import { NIGHT, PALETTE } from '@/lib/palette'
+import { THEME_BOOT_SCRIPT } from '@/lib/theme'
 
 // Self-hosted at build time: no runtime font fetch, so the site is fully
 // offline after first load. PRD §11.
@@ -62,11 +63,15 @@ export const metadata: Metadata = {
 
 /**
  * The browser chrome takes the ground colour, not the mark's ink: on a phone
- * the address bar sits directly above the page, and matching it to the paper
- * is what makes the site look like one surface rather than two.
+ * the address bar sits directly above the page, and matching it to the sheet
+ * is what makes the site look like one surface rather than two — in either
+ * theme, so there is one entry per scheme.
  */
 export const viewport: Viewport = {
-  themeColor: PALETTE.ground,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: PALETTE.ground },
+    { media: '(prefers-color-scheme: dark)', color: NIGHT.ground },
+  ],
 }
 
 /**
@@ -78,7 +83,13 @@ export const viewport: Viewport = {
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${mono.variable} ${serif.variable} ${sans.variable}`}>
+    // suppressHydrationWarning: the boot script may set data-theme on <html>
+    // before React hydrates, and that difference is intended.
+    <html lang="en" className={`${mono.variable} ${serif.variable} ${sans.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Our own constant, never user input. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body className="bg-ground text-ink antialiased">{children}</body>
     </html>
   )

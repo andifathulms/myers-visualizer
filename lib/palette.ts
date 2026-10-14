@@ -8,11 +8,17 @@
  *   madder is reserved for the chosen path and the middle snake: the two
  *   things that are *the answer*. Never use it for anything else.
  *
+ * Two palettes with the same keys: `PALETTE` is the day sheet and the
+ * default; `NIGHT` is the dark theme. The roles are identical — every token
+ * means the same thing in both — only the values move. A component never
+ * picks one: CSS switches the custom properties, and canvas asks
+ * `paletteFor(theme)`.
+ *
  * The values were re-tuned in the 2026 redesign (DESIGN.md §3, recorded
  * there). The old warm cotton/paper ground sat 1.1:1 from its own cards and
  * put the frontier at 2.03:1 on the ground, under the 3:1 WCAG asks of a
  * graphic. `tests/ui/tokens.test.ts` now holds lattice marks to 3:1 as well
- * as text to 4.5:1, on every surface.
+ * as text to 4.5:1, on every surface, in both themes.
  */
 export const PALETTE = {
   /** The sheet — the page ground. Cool, so the lattice colours carry. */
@@ -46,6 +52,32 @@ export const PALETTE = {
 
 export type PaletteToken = keyof typeof PALETTE
 export type Palette = { readonly [K in PaletteToken]: string }
+
+/**
+ * The night sheet. Same roles; the values were chosen so the lattice glows on
+ * the dark ground rather than inverting the day palette mechanically — the
+ * frontier and the path are brighter here, the wash darker.
+ */
+export const NIGHT: Palette = {
+  ground: '#0C111D',
+  surface: '#141B2B',
+  sunken: '#0F1524',
+  rule: '#253049',
+  indigo: '#A9B8E8',
+  ink: '#E8EBF4',
+  muted: '#9AA4BE',
+  turmeric: '#F2B541',
+  madder: '#FF6B4D',
+  explored: '#24325A',
+  added: '#5CCB94',
+  removed: '#F28DA6',
+}
+
+export type Theme = 'light' | 'dark'
+
+export function paletteFor(theme: Theme): Palette {
+  return theme === 'dark' ? NIGHT : PALETTE
+}
 
 /**
  * The brand mark's own colours — the "snake" staircase from the brand kit,

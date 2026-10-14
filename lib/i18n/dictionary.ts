@@ -275,6 +275,8 @@ export type Dict = {
     minimalAtLeast: string
   }
   a11y: {
+    /** The theme toggle: the three states, and the name for the control. */
+    theme: { label: string; system: string; light: string; dark: string }
     skipToContent: string
     graphLabel: string
     /** Appended to graphLabel when there is exactly one minimal path. */
@@ -589,6 +591,7 @@ const id: Dict = {
     stepAnnouncement: 'd = {d} dari {maxD}, diagonal k = {k}, titik ({x}, {y})',
     copyLink: 'Salin tautan',
     copied: 'Tersalin',
+    theme: { label: 'Tema', system: 'Ikuti sistem', light: 'Terang', dark: 'Gelap' },
     switchLocale: 'Ganti bahasa',
     currentLocale: 'Bahasa saat ini: {name}',
   },
@@ -882,6 +885,7 @@ const en: Dict = {
     stepAnnouncement: 'd = {d} of {maxD}, diagonal k = {k}, point ({x}, {y})',
     copyLink: 'Copy link',
     copied: 'Copied',
+    theme: { label: 'Theme', system: 'Match system', light: 'Day', dark: 'Night' },
     switchLocale: 'Switch language',
     currentLocale: 'Current language: {name}',
   },
